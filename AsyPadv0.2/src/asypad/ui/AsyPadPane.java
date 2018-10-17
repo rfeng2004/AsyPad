@@ -8,6 +8,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import asypad.shapes.*;
 import asypad.shapes.types.*;
+import asypad.ui.menus.*;
 
 /**
  * A special pane that interacts with the user and draws shapes.
@@ -26,7 +27,10 @@ public class AsyPadPane extends Pane
 	public AsyPadPane()
 	{
 		super();
-		getChildren().add(new AsyPadMenuBar());
+		AsyPadMenuBar menus = new AsyPadMenuBar();
+		AsyPadToolBar tools = new AsyPadToolBar();
+		tools.setLayoutY(menus.getPrefHeight());
+		getChildren().addAll(menus, tools);
 		shapes = new ArrayList<Shape>();
 		this.setOnMouseMoved(new EventHandler<MouseEvent>()
 		{
