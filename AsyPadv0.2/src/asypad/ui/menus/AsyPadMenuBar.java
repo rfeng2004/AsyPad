@@ -77,11 +77,12 @@ public class AsyPadMenuBar extends MenuBar
 			{
 				Stage a = new Stage();
 				FlowPane p = new FlowPane();
-				Scene scene = new Scene(p, 250, 50);
+				Scene scene = new Scene(p, 500, 100);
 				Label ab = new Label("AsyPad allows you to draw diagrams\n and save them into Asymptote Files.");
 				ab.setAlignment(Pos.CENTER);
 				ab.setTextAlignment(TextAlignment.CENTER);
-				ab.setPrefSize(250, 50);
+				ab.setStyle("-fx-font: 24 arial");
+				ab.setPrefSize(500, 100);
 				p.getChildren().add(ab);
 				a.setScene(scene);
 				a.show();
@@ -95,10 +96,11 @@ public class AsyPadMenuBar extends MenuBar
 			{
 				Stage cred = new Stage();
 				FlowPane p = new FlowPane();
-				Scene scene = new Scene(p, 250, 30);
+				Scene scene = new Scene(p, 500, 60);
 				Label creds = new Label("AsyPad v0.2, created by Raymond Feng");
 				creds.setAlignment(Pos.CENTER);
-				creds.setPrefSize(250, 30);
+				creds.setStyle("-fx-font: 24 arial");
+				creds.setPrefSize(500, 60);
 				p.getChildren().add(creds);
 				cred.setScene(scene);
 				cred.show();
