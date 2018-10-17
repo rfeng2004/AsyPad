@@ -26,6 +26,7 @@ public class AsyPadPane extends Pane
 	public AsyPadPane()
 	{
 		super();
+		getChildren().add(new AsyPadMenuBar());
 		shapes = new ArrayList<Shape>();
 		this.setOnMouseMoved(new EventHandler<MouseEvent>()
 		{
@@ -53,7 +54,7 @@ public class AsyPadPane extends Pane
 					{
 						//System.out.println(shapes.get(snappedIndex));
 						shapes.get(i).getObject().setStroke(Color.RED);
-						shapes.get(i).getObject().toFront();
+						//shapes.get(i).getObject().toFront();
 					}
 					else
 					{
@@ -110,6 +111,7 @@ public class AsyPadPane extends Pane
 	{
 		shapes.add(shape);
 		shape.draw(this);
+		shape.getObject().toBack();
 	}
 
 	/**
@@ -122,6 +124,7 @@ public class AsyPadPane extends Pane
 		{
 			this.shapes.add(s);
 			s.draw(this);
+			s.getObject().toBack();
 		}
 	}
 
