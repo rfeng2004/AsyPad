@@ -26,9 +26,10 @@ public class Point extends Shape
 		this.y = y;
 		type = POINT_TYPE.POINT;
 		dot = new javafx.scene.shape.Circle(x, y, 1.5*StrokeWidth);
+		dot.setStrokeWidth(StrokeWidth);
 		label = new Label("");
-		label.setLayoutX(x);
-		label.setLayoutY(y);
+		label.setLayoutX(x+StrokeWidth);
+		label.setLayoutY(y+StrokeWidth);
 	}
 
 	/**
@@ -45,9 +46,10 @@ public class Point extends Shape
 		type = POINT_TYPE.POINT;
 		relativeLocation = -1;
 		dot = new javafx.scene.shape.Circle(x, y, 1.5*StrokeWidth);
+		dot.setStrokeWidth(StrokeWidth);
 		label = new Label(name);
-		label.setLayoutX(x);
-		label.setLayoutY(y);
+		label.setLayoutX(x+StrokeWidth);
+		label.setLayoutY(y+StrokeWidth);
 	}
 	
 	/**
@@ -77,9 +79,10 @@ public class Point extends Shape
 			if(x < c.getCenterX()) relativeLocation += Math.PI;
 		}
 		dot = new javafx.scene.shape.Circle(x, y, 1.5*StrokeWidth);
+		dot.setStrokeWidth(StrokeWidth);
 		label = new Label(name);
-		label.setLayoutX(x);
-		label.setLayoutY(y);
+		label.setLayoutX(x+StrokeWidth);
+		label.setLayoutY(y+StrokeWidth);
 	}
 	
 	/**
@@ -96,9 +99,10 @@ public class Point extends Shape
 		type = POINT_TYPE.INTERSECTION_POINT;
 		relativeLocation = -1;
 		dot = new javafx.scene.shape.Circle(x, y, 1.5*StrokeWidth);
+		dot.setStrokeWidth(StrokeWidth);
 		label = new Label(name);
-		label.setLayoutX(x);
-		label.setLayoutY(y);
+		label.setLayoutX(x+StrokeWidth);
+		label.setLayoutY(y+StrokeWidth);
 	}
 
 	/**
@@ -202,8 +206,10 @@ public class Point extends Shape
 		}
 		dot.setCenterX(x);
 		dot.setCenterY(y);
-		label.setLayoutX(x);
-		label.setLayoutY(y);
+		dot.setRadius(1.5*StrokeWidth);
+		dot.setStrokeWidth(StrokeWidth);
+		label.setLayoutX(x+StrokeWidth);
+		label.setLayoutY(y+StrokeWidth);
 		for(Shape s : children)
 		{
 			s.refresh();

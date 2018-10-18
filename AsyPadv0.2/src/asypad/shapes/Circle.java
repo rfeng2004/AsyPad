@@ -100,6 +100,7 @@ public class Circle extends Shape
 		circle.setCenterX(x);
 		circle.setCenterY(y);
 		circle.setRadius(radius);
+		circle.setStrokeWidth(StrokeWidth);
 		for(Shape s : children)
 		{
 			s.refresh();

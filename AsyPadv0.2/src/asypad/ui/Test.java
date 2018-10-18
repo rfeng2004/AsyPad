@@ -2,6 +2,7 @@ package asypad.ui;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import asypad.shapes.*;
 
@@ -30,6 +31,7 @@ public class Test extends Application
 		Line pb = new Line(ip, p4);
 		rootNode.addShapes(p1, p2, p3, p4, l1, l2, l3, ip, c, cc, ab, pb);
 		rootNode.update();
+		primaryStage.getIcons().add(new Image("resources/point.png"));
 		primaryStage.setTitle("AsyPad");
 		primaryStage.setScene(scene);
 		primaryStage.show();

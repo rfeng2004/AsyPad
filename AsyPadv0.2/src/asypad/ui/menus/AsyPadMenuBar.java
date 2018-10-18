@@ -1,5 +1,7 @@
 package asypad.ui.menus;
 
+import asypad.shapes.Shape;
+import asypad.ui.AsyPadPane;
 import javafx.event.*;
 import javafx.geometry.*;
 import javafx.scene.Scene;
@@ -15,12 +17,12 @@ import javafx.stage.*;
 public class AsyPadMenuBar extends MenuBar
 {
 	/**
-	 * Creates a new AsyPad menu bar.
+	 * Creates a new AsyPad menu bar with specified parent.
 	 */
-	public AsyPadMenuBar()
+	public AsyPadMenuBar(AsyPadPane parent)
 	{
 		super();
-
+		
 		//uses system menu bar on mac
 		final String os = System.getProperty("os.name");
 		if (os != null && os.startsWith("Mac"))
@@ -60,7 +62,46 @@ public class AsyPadMenuBar extends MenuBar
 		{
 			public void handle(ActionEvent event)
 			{
-
+				Stage setSW = new Stage();
+				Pane p = new Pane();
+				Scene scene = new Scene(p, 250, 80);
+				Label label = new Label("Set the Stroke Width: " + Shape.StrokeWidth);
+				label.setPrefSize(200, 20);
+				label.setLayoutX(50);
+				label.setLayoutY(0);
+				label.setTextAlignment(TextAlignment.CENTER);
+				Slider sw = new Slider();
+				sw.setOrientation(Orientation.HORIZONTAL);
+				sw.setShowTickMarks(true);
+				sw.setMajorTickUnit(10);
+				sw.setMax(50);
+				sw.setMinorTickCount(0);
+				sw.setShowTickLabels(false);
+				sw.setPrefSize(250, 30);
+				sw.setLayoutX(0);
+				sw.setLayoutY(20);
+				sw.setValue(Shape.StrokeWidth*10);
+				sw.valueProperty().addListener((observable, oldValue, newValue)->
+				{
+					int j = newValue.intValue();
+					Shape.StrokeWidth = (double) (j)/10;
+					label.setText("Set the Stroke Width: " + Double.toString(Shape.StrokeWidth));
+				});
+				Button refresh = new Button("Refresh");
+				refresh.setPrefHeight(30);
+				refresh.setLayoutX(90);
+				refresh.setLayoutY(50);
+				refresh.setOnAction(new EventHandler<ActionEvent>()
+				{
+					public void handle(ActionEvent event)
+					{
+						setSW.close();
+						parent.update();
+					}
+				});
+				p.getChildren().addAll(label, sw, refresh);
+				setSW.setScene(scene);
+				setSW.show();
 			}
 		});
 

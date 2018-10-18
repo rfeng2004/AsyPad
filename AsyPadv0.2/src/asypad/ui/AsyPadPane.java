@@ -3,6 +3,7 @@ package asypad.ui;
 import java.util.ArrayList;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -20,6 +21,7 @@ public class AsyPadPane extends Pane
 	private ArrayList<Shape> shapes;
 	private int snappedIndex;
 	private static final int snapForce = 3;
+	private Label currentTool;
 
 	/**
 	 * Creates an AsyPadPane layout.
@@ -27,10 +29,13 @@ public class AsyPadPane extends Pane
 	public AsyPadPane()
 	{
 		super();
-		AsyPadMenuBar menus = new AsyPadMenuBar();
-		AsyPadToolBar tools = new AsyPadToolBar();
+		currentTool = new Label("Tool: Mouse");
+		currentTool.setLayoutX(220);
+		currentTool.setLayoutY(10);
+		AsyPadMenuBar menus = new AsyPadMenuBar(this);
+		AsyPadToolBar tools = new AsyPadToolBar(this);
 		tools.setLayoutY(menus.getPrefHeight());
-		getChildren().addAll(menus, tools);
+		getChildren().addAll(menus, tools, currentTool);
 		shapes = new ArrayList<Shape>();
 		this.setOnMouseMoved(new EventHandler<MouseEvent>()
 		{
@@ -133,7 +138,9 @@ public class AsyPadPane extends Pane
 	}
 
 	/**
-	 * Updates the AsyPadPane by deleting all shapes with remove = true, this should be called each time delete() is called on a shape.
+	 * Updates the AsyPadPane by 
+	 * deleting all shapes with remove = true (this should be called each time delete() is called on a shape)
+	 * and refreshing all shapes.
 	 */
 	public void update()
 	{
@@ -151,6 +158,15 @@ public class AsyPadPane extends Pane
 				}
 			}
 		}
+		for(Shape s : shapes)
+		{
+			s.refresh();
+		}
+	}
+	
+	public void updateTool(String tool)
+	{
+		currentTool.setText("Tool: " + tool);
 	}
 
 	/**
