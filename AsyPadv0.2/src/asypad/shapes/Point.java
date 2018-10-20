@@ -2,6 +2,7 @@ package asypad.shapes;
 
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import asypad.shapes.types.POINT_TYPE;
 
 /**
@@ -25,7 +26,8 @@ public class Point extends Shape
 		this.x = x;
 		this.y = y;
 		type = POINT_TYPE.POINT;
-		dot = new javafx.scene.shape.Circle(x, y, 1.5*StrokeWidth);
+		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
+		dot.setStroke(Color.BLACK);
 		dot.setStrokeWidth(StrokeWidth);
 		label = new Label("");
 		label.setLayoutX(x+StrokeWidth);
@@ -45,7 +47,8 @@ public class Point extends Shape
 		this.y = y;
 		type = POINT_TYPE.POINT;
 		relativeLocation = -1;
-		dot = new javafx.scene.shape.Circle(x, y, 1.5*StrokeWidth);
+		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
+		dot.setStroke(Color.BLACK);
 		dot.setStrokeWidth(StrokeWidth);
 		label = new Label(name);
 		label.setLayoutX(x+StrokeWidth);
@@ -62,7 +65,7 @@ public class Point extends Shape
 	public Point(double cx, double cy, Shape snap, String name)
 	{
 		super(snap);
-		type = POINT_TYPE.POINT_ON_OBJECT;
+		type = POINT_TYPE.POINT_ON_SHAPE;
 		if(snap instanceof Line)
 		{
 			Line l = (Line) snap;
@@ -78,7 +81,8 @@ public class Point extends Shape
 			relativeLocation = Math.atan((y-c.getCenterY())/(x-c.getCenterX()));
 			if(x < c.getCenterX()) relativeLocation += Math.PI;
 		}
-		dot = new javafx.scene.shape.Circle(x, y, 1.5*StrokeWidth);
+		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
+		dot.setStroke(Color.BLACK);
 		dot.setStrokeWidth(StrokeWidth);
 		label = new Label(name);
 		label.setLayoutX(x+StrokeWidth);
@@ -98,7 +102,8 @@ public class Point extends Shape
 		this.y = Utility.intersectY(l1, l2);
 		type = POINT_TYPE.INTERSECTION_POINT;
 		relativeLocation = -1;
-		dot = new javafx.scene.shape.Circle(x, y, 1.5*StrokeWidth);
+		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
+		dot.setStroke(Color.BLACK);
 		dot.setStrokeWidth(StrokeWidth);
 		label = new Label(name);
 		label.setLayoutX(x+StrokeWidth);
@@ -151,7 +156,7 @@ public class Point extends Shape
 	 */
 	public void setRelativeLocation(double cx, double cy)
 	{
-		if(type != POINT_TYPE.POINT_ON_OBJECT) return;
+		if(type != POINT_TYPE.POINT_ON_SHAPE) return;
 		if(dependencies.get(0) instanceof Line)
 		{
 			//set relative location
@@ -180,7 +185,7 @@ public class Point extends Shape
 
 	public void refresh()
 	{
-		if(type == POINT_TYPE.POINT_ON_OBJECT)
+		if(type == POINT_TYPE.POINT_ON_SHAPE)
 		{
 			Shape snap = dependencies.get(0);
 			if(snap instanceof Line)
@@ -206,7 +211,7 @@ public class Point extends Shape
 		}
 		dot.setCenterX(x);
 		dot.setCenterY(y);
-		dot.setRadius(1.5*StrokeWidth);
+		dot.setRadius(StrokeWidth);
 		dot.setStrokeWidth(StrokeWidth);
 		label.setLayoutX(x+StrokeWidth);
 		label.setLayoutY(y+StrokeWidth);

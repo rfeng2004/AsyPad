@@ -7,6 +7,6 @@ package asypad.shapes.types;
 public enum POINT_TYPE implements SHAPE_TYPE
 {
 	POINT,
-	POINT_ON_OBJECT,
+	POINT_ON_SHAPE,
 	INTERSECTION_POINT;
 }

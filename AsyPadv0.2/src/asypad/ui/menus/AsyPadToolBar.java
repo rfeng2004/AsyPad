@@ -29,10 +29,10 @@ public class AsyPadToolBar extends MenuBar
 		mouseGraphic.setFitWidth(30);
 		mouse.setGraphic(mouseGraphic);
 		
-		Tool defaultMouse = new Tool(cursor, "Mouse", MOUSE.MOUSE, mouse, this, parent);
+		Tool defaultMouse = new Tool(cursor, "Mouse", "Drag points or double click on point to configure.", MOUSE.MOUSE, mouse, this, parent);
 		
 		Image delete = new Image("resources/delete.png");
-		Tool trash = new Tool(delete, "Delete", MOUSE.DELETE, mouse, this, parent);
+		Tool trash = new Tool(delete, "Delete", "Click on shapes to delete.", MOUSE.DELETE, mouse, this, parent);
 		
 		mouse.getItems().addAll(defaultMouse, trash);
 		
@@ -44,9 +44,12 @@ public class AsyPadToolBar extends MenuBar
 		pointGraphic.setFitWidth(30);
 		point.setGraphic(pointGraphic);
 		
-		Tool defaultPoint = new Tool(p, "Point", POINT_TYPE.POINT, point, this, parent);
-		Tool pointOnShape = new Tool(p, "Point on Shape", POINT_TYPE.POINT_ON_OBJECT, point, this, parent);
-		Tool intersectionPoint = new Tool(p, "Intersection Point", POINT_TYPE.INTERSECTION_POINT, point, this, parent);
+		Image onShape = new Image("resources/onshape.png");
+		Image intersection = new Image("resources/intersection.png");
+		
+		Tool defaultPoint = new Tool(p, "Point", "Click to create a point.", POINT_TYPE.POINT, point, this, parent);
+		Tool pointOnShape = new Tool(onShape, "Point on Shape", "Click on a shape to create a point that is locked onto that shape.", POINT_TYPE.POINT_ON_SHAPE, point, this, parent);
+		Tool intersectionPoint = new Tool(intersection, "Intersection Point", "Click on the intersection of 2 lines to create an intersection point.", POINT_TYPE.INTERSECTION_POINT, point, this, parent);
 		
 		point.getItems().addAll(defaultPoint, pointOnShape, intersectionPoint);
 
@@ -57,12 +60,18 @@ public class AsyPadToolBar extends MenuBar
 		lineGraphic.setFitWidth(30);
 		line.setGraphic(lineGraphic);
 		
-		Tool defaultSegment = new Tool(segment, "Segment", LINE_TYPE.SEGMENT, line, this, parent);
-		Tool defaultLine = new Tool(segment, "Line", LINE_TYPE.LINE, line, this, parent);
-		Tool parallelLine = new Tool(segment, "Parallel Line", LINE_TYPE.PARALLEL_LINE, line, this, parent);
-		Tool perpendicularLine = new Tool(segment, "Perpendicular Line", LINE_TYPE.PERPENDICULAR_LINE, line, this, parent);
-		Tool angleBisector = new Tool(segment, "Angle Bisector", LINE_TYPE.ANGLE_BISECTOR, line, this, parent);
-		Tool perpendicularBisector = new Tool(segment, "Perpendicular Bisector", LINE_TYPE.PERPENDICULAR_BISECTOR, line, this, parent);
+		Image lineImage = new Image("resources/line.png");
+		Image parallel = new Image("resources/parallel.png");
+		Image perpendicular = new Image("resources/perpendicular.png");
+		Image angleBisectorImage = new Image("resources/anglebisector.png");
+		Image perpendicularBisectorImage = new Image("resources/perpendicularBisector.png");
+		
+		Tool defaultSegment = new Tool(segment, "Segment", "Select 2 points to create a segment.", LINE_TYPE.SEGMENT, line, this, parent);
+		Tool defaultLine = new Tool(lineImage, "Line", "Select 2 points to create a line.", LINE_TYPE.LINE, line, this, parent);
+		Tool parallelLine = new Tool(parallel, "Parallel Line", "Select a point and a line to create a parallel line.", LINE_TYPE.PARALLEL_LINE, line, this, parent);
+		Tool perpendicularLine = new Tool(perpendicular, "Perpendicular Line", "Select a point and a line to create a perpendicular line.", LINE_TYPE.PERPENDICULAR_LINE, line, this, parent);
+		Tool angleBisector = new Tool(angleBisectorImage, "Angle Bisector", "Select 3 points to create an angle bisector. The second point will be the vertex of the angle.", LINE_TYPE.ANGLE_BISECTOR, line, this, parent);
+		Tool perpendicularBisector = new Tool(perpendicularBisectorImage, "Perpendicular Bisector", "Select 2 points to construct their perpendicular bisector", LINE_TYPE.PERPENDICULAR_BISECTOR, line, this, parent);
 		
 		line.getItems().addAll(defaultSegment, defaultLine, parallelLine, perpendicularLine, angleBisector, perpendicularBisector);
 		
@@ -73,8 +82,10 @@ public class AsyPadToolBar extends MenuBar
 		circleGraphic.setFitWidth(30);
 		circle.setGraphic(circleGraphic);
 		
-		Tool defaultCircle = new Tool(c, "Circle", CIRCLE_TYPE.CIRCLE, circle, this, parent);
-		Tool circumcircle = new Tool(c, "Circumircle", CIRCLE_TYPE.CIRCUMCIRCLE, circle, this, parent);
+		Image cc = new Image("resources/circumcircle.png");
+		
+		Tool defaultCircle = new Tool(c, "Circle", "Select the center, then a point on the circle.", CIRCLE_TYPE.CIRCLE, circle, this, parent);
+		Tool circumcircle = new Tool(cc, "Circumircle", "Select 3 points to create a circumcircle.", CIRCLE_TYPE.CIRCUMCIRCLE, circle, this, parent);
 		
 		circle.getItems().addAll(defaultCircle, circumcircle);
 		
