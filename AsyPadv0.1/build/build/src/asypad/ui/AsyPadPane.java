@@ -1,4 +1,9 @@
 package asypad.ui;
+/*
+ * TODO Implement Asymptote conversion and file i/o.
+ * TODO Implement intersection of lines and circles.
+ * TODO Implement grid show and hide.
+ */
 
 import java.util.ArrayList;
 
@@ -18,7 +23,7 @@ import asypad.ui.menus.*;
 /**
  * A special pane that interacts with the user and draws shapes.
  * @author Raymond Feng
- * @version 0.2
+ * @version 0.1
  */
 public class AsyPadPane extends Pane
 {
@@ -65,16 +70,19 @@ public class AsyPadPane extends Pane
 				snappedShapes.clear();
 				for(Shape s : shapes)
 				{
-					if(Utility.distToShape(event.getSceneX(), event.getSceneY(), s) < snapForce)
+					if(getChildren().contains(s.getObject()))
 					{
-						setCursor(Cursor.HAND);
-						if(snappedIndex == -1 || !(shapes.get(snappedIndex) instanceof Point))
+						if(Utility.distToShape(event.getSceneX(), event.getSceneY(), s) < snapForce)
 						{
-							snappedIndex = shapes.indexOf(s);
-						}
-						if(!(s instanceof Point))
-						{
-							snappedShapes.add(s);
+							setCursor(Cursor.HAND);
+							if(snappedIndex == -1 || !(shapes.get(snappedIndex) instanceof Point))
+							{
+								snappedIndex = shapes.indexOf(s);
+							}
+							if(!(s instanceof Point))
+							{
+								snappedShapes.add(s);
+							}
 						}
 					}
 				}
@@ -179,11 +187,9 @@ public class AsyPadPane extends Pane
 				SHAPE_TYPE tool = tools.getSelectedTool();
 				if(tool == MOUSE.MOUSE || tool instanceof POINT_TYPE)
 				{
-					if(snappedIndex != -1 && shapes.get(snappedIndex) instanceof Point && event.getClickCount() == 2)
+					if(snappedIndex != -1 && event.getClickCount() == 2)
 					{
-						Point p = (Point) shapes.get(snappedIndex);
-						//configure point
-						showConfigurePoint(p);
+						showConfigureShape(shapes.get(snappedIndex));
 					}
 				}
 				if(tool == MOUSE.DELETE)
@@ -247,6 +253,16 @@ public class AsyPadPane extends Pane
 					if(lines.size() >= 2)
 					{
 						addShape(new Point(lines.get(0), lines.get(1), ""));
+					}
+				}
+				else if(tool == POINT_TYPE.MIDPOINT)
+				{
+					if(snappedIndex != -1 && shapes.get(snappedIndex) instanceof Point) selectedShapes.add(shapes.get(snappedIndex));
+					if(selectedShapes.size() == 2)
+					{
+						addShape(new Point((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), ""));
+						resetSelectedShapes();
+						selectedShapes.clear();
 					}
 				}
 				else if(tool == LINE_TYPE.SEGMENT || tool == LINE_TYPE.LINE)
@@ -396,6 +412,15 @@ public class AsyPadPane extends Pane
 			}
 		});
 	}
+	
+	/**
+	 * Returns the shapes in this pane.
+	 * @return shapes
+	 */
+	public ArrayList<Shape> getShapes()
+	{
+		return shapes;
+	}
 
 	/**
 	 * Adds a new shape to this pane.
@@ -424,7 +449,8 @@ public class AsyPadPane extends Pane
 
 	/**
 	 * Updates the AsyPadPane by 
-	 * deleting all shapes with remove = true (this should be called each time delete() is called on a shape)
+	 * deleting all shapes with remove = true (this should be called each time delete() is called on a shape),
+	 * hiding all shapes with hidden = true and showing shapes with hidden = false (should be called after each setHidden() call),
 	 * and refreshing all shapes.
 	 */
 	public void update()
@@ -437,9 +463,25 @@ public class AsyPadPane extends Pane
 				if(s.remove())
 				{
 					shapes.remove(s);
-					if(getChildren().contains(s.getObject())) getChildren().remove(s.getObject());
-					if(getChildren().contains(s.getLabel())) getChildren().remove(s.getLabel());
+					getChildren().remove(s.getObject());
+					getChildren().remove(s.getLabel());
 					break;
+				}
+				else if(s.isHidden())
+				{
+					getChildren().remove(s.getObject());
+					getChildren().remove(s.getLabel());
+				}
+				else
+				{
+					if(!getChildren().contains(s.getObject()))
+					{
+						getChildren().add(s.getObject());
+					}
+					if(!getChildren().contains(s.getLabel()) && s.getLabel() != null)
+					{
+						getChildren().add(s.getLabel());
+					}
 				}
 			}
 		}
@@ -457,14 +499,15 @@ public class AsyPadPane extends Pane
 	{
 		Stage rename = new Stage();
 		FlowPane flowPane = new FlowPane();
-		Scene renameScene = new Scene(flowPane, 500, 50);
+		Scene renameScene = new Scene(flowPane, 570, 50);
 		flowPane.getChildren().add(new Label("Rename Point " + p.getLabel().getText() + ":"));
 		TextField name = new TextField();
 		name.setPromptText("Enter new name of point");
 		Button submit = new Button("Submit");
 		Button cancel = new Button("Cancel");
 		Button delete = new Button("Delete Point");
-		flowPane.getChildren().addAll(name, submit, cancel, delete);
+		Button hide = new Button("Hide Point");
+		flowPane.getChildren().addAll(name, submit, cancel, delete, hide);
 		cancel.requestFocus();
 		submit.setOnAction(new EventHandler<ActionEvent>()
 		{
@@ -487,7 +530,17 @@ public class AsyPadPane extends Pane
 		{
 			public void handle(ActionEvent event)
 			{
-				shapes.get(snappedIndex).delete();
+				p.delete();
+				update();
+				snappedIndex = -1;
+				rename.close();
+			}
+		});
+		hide.setOnAction(new EventHandler<ActionEvent>()
+		{
+			public void handle(ActionEvent event)
+			{
+				p.setHidden(true);
 				update();
 				snappedIndex = -1;
 				rename.close();
@@ -495,6 +548,55 @@ public class AsyPadPane extends Pane
 		});
 		rename.setScene(renameScene);
 		rename.show();
+	}
+	
+	private void showConfigureShape(Shape s)
+	{
+		if(s instanceof Point)
+		{
+			showConfigurePoint((Point) s);
+			return;
+		}
+		else
+		{
+			Stage configure = new Stage();
+			FlowPane flowPane = new FlowPane();
+			Scene renameScene = new Scene(flowPane, 250, 30);
+			Button cancel = new Button("Cancel");
+			Button delete = new Button("Delete Shape");
+			Button hide = new Button("Hide Shape");
+			flowPane.getChildren().addAll(cancel, delete, hide);
+			cancel.requestFocus();
+			cancel.setOnAction(new EventHandler<ActionEvent>()
+			{
+				public void handle(ActionEvent event)
+				{
+					configure.close();
+				}
+			});
+			delete.setOnAction(new EventHandler<ActionEvent>()
+			{
+				public void handle(ActionEvent event)
+				{
+					s.delete();
+					update();
+					snappedIndex = -1;
+					configure.close();
+				}
+			});
+			hide.setOnAction(new EventHandler<ActionEvent>()
+			{
+				public void handle(ActionEvent event)
+				{
+					s.setHidden(true);
+					update();
+					snappedIndex = -1;
+					configure.close();
+				}
+			});
+			configure.setScene(renameScene);
+			configure.show();
+		}
 	}
 
 	/**
@@ -515,7 +617,7 @@ public class AsyPadPane extends Pane
 			getChildren().remove(currentCircle);
 		}
 	}
-	
+
 	/**
 	 * Sets the description of the current tool.
 	 * @param description description of tool.

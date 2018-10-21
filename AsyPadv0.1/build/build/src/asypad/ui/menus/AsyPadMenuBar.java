@@ -22,7 +22,7 @@ public class AsyPadMenuBar extends MenuBar
 	public AsyPadMenuBar(AsyPadPane parent)
 	{
 		super();
-		
+
 		//uses system menu bar on mac
 		final String os = System.getProperty("os.name");
 		if (os != null && os.startsWith("Mac"))
@@ -105,6 +105,21 @@ public class AsyPadMenuBar extends MenuBar
 			}
 		});
 
+		Menu view = new Menu("View");
+		MenuItem showHidden = new MenuItem("Show Hidden Shapes");
+		showHidden.setOnAction(new EventHandler<ActionEvent>()
+		{
+			public void handle(ActionEvent event)
+			{
+				for(Shape s : parent.getShapes())
+				{
+					s.setHidden(false);
+				}
+				parent.update();
+			}
+		});
+		view.getItems().add(showHidden);
+
 		//help menu (about and credits)
 		Menu help = new Menu("Help");
 		Menu about = new Menu("About");
@@ -148,6 +163,6 @@ public class AsyPadMenuBar extends MenuBar
 			}
 		});
 
-		getMenus().addAll(file, settings, help);
+		getMenus().addAll(file, settings, view, help);
 	}
 }

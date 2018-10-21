@@ -109,6 +109,21 @@ public class Point extends Shape
 		label.setLayoutX(x+StrokeWidth);
 		label.setLayoutY(y+StrokeWidth);
 	}
+	
+	public Point(Point p1, Point p2, String name)
+	{
+		super(p1, p2);
+		this.x = (p1.getX()+p2.getX())/2;
+		this.y = (p1.getY()+p2.getY())/2;
+		type = POINT_TYPE.MIDPOINT;
+		relativeLocation = -1;
+		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
+		dot.setStroke(Color.BLACK);
+		dot.setStrokeWidth(StrokeWidth);
+		label = new Label(name);
+		label.setLayoutX(x+StrokeWidth);
+		label.setLayoutY(y+StrokeWidth);
+	}
 
 	/**
 	 * Gets x-coordinate.
@@ -208,6 +223,13 @@ public class Point extends Shape
 			x = Utility.intersectX(l1, l2);
 			y = Utility.intersectY(l1, l2);
 			//System.out.println(x + " " + y);
+		}
+		else if(type == POINT_TYPE.MIDPOINT)
+		{
+			Point p1 = (Point) dependencies.get(0);
+			Point p2 = (Point) dependencies.get(1);
+			x = (p1.getX()+p2.getX())/2;
+			y = (p1.getY()+p2.getY())/2;
 		}
 		dot.setCenterX(x);
 		dot.setCenterY(y);

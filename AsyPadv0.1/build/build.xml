@@ -24,7 +24,7 @@
 	
 		<mkdir dir="project" />
 		<copy todir="project">
-			<fileset dir="/Users/raymondfeng/Documents/workspace/AsyPadv0.1">
+			<fileset dir="/Users/raymondfeng/Documents/GitHub/AsyPad/AsyPadv0.1">
 				<include name="src/**" />
 			</fileset>
 		</copy>
