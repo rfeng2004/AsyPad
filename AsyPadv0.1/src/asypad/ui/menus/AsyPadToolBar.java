@@ -46,12 +46,14 @@ public class AsyPadToolBar extends MenuBar
 		
 		Image onShape = new Image("resources/onshape.png");
 		Image intersection = new Image("resources/intersection.png");
+		Image mid = new Image("resources/midpoint.png");
 		
 		Tool defaultPoint = new Tool(p, "Point", "Click to create a point.", POINT_TYPE.POINT, point, this, parent);
 		Tool pointOnShape = new Tool(onShape, "Point on Shape", "Click on a shape to create a point that is locked onto that shape.", POINT_TYPE.POINT_ON_SHAPE, point, this, parent);
 		Tool intersectionPoint = new Tool(intersection, "Intersection Point", "Click on the intersection of 2 lines to create an intersection point.", POINT_TYPE.INTERSECTION_POINT, point, this, parent);
+		Tool midpoint = new Tool(mid, "Midpoint", "Select 2 points to create a midpoint.", POINT_TYPE.MIDPOINT, point, this, parent);
 		
-		point.getItems().addAll(defaultPoint, pointOnShape, intersectionPoint);
+		point.getItems().addAll(defaultPoint, pointOnShape, intersectionPoint, midpoint);
 
 		Menu line = new Menu();
 		Image segment = new Image("resources/segment.png");

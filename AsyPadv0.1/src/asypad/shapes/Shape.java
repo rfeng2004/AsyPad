@@ -28,6 +28,10 @@ public abstract class Shape
 	 */
 	protected boolean remove;
 	/**
+	 * If this shape should be hidden.
+	 */
+	protected boolean hide;
+	/**
 	 * The shape's label.
 	 */
 	protected Label label;
@@ -88,6 +92,11 @@ public abstract class Shape
 		}
 	}
 	
+	public void setHidden(boolean hidden)
+	{
+		hide = hidden;
+	}
+	
 	/**
 	 * If this shape should be removed.
 	 * @return remove
@@ -95,6 +104,15 @@ public abstract class Shape
 	public boolean remove()
 	{
 		return remove;
+	}
+	
+	/**
+	 * If this shape should be hidden.
+	 * @return hide
+	 */
+	public boolean isHidden()
+	{
+		return hide;
 	}
 	
 	/**
