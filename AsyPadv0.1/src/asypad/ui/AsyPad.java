@@ -1,5 +1,4 @@
 package asypad.ui;
-//test commit
 
 import javafx.application.Application;
 import javafx.scene.Scene;
