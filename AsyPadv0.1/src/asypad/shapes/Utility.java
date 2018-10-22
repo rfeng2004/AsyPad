@@ -166,6 +166,7 @@ public class Utility
 	 * @param identifier distinguishes between the possibly 2 different intersection points
 	 * @return x-coordinate of the appropriate intersection
 	 */
+	//measure by which one is closer to which endpoint not by counterclockwiseness.
 	public static double intersectX(Line l, Circle c, boolean identifier)
 	{
 		double x1 = l.getStartX()-c.getCenterX();
@@ -189,9 +190,13 @@ public class Utility
 			double iy1 = (-D*dy+Math.abs(dy)*Math.sqrt(discriminant))/(dr*dr);
 			double ix2 = (D*dy-(Math.abs(dy)/dy)*dx*Math.sqrt(discriminant))/(dr*dr);
 			double iy2 = (-D*dy-Math.abs(dy)*Math.sqrt(discriminant))/(dr*dr);
-			double theta1 = Math.atan((iy1-c.getCenterY())/(ix1-c.getCenterX()));
-			if(ix1 < c.getCenterX()) theta1 += Math.PI;
-			if((ix1*iy2-ix2*iy1) > 0)
+			double theta1 = Math.atan(iy1/ix1);
+			if(ix1 < 0) theta1 += Math.PI;
+			if(theta1 < 0) theta1 += 2*Math.PI;
+			double theta2 = Math.atan(iy2/ix2);
+			if(ix2 < 0) theta2 += Math.PI;
+			if(theta2 < 0) theta2 += 2*Math.PI;
+			if(theta2 < theta1)
 			{
 				if(identifier)
 				{
@@ -247,7 +252,13 @@ public class Utility
 			double iy1 = (-D*dy+Math.abs(dy)*Math.sqrt(discriminant))/(dr*dr);
 			double ix2 = (D*dy-(Math.abs(dy)/dy)*dx*Math.sqrt(discriminant))/(dr*dr);
 			double iy2 = (-D*dy-Math.abs(dy)*Math.sqrt(discriminant))/(dr*dr);
-			if((ix1*iy2-ix2*iy1) > 0)
+			double theta1 = Math.atan(iy1/ix1);
+			if(ix1 < 0) theta1 += Math.PI;
+			if(theta1 < 0) theta1 += 2*Math.PI;
+			double theta2 = Math.atan(iy2/ix2);
+			if(ix2 < 0) theta2 += Math.PI;
+			if(theta2 < 0) theta2 += 2*Math.PI;
+			if(theta2 < theta1)
 			{
 				if(identifier)
 				{
