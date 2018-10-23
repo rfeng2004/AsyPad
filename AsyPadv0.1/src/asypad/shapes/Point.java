@@ -118,7 +118,7 @@ public class Point extends Shape
 
 	/**
 	 * Constructs an intersection point between a line and a circle. Identifier = true represents
-	 * the intersection point that is more counterclockwise on the circle.
+	 * the intersection point that closer to the start of the line.
 	 * @param l line
 	 * @param c circle
 	 * @param identifier which intersection point this will be

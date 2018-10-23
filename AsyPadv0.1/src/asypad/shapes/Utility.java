@@ -42,7 +42,7 @@ public class Utility
 
 	public static double solveX(double m1, double b1, double m2, double b2)
 	{
-		if(m1 == m2) return 1/0.000000001;
+		if(m1 == m2) return Double.POSITIVE_INFINITY;
 		return (b2-b1)/(m1-m2);
 	}
 
@@ -111,7 +111,7 @@ public class Utility
 		{
 			if(l1.getEndX()-l1.getStartX()==0 && l2.getEndX()-l2.getStartX()==0)
 			{
-				return 1/0.000000001;
+				return Double.POSITIVE_INFINITY;
 			}
 			if(l1.getEndX()-l1.getStartX()==0)
 			{
@@ -145,7 +145,7 @@ public class Utility
 		{
 			if(l1.getEndX()-l1.getStartX()==0 && l2.getEndX()-l2.getStartX()==0)
 			{
-				return 1/0.000000001;
+				return Double.POSITIVE_INFINITY;
 			}
 			if(l1.getEndX()-l1.getStartX()==0)
 			{
@@ -160,13 +160,12 @@ public class Utility
 
 	/**
 	 * Calculates an intersection point between the line and the circle. If there is more than one intersection point,
-	 * identifier = true means to return the x-coordinate of the intersection that is more counterclockwise on the circle.
+	 * identifier = true means to return the x-coordinate of the intersection that is closer to the start of the line.
 	 * @param l line
 	 * @param c circle
 	 * @param identifier distinguishes between the possibly 2 different intersection points
 	 * @return x-coordinate of the appropriate intersection
 	 */
-	//measure by which one is closer to which endpoint not by counterclockwiseness.
 	public static double intersectX(Line l, Circle c, boolean identifier)
 	{
 		double x1 = l.getStartX()-c.getCenterX();
@@ -179,43 +178,35 @@ public class Utility
 		double D = x1*y2-x2*y1;
 		double r = c.getRadius();
 		double discriminant = r*r*dr*dr-D*D;
-		if(discriminant < 0) return -1;
+		if(discriminant < 0) return Double.POSITIVE_INFINITY;
 		else if(discriminant == 0)
 		{
 			return D*dy/(dr*dr)+c.getCenterX();
 		}
 		else
 		{
-			double ix1 = (D*dy+(Math.abs(dy)/dy)*dx*Math.sqrt(discriminant))/(dr*dr);
-			double iy1 = (-D*dy+Math.abs(dy)*Math.sqrt(discriminant))/(dr*dr);
-			double ix2 = (D*dy-(Math.abs(dy)/dy)*dx*Math.sqrt(discriminant))/(dr*dr);
-			double iy2 = (-D*dy-Math.abs(dy)*Math.sqrt(discriminant))/(dr*dr);
-			double theta1 = Math.atan(iy1/ix1);
-			if(ix1 < 0) theta1 += Math.PI;
-			if(theta1 < 0) theta1 += 2*Math.PI;
-			double theta2 = Math.atan(iy2/ix2);
-			if(ix2 < 0) theta2 += Math.PI;
-			if(theta2 < 0) theta2 += 2*Math.PI;
-			if(theta2 < theta1)
+			double ix1 = (D*dy+(Math.abs(dy)/dy)*dx*Math.sqrt(discriminant))/(dr*dr)+c.getCenterX();
+			double ix2 = (D*dy-(Math.abs(dy)/dy)*dx*Math.sqrt(discriminant))/(dr*dr)+c.getCenterX();
+			if(Math.abs(ix1-l.getStartX()) > Math.abs(ix2-l.getStartX()))
 			{
 				if(identifier)
 				{
-					return ix2+c.getCenterX();
+					return ix2;
 				}
 				else
 				{
-					return ix1+c.getCenterX();
+					return ix1;
 				}
 			}
 			else
 			{
 				if(identifier)
 				{
-					return ix1+c.getCenterX();
+					return ix1;
 				}
 				else
 				{
-					return ix2+c.getCenterX();
+					return ix2;
 				}
 			}
 		}
@@ -223,7 +214,7 @@ public class Utility
 
 	/**
 	 * Calculates an intersection point between the line and the circle. If there is more than one intersection point,
-	 * identifier = true means to return the y-coordinate of the intersection that is more counterclockwise on the circle.
+	 * identifier = true means to return the y-coordinate of the intersection that is closer to the start of the line.
 	 * @param l line
 	 * @param c circle
 	 * @param identifier distinguishes between the possibly 2 different intersection points
@@ -241,43 +232,35 @@ public class Utility
 		double D = x1*y2-x2*y1;
 		double r = c.getRadius();
 		double discriminant = r*r*dr*dr-D*D;
-		if(discriminant < 0) return -1;
+		if(discriminant < 0) return Double.POSITIVE_INFINITY;
 		else if(discriminant == 0)
 		{
 			return -D*dx/(dr*dr)+c.getCenterY();
 		}
 		else
 		{
-			double ix1 = (D*dy+(Math.abs(dy)/dy)*dx*Math.sqrt(discriminant))/(dr*dr);
-			double iy1 = (-D*dy+Math.abs(dy)*Math.sqrt(discriminant))/(dr*dr);
-			double ix2 = (D*dy-(Math.abs(dy)/dy)*dx*Math.sqrt(discriminant))/(dr*dr);
-			double iy2 = (-D*dy-Math.abs(dy)*Math.sqrt(discriminant))/(dr*dr);
-			double theta1 = Math.atan(iy1/ix1);
-			if(ix1 < 0) theta1 += Math.PI;
-			if(theta1 < 0) theta1 += 2*Math.PI;
-			double theta2 = Math.atan(iy2/ix2);
-			if(ix2 < 0) theta2 += Math.PI;
-			if(theta2 < 0) theta2 += 2*Math.PI;
-			if(theta2 < theta1)
+			double iy1 = (-D*dx+Math.abs(dy)*Math.sqrt(discriminant))/(dr*dr)+c.getCenterY();
+			double iy2 = (-D*dx-Math.abs(dy)*Math.sqrt(discriminant))/(dr*dr)+c.getCenterY();
+			if(Math.abs(iy1-l.getStartY()) > Math.abs(iy2-l.getStartY()))
 			{
 				if(identifier)
 				{
-					return iy2+c.getCenterY();
+					return iy2;
 				}
 				else
 				{
-					return iy1+c.getCenterY();
+					return iy1;
 				}
 			}
 			else
 			{
 				if(identifier)
 				{
-					return iy1+c.getCenterY();
+					return iy1;
 				}
 				else
 				{
-					return iy2+c.getCenterY();
+					return iy2;
 				}
 			}
 		}
@@ -366,7 +349,7 @@ public class Utility
 		{
 			if(p1.getY()-p2.getY() == 0 && p1.getY()-p3.getY() == 0)
 			{
-				return 1/0.000000001;
+				return Double.POSITIVE_INFINITY;
 			}
 			else if(p1.getY()-p2.getY() == 0)
 			{
@@ -400,7 +383,7 @@ public class Utility
 		{
 			if(p1.getY()-p2.getY() == 0 && p1.getY()-p3.getY() == 0)
 			{
-				return 1/0.000000001;
+				return Double.POSITIVE_INFINITY;
 			}
 			else if(p1.getY()-p2.getY() == 0)
 			{
