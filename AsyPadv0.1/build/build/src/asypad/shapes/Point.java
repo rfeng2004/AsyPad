@@ -14,7 +14,8 @@ public class Point extends Shape
 	private javafx.scene.shape.Circle dot;
 	private double x, y;
 	private double relativeLocation; //used for points that are snapped to another shape.
-	
+	private boolean identifier; //used for intersection of line and circle or 2 circles.
+
 	/**
 	 * Constructs new Point at (x, y) with no label.
 	 * @param x x-coordinate
@@ -26,6 +27,8 @@ public class Point extends Shape
 		this.x = x;
 		this.y = y;
 		type = POINT_TYPE.POINT;
+		relativeLocation = -1;
+		identifier = false;
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
 		dot.setStroke(Color.BLACK);
 		dot.setStrokeWidth(StrokeWidth);
@@ -47,6 +50,7 @@ public class Point extends Shape
 		this.y = y;
 		type = POINT_TYPE.POINT;
 		relativeLocation = -1;
+		identifier = false;
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
 		dot.setStroke(Color.BLACK);
 		dot.setStrokeWidth(StrokeWidth);
@@ -54,7 +58,7 @@ public class Point extends Shape
 		label.setLayoutX(x+StrokeWidth);
 		label.setLayoutY(y+StrokeWidth);
 	}
-	
+
 	/**
 	 * Creates a new point that snaps onto the specified shape.
 	 * @param cx current x-coordinate
@@ -66,6 +70,7 @@ public class Point extends Shape
 	{
 		super(snap);
 		type = POINT_TYPE.POINT_ON_SHAPE;
+		identifier = false;
 		if(snap instanceof Line)
 		{
 			Line l = (Line) snap;
@@ -88,7 +93,7 @@ public class Point extends Shape
 		label.setLayoutX(x+StrokeWidth);
 		label.setLayoutY(y+StrokeWidth);
 	}
-	
+
 	/**
 	 * Constructs an intersection point between lines l1 and l2.
 	 * @param l1 first line
@@ -102,6 +107,7 @@ public class Point extends Shape
 		this.y = Utility.intersectY(l1, l2);
 		type = POINT_TYPE.INTERSECTION_POINT;
 		relativeLocation = -1;
+		identifier = false;
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
 		dot.setStroke(Color.BLACK);
 		dot.setStrokeWidth(StrokeWidth);
@@ -109,7 +115,37 @@ public class Point extends Shape
 		label.setLayoutX(x+StrokeWidth);
 		label.setLayoutY(y+StrokeWidth);
 	}
-	
+
+	/**
+	 * Constructs an intersection point between a line and a circle. Identifier = true represents
+	 * the intersection point that closer to the start of the line.
+	 * @param l line
+	 * @param c circle
+	 * @param identifier which intersection point this will be
+	 * @param name
+	 */
+	public Point(Line l, Circle c, boolean identifier, String name)
+	{
+		super(l, c);
+		type = POINT_TYPE.INTERSECTION_POINT;
+		relativeLocation = -1;
+		this.identifier = identifier;
+		this.x = Utility.intersectX(l, c, identifier);
+		this.y = Utility.intersectY(l, c, identifier);
+		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
+		dot.setStroke(Color.BLACK);
+		dot.setStrokeWidth(StrokeWidth);
+		label = new Label(name);
+		label.setLayoutX(x+StrokeWidth);
+		label.setLayoutY(y+StrokeWidth);
+	}
+
+	/**
+	 * Constructs the midpoint of 2 points.
+	 * @param p1 first point
+	 * @param p2 second point
+	 * @param name name of point
+	 */
 	public Point(Point p1, Point p2, String name)
 	{
 		super(p1, p2);
@@ -162,7 +198,7 @@ public class Point extends Shape
 		this.y = y;
 		refresh();
 	}
-	
+
 	/**
 	 * Sets the relative location of this point to the shape that it is on
 	 * based on the current location of the mouse.
@@ -218,11 +254,21 @@ public class Point extends Shape
 		}
 		else if(type == POINT_TYPE.INTERSECTION_POINT)
 		{
-			Line l1 = (Line) dependencies.get(0);
-			Line l2 = (Line) dependencies.get(1);
-			x = Utility.intersectX(l1, l2);
-			y = Utility.intersectY(l1, l2);
-			//System.out.println(x + " " + y);
+			if(dependencies.get(0) instanceof Line && dependencies.get(1) instanceof Line)
+			{
+				Line l1 = (Line) dependencies.get(0);
+				Line l2 = (Line) dependencies.get(1);
+				x = Utility.intersectX(l1, l2);
+				y = Utility.intersectY(l1, l2);
+			}
+			else if(dependencies.get(0) instanceof Line && dependencies.get(1) instanceof Circle)
+			{
+				Line l = (Line) dependencies.get(0);
+				Circle c = (Circle) dependencies.get(1);
+				x = Utility.intersectX(l, c, identifier);
+				y = Utility.intersectY(l, c, identifier);
+				
+			}
 		}
 		else if(type == POINT_TYPE.MIDPOINT)
 		{
@@ -242,12 +288,12 @@ public class Point extends Shape
 			s.refresh();
 		}
 	}
-	
+
 	public javafx.scene.shape.Circle getObject()
 	{
 		return dot;
 	}
-	
+
 	public String toString()
 	{
 		String s = "POINT: type = " + type + " x = " + x + " y = " + y;

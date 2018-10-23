@@ -19,7 +19,7 @@ public class Utility
 	{
 		return Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
 	}
-	
+
 	/**
 	 * Calculates the distance between 2 points.
 	 * @param p1 first point
@@ -42,7 +42,7 @@ public class Utility
 
 	public static double solveX(double m1, double b1, double m2, double b2)
 	{
-		if(m1 == m2) return 1/0.000000001;
+		if(m1 == m2) return Double.POSITIVE_INFINITY;
 		return (b2-b1)/(m1-m2);
 	}
 
@@ -111,7 +111,7 @@ public class Utility
 		{
 			if(l1.getEndX()-l1.getStartX()==0 && l2.getEndX()-l2.getStartX()==0)
 			{
-				return 1/0.000000001;
+				return Double.POSITIVE_INFINITY;
 			}
 			if(l1.getEndX()-l1.getStartX()==0)
 			{
@@ -145,7 +145,7 @@ public class Utility
 		{
 			if(l1.getEndX()-l1.getStartX()==0 && l2.getEndX()-l2.getStartX()==0)
 			{
-				return 1/0.000000001;
+				return Double.POSITIVE_INFINITY;
 			}
 			if(l1.getEndX()-l1.getStartX()==0)
 			{
@@ -154,6 +154,114 @@ public class Utility
 			else
 			{
 				return m1*l2.getStartX()+b1;
+			}
+		}
+	}
+
+	/**
+	 * Calculates an intersection point between the line and the circle. If there is more than one intersection point,
+	 * identifier = true means to return the x-coordinate of the intersection that is closer to the start of the line.
+	 * @param l line
+	 * @param c circle
+	 * @param identifier distinguishes between the possibly 2 different intersection points
+	 * @return x-coordinate of the appropriate intersection
+	 */
+	public static double intersectX(Line l, Circle c, boolean identifier)
+	{
+		double x1 = l.getStartX()-c.getCenterX();
+		double y1 = l.getStartY()-c.getCenterY();
+		double x2 = l.getEndX()-c.getCenterX();
+		double y2 = l.getEndY()-c.getCenterY();
+		double dx = x2-x1;
+		double dy = y2-y1;
+		double dr = Math.sqrt(dx*dx+dy*dy);
+		double D = x1*y2-x2*y1;
+		double r = c.getRadius();
+		double discriminant = r*r*dr*dr-D*D;
+		if(discriminant < 0) return Double.POSITIVE_INFINITY;
+		else if(discriminant == 0)
+		{
+			return D*dy/(dr*dr)+c.getCenterX();
+		}
+		else
+		{
+			double ix1 = (D*dy+(Math.abs(dy)/dy)*dx*Math.sqrt(discriminant))/(dr*dr)+c.getCenterX();
+			double ix2 = (D*dy-(Math.abs(dy)/dy)*dx*Math.sqrt(discriminant))/(dr*dr)+c.getCenterX();
+			if(Math.abs(ix1-l.getStartX()) > Math.abs(ix2-l.getStartX()))
+			{
+				if(identifier)
+				{
+					return ix2;
+				}
+				else
+				{
+					return ix1;
+				}
+			}
+			else
+			{
+				if(identifier)
+				{
+					return ix1;
+				}
+				else
+				{
+					return ix2;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Calculates an intersection point between the line and the circle. If there is more than one intersection point,
+	 * identifier = true means to return the y-coordinate of the intersection that is closer to the start of the line.
+	 * @param l line
+	 * @param c circle
+	 * @param identifier distinguishes between the possibly 2 different intersection points
+	 * @return y-coordinate of the appropriate intersection
+	 */
+	public static double intersectY(Line l, Circle c, boolean identifier)
+	{
+		double x1 = l.getStartX()-c.getCenterX();
+		double y1 = l.getStartY()-c.getCenterY();
+		double x2 = l.getEndX()-c.getCenterX();
+		double y2 = l.getEndY()-c.getCenterY();
+		double dx = x2-x1;
+		double dy = y2-y1;
+		double dr = Math.sqrt(dx*dx+dy*dy);
+		double D = x1*y2-x2*y1;
+		double r = c.getRadius();
+		double discriminant = r*r*dr*dr-D*D;
+		if(discriminant < 0) return Double.POSITIVE_INFINITY;
+		else if(discriminant == 0)
+		{
+			return -D*dx/(dr*dr)+c.getCenterY();
+		}
+		else
+		{
+			double iy1 = (-D*dx+Math.abs(dy)*Math.sqrt(discriminant))/(dr*dr)+c.getCenterY();
+			double iy2 = (-D*dx-Math.abs(dy)*Math.sqrt(discriminant))/(dr*dr)+c.getCenterY();
+			if(Math.abs(iy1-l.getStartY()) > Math.abs(iy2-l.getStartY()))
+			{
+				if(identifier)
+				{
+					return iy2;
+				}
+				else
+				{
+					return iy1;
+				}
+			}
+			else
+			{
+				if(identifier)
+				{
+					return iy1;
+				}
+				else
+				{
+					return iy2;
+				}
 			}
 		}
 	}
@@ -173,7 +281,7 @@ public class Utility
 	{
 		return Math.abs((ly2-ly1)*x1-(lx2-lx1)*y1+lx2*ly1-ly2*lx1)/dist(lx1, ly1, lx2, ly2);
 	}
-	
+
 	/**
 	 * Calculates the distance from (x, y) to the line l.
 	 * @param x x-coordinate of point
@@ -219,7 +327,7 @@ public class Utility
 		if(m1 == 0) return b1;
 		return solveY(m1, b1, m2, b2);
 	}
-	
+
 	/**
 	 * Finds the x-coordinate of the circumcenter of 3 points.
 	 * @param p1 first point
@@ -241,7 +349,7 @@ public class Utility
 		{
 			if(p1.getY()-p2.getY() == 0 && p1.getY()-p3.getY() == 0)
 			{
-				return 1/0.000000001;
+				return Double.POSITIVE_INFINITY;
 			}
 			else if(p1.getY()-p2.getY() == 0)
 			{
@@ -253,7 +361,7 @@ public class Utility
 			}
 		}
 	}
-	
+
 	/**
 	 * Finds the y-coordinate of the circumcenter of 3 points.
 	 * @param p1 first point
@@ -275,7 +383,7 @@ public class Utility
 		{
 			if(p1.getY()-p2.getY() == 0 && p1.getY()-p3.getY() == 0)
 			{
-				return 1/0.000000001;
+				return Double.POSITIVE_INFINITY;
 			}
 			else if(p1.getY()-p2.getY() == 0)
 			{
@@ -287,7 +395,7 @@ public class Utility
 			}
 		}
 	}
-	
+
 	/**
 	 * Calculates the x-coordinate of the point that lies on the angle bisector of angle p1p2p3,
 	 * and is 10 pixels away from p2.
@@ -310,7 +418,7 @@ public class Utility
 		x2 = (d2-10)/d2*p2.getX()+10/d2*x2;
 		return x2;
 	}
-	
+
 	/**
 	 * Calculates the y-coordinate of the point that lies on the angle bisector of angle p1p2p3,
 	 * and is 10 pixels away from p2.

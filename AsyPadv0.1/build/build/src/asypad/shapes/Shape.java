@@ -16,6 +16,10 @@ public abstract class Shape
 	 */
 	public static double StrokeWidth = 3;
 	/**
+	 * Infinite that is used for drawing lines that should extend to infinity.
+	 */
+	public static final double INF = 1000;
+	/**
 	 * The shapes that this shape depends on.
 	 */
 	protected ArrayList<Shape> dependencies;

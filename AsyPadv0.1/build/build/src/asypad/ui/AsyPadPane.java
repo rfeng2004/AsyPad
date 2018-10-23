@@ -1,7 +1,6 @@
 package asypad.ui;
 /*
  * TODO Implement Asymptote conversion and file i/o.
- * TODO Implement intersection of lines and circles.
  * TODO Implement grid show and hide.
  */
 
@@ -111,7 +110,7 @@ public class AsyPadPane extends Pane
 						}
 						else
 						{
-							setCurrentLine(p.getX()-1000*(x-p.getX()), p.getY()-1000*(y-p.getY()), x+1000*(x-p.getX()), y+1000*(y-p.getY()));
+							setCurrentLine(p.getX()-Shape.INF*(x-p.getX()), p.getY()-Shape.INF*(y-p.getY()), x+Shape.INF*(x-p.getX()), y+Shape.INF*(y-p.getY()));
 						}
 					}
 				}
@@ -204,11 +203,16 @@ public class AsyPadPane extends Pane
 				else if(tool == POINT_TYPE.POINT)
 				{
 					ArrayList<Line> lines = new ArrayList<Line>();
+					ArrayList<Circle> circles = new ArrayList<Circle>();
 					for(Shape s : snappedShapes)
 					{
 						if(s instanceof Line)
 						{
 							lines.add((Line) s);
+						}
+						else if(s instanceof Circle)
+						{
+							circles.add((Circle) s);
 						}
 					}
 					if(snappedIndex == -1)
@@ -217,7 +221,7 @@ public class AsyPadPane extends Pane
 						snappedIndex = shapes.size()-1;
 						setCursor(Cursor.HAND);
 					}
-					else if(!(shapes.get(snappedIndex) instanceof Point) && lines.size() < 2)
+					else if(!(shapes.get(snappedIndex) instanceof Point) && snappedShapes.size() == 1)
 					{
 						addShape(new Point(event.getSceneX(), event.getSceneY(), shapes.get(snappedIndex), ""));
 						snappedIndex = shapes.size()-1;
@@ -228,6 +232,16 @@ public class AsyPadPane extends Pane
 						if(lines.size() >= 2)
 						{
 							addShape(new Point(lines.get(0), lines.get(1), ""));
+						}
+						else if(lines.size() == 1 && circles.size() >= 1)
+						{
+							Point p1 = new Point((Line) lines.get(0), (Circle) circles.get(0), false, "");
+							Point p2 = new Point((Line) lines.get(0), (Circle) circles.get(0), true, "");
+							if(Utility.distToShape(event.getSceneX(), event.getSceneY(), p1) < Utility.distToShape(event.getSceneX(), event.getSceneY(), p2))
+							{
+								addShape(p1);
+							}
+							else addShape(p2);
 						}
 					}
 				}
@@ -243,16 +257,36 @@ public class AsyPadPane extends Pane
 				else if(tool == POINT_TYPE.INTERSECTION_POINT)
 				{
 					ArrayList<Line> lines = new ArrayList<Line>();
+					ArrayList<Circle> circles = new ArrayList<Circle>();
 					for(Shape s : snappedShapes)
 					{
 						if(s instanceof Line)
 						{
 							lines.add((Line) s);
 						}
+						else if(s instanceof Circle)
+						{
+							circles.add((Circle) s);
+						}
 					}
 					if(lines.size() >= 2)
 					{
 						addShape(new Point(lines.get(0), lines.get(1), ""));
+					}
+					else if(lines.size() == 1 && circles.size() >= 1)
+					{
+						Point p1 = new Point((Line) lines.get(0), (Circle) circles.get(0), false, "");
+						Point p2 = new Point((Line) lines.get(0), (Circle) circles.get(0), true, "");
+						if(Utility.distToShape(event.getSceneX(), event.getSceneY(), p1) < Utility.distToShape(event.getSceneX(), event.getSceneY(), p2))
+						{
+							addShape(p1);
+							//System.out.println(p1);
+						}
+						else 
+						{
+							addShape(p2);
+							//System.out.println(p2);
+						}
 					}
 				}
 				else if(tool == POINT_TYPE.MIDPOINT)
@@ -412,7 +446,7 @@ public class AsyPadPane extends Pane
 			}
 		});
 	}
-	
+
 	/**
 	 * Returns the shapes in this pane.
 	 * @return shapes
@@ -477,10 +511,12 @@ public class AsyPadPane extends Pane
 					if(!getChildren().contains(s.getObject()))
 					{
 						getChildren().add(s.getObject());
+						s.getObject().toBack();
 					}
 					if(!getChildren().contains(s.getLabel()) && s.getLabel() != null)
 					{
 						getChildren().add(s.getLabel());
+						s.getLabel().toBack();
 					}
 				}
 			}
@@ -549,7 +585,7 @@ public class AsyPadPane extends Pane
 		rename.setScene(renameScene);
 		rename.show();
 	}
-	
+
 	private void showConfigureShape(Shape s)
 	{
 		if(s instanceof Point)

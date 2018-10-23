@@ -31,10 +31,10 @@ public class Line extends Shape
 		else 
 		{
 			type = LINE_TYPE.LINE;
-			x1 = p1.getX()-1000*(p2.getX()-p1.getX());
-			y1 = p1.getY()-1000*(p2.getY()-p1.getY());
-			x2 = p2.getX()+1000*(p2.getX()-p1.getX());
-			y2 = p2.getY()+1000*(p2.getY()-p1.getY());
+			x1 = p1.getX()-INF*(p2.getX()-p1.getX());
+			y1 = p1.getY()-INF*(p2.getY()-p1.getY());
+			x2 = p2.getX()+INF*(p2.getX()-p1.getX());
+			y2 = p2.getY()+INF*(p2.getY()-p1.getY());
 		}
 		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
 		line.setStrokeWidth(StrokeWidth);
@@ -61,10 +61,10 @@ public class Line extends Shape
 			}
 			else
 			{
-				x1 = p.getX()-1000*(l.getEndX()-l.getStartX());
-				y1 = p.getY()-1000*(l.getEndY()-l.getStartY());
-				x2 = p.getX()+1000*(l.getEndX()-l.getStartX());
-				y2 = p.getY()+1000*(l.getEndY()-l.getStartY());
+				x1 = p.getX()-INF*(l.getEndX()-l.getStartX());
+				y1 = p.getY()-INF*(l.getEndY()-l.getStartY());
+				x2 = p.getX()+INF*(l.getEndX()-l.getStartX());
+				y2 = p.getY()+INF*(l.getEndY()-l.getStartY());
 			}
 		}
 		else
@@ -79,10 +79,10 @@ public class Line extends Shape
 			}
 			else
 			{
-				x1 = p.getX()+1000*(l.getEndY()-l.getStartY());
-				y1 = p.getY()-1000*(l.getEndX()-l.getStartX());
-				x2 = p.getX()-1000*(l.getEndY()-l.getStartY());
-				y2 = p.getY()+1000*(l.getEndX()-l.getStartX());
+				x1 = p.getX()+INF*(l.getEndY()-l.getStartY());
+				y1 = p.getY()-INF*(l.getEndX()-l.getStartX());
+				x2 = p.getX()-INF*(l.getEndY()-l.getStartY());
+				y2 = p.getY()+INF*(l.getEndX()-l.getStartX());
 			}
 		}
 		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
@@ -101,10 +101,10 @@ public class Line extends Shape
 		type = LINE_TYPE.ANGLE_BISECTOR;
 		double abx = Utility.angleBisectorX(p1, p2, p3);
 		double aby = Utility.angleBisectorY(p1, p2, p3);
-		x1 = p2.getX()-1000*(abx-p2.getX());
-		y1 = p2.getY()-1000*(aby-p2.getY());
-		x2 = abx+1000*(abx-p2.getX());
-		y2 = aby+1000*(aby-p2.getY());
+		x1 = p2.getX()-INF*(abx-p2.getX());
+		y1 = p2.getY()-INF*(aby-p2.getY());
+		x2 = abx+INF*(abx-p2.getX());
+		y2 = aby+INF*(aby-p2.getY());
 		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
 		line.setStrokeWidth(StrokeWidth);
 	}
@@ -120,10 +120,10 @@ public class Line extends Shape
 		type = LINE_TYPE.PERPENDICULAR_BISECTOR;
 		double mx = (p1.getX()+p2.getX())/2;
 		double my = (p1.getY()+p2.getY())/2;
-		x1 = mx+1000*(p2.getY()-p1.getY());
-		y1 = my-1000*(p2.getX()-p1.getX());
-		x2 = mx-1000*(p2.getY()-p1.getY());
-		y2 = my+1000*(p2.getX()-p1.getX());
+		x1 = mx+INF*(p2.getY()-p1.getY());
+		y1 = my-INF*(p2.getX()-p1.getX());
+		x2 = mx-INF*(p2.getY()-p1.getY());
+		y2 = my+INF*(p2.getX()-p1.getX());
 		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
 		line.setStrokeWidth(StrokeWidth);
 	}
@@ -224,10 +224,10 @@ public class Line extends Shape
 		{
 			Point p1 = (Point) dependencies.get(0);
 			Point p2 = (Point) dependencies.get(1);
-			x1 = p1.getX()-1000*(p2.getX()-p1.getX());
-			y1 = p1.getY()-1000*(p2.getY()-p1.getY());
-			x2 = p2.getX()+1000*(p2.getX()-p1.getX());
-			y2 = p2.getY()+1000*(p2.getY()-p1.getY());
+			x1 = p1.getX()-INF*(p2.getX()-p1.getX());
+			y1 = p1.getY()-INF*(p2.getY()-p1.getY());
+			x2 = p2.getX()+INF*(p2.getX()-p1.getX());
+			y2 = p2.getY()+INF*(p2.getY()-p1.getY());
 		}
 		else if(type == LINE_TYPE.PARALLEL_LINE)
 		{
@@ -242,10 +242,10 @@ public class Line extends Shape
 			}
 			else
 			{
-				x1 = p.getX()-1000*(l.getEndX()-l.getStartX());
-				y1 = p.getY()-1000*(l.getEndY()-l.getStartY());
-				x2 = p.getX()+1000*(l.getEndX()-l.getStartX());
-				y2 = p.getY()+1000*(l.getEndY()-l.getStartY());
+				x1 = p.getX()-INF*(l.getEndX()-l.getStartX());
+				y1 = p.getY()-INF*(l.getEndY()-l.getStartY());
+				x2 = p.getX()+INF*(l.getEndX()-l.getStartX());
+				y2 = p.getY()+INF*(l.getEndY()-l.getStartY());
 			}
 		}
 		else if(type == LINE_TYPE.PERPENDICULAR_LINE)
@@ -261,10 +261,10 @@ public class Line extends Shape
 			}
 			else
 			{
-				x1 = p.getX()+1000*(l.getEndY()-l.getStartY());
-				y1 = p.getY()-1000*(l.getEndX()-l.getStartX());
-				x2 = p.getX()-1000*(l.getEndY()-l.getStartY());
-				y2 = p.getY()+1000*(l.getEndX()-l.getStartX());
+				x1 = p.getX()+INF*(l.getEndY()-l.getStartY());
+				y1 = p.getY()-INF*(l.getEndX()-l.getStartX());
+				x2 = p.getX()-INF*(l.getEndY()-l.getStartY());
+				y2 = p.getY()+INF*(l.getEndX()-l.getStartX());
 			}
 		}
 		else if(type == LINE_TYPE.ANGLE_BISECTOR)
@@ -274,10 +274,10 @@ public class Line extends Shape
 			Point p3 = (Point) dependencies.get(2);
 			double abx = Utility.angleBisectorX(p1, p2, p3);
 			double aby = Utility.angleBisectorY(p1, p2, p3);
-			x1 = p2.getX()-1000*(abx-p2.getX());
-			y1 = p2.getY()-1000*(aby-p2.getY());
-			x2 = abx+1000*(abx-p2.getX());
-			y2 = aby+1000*(aby-p2.getY());
+			x1 = p2.getX()-INF*(abx-p2.getX());
+			y1 = p2.getY()-INF*(aby-p2.getY());
+			x2 = abx+INF*(abx-p2.getX());
+			y2 = aby+INF*(aby-p2.getY());
 		}
 		else if(type == LINE_TYPE.PERPENDICULAR_BISECTOR)
 		{
@@ -285,10 +285,10 @@ public class Line extends Shape
 			Point p2 = (Point) dependencies.get(1);
 			double mx = (p1.getX()+p2.getX())/2;
 			double my = (p1.getY()+p2.getY())/2;
-			x1 = mx+1000*(p2.getY()-p1.getY());
-			y1 = my-1000*(p2.getX()-p1.getX());
-			x2 = mx-1000*(p2.getY()-p1.getY());
-			y2 = my+1000*(p2.getX()-p1.getX());
+			x1 = mx+INF*(p2.getY()-p1.getY());
+			y1 = my-INF*(p2.getX()-p1.getX());
+			x2 = mx-INF*(p2.getY()-p1.getY());
+			y2 = my+INF*(p2.getX()-p1.getX());
 		}
 		//System.out.println(this);
 		line.setStartX(x1);
