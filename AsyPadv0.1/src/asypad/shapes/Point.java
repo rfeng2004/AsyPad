@@ -1,6 +1,5 @@
 package asypad.shapes;
 
-import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import asypad.shapes.types.POINT_TYPE;
@@ -23,18 +22,50 @@ public class Point extends Shape
 	 */
 	public Point(double x, double y)
 	{
-		super();
-		this.x = x;
-		this.y = y;
-		type = POINT_TYPE.POINT;
-		relativeLocation = -1;
-		identifier = false;
-		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
-		dot.setStroke(Color.BLACK);
-		dot.setStrokeWidth(StrokeWidth);
-		label = new Label("");
-		label.setLayoutX(x+StrokeWidth);
-		label.setLayoutY(y+StrokeWidth);
+		this(x, y, "");
+	}
+	
+	/**
+	 * Creates a new point that snaps onto the specified shape with no label.
+	 * @param cx current x-coordinate
+	 * @param cy current y-coordinate
+	 * @param snap shape that this point will lie on.
+	 */
+	public Point(double cx, double cy, Shape snap)
+	{
+		this(cx, cy, snap, "");
+	}
+	
+	/**
+	 * Constructs an intersection point between lines l1 and l2 with no label.
+	 * @param l1 first line
+	 * @param l2 second line
+	 */
+	public Point(Line l1, Line l2)
+	{
+		this(l1, l2, "");
+	}
+	
+	/**
+	 * Constructs an intersection point between a line and a circle with no label. 
+	 * Identifier = true represents the intersection point that is closer to the start of the line.
+	 * @param l line
+	 * @param c circle
+	 * @param identifier which intersection point this will be
+	 */
+	public Point(Line l, Circle c, boolean identifier)
+	{
+		this(l, c, identifier, "");
+	}
+	
+	/**
+	 * Constructs the midpoint of 2 points with no label.
+	 * @param p1 first point
+	 * @param p2 second point
+	 */
+	public Point(Point p1, Point p2)
+	{
+		this(p1, p2, "");
 	}
 
 	/**
@@ -54,7 +85,7 @@ public class Point extends Shape
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
 		dot.setStroke(Color.BLACK);
 		dot.setStrokeWidth(StrokeWidth);
-		label = new Label(name);
+		label.setText(name);
 		label.setLayoutX(x+StrokeWidth);
 		label.setLayoutY(y+StrokeWidth);
 	}
@@ -89,7 +120,7 @@ public class Point extends Shape
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
 		dot.setStroke(Color.BLACK);
 		dot.setStrokeWidth(StrokeWidth);
-		label = new Label(name);
+		label.setText(name);
 		label.setLayoutX(x+StrokeWidth);
 		label.setLayoutY(y+StrokeWidth);
 	}
@@ -111,14 +142,14 @@ public class Point extends Shape
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
 		dot.setStroke(Color.BLACK);
 		dot.setStrokeWidth(StrokeWidth);
-		label = new Label(name);
+		label.setText(name);
 		label.setLayoutX(x+StrokeWidth);
 		label.setLayoutY(y+StrokeWidth);
 	}
 
 	/**
 	 * Constructs an intersection point between a line and a circle. Identifier = true represents
-	 * the intersection point that closer to the start of the line.
+	 * the intersection point that is closer to the start of the line.
 	 * @param l line
 	 * @param c circle
 	 * @param identifier which intersection point this will be
@@ -135,7 +166,7 @@ public class Point extends Shape
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
 		dot.setStroke(Color.BLACK);
 		dot.setStrokeWidth(StrokeWidth);
-		label = new Label(name);
+		label.setText(name);
 		label.setLayoutX(x+StrokeWidth);
 		label.setLayoutY(y+StrokeWidth);
 	}
@@ -156,7 +187,7 @@ public class Point extends Shape
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
 		dot.setStroke(Color.BLACK);
 		dot.setStrokeWidth(StrokeWidth);
-		label = new Label(name);
+		label.setText(name);
 		label.setLayoutX(x+StrokeWidth);
 		label.setLayoutY(y+StrokeWidth);
 	}
@@ -298,5 +329,69 @@ public class Point extends Shape
 	{
 		String s = "POINT: type = " + type + " x = " + x + " y = " + y;
 		return s;
+	}
+	
+	public String toAsymptote()
+	{
+		String n = getName();
+		if(type == POINT_TYPE.POINT)
+		{
+			String s = "pair " + n + " = (" + FORMATTER.format(x/100) + ", " + FORMATTER.format((INF-y)/100) + "); ";
+			if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", SE);\n";
+			else s+="\n";
+			return s;
+		}
+		else if(type == POINT_TYPE.INTERSECTION_POINT)
+		{
+			if(dependencies.get(1) instanceof Line)
+			{
+				String l1 = dependencies.get(0).getName();
+				String l2 = dependencies.get(1).getName();
+				String s = "pair " + n + " = intersectionpoint(" + l1 + ", " + l2 + "); ";
+				if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", SE);\n";
+				else s+="\n";
+				return s;
+			}
+			else if(dependencies.get(1) instanceof Circle)
+			{
+				String l = dependencies.get(0).getName();
+				String c = dependencies.get(1).getName();
+				int a = 1;
+				if(identifier) a = 0;
+				String s = "pair " + n + " = intersectionpoints(" + l + ", " + c + ")[" + a + "]; ";
+				if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", SE);\n";
+				else s+="\n";
+				return s;
+			}
+		}
+		else if(type == POINT_TYPE.POINT_ON_SHAPE)
+		{
+			if(dependencies.get(0) instanceof Line)
+			{
+				String l = dependencies.get(0).getName();
+				String s = "pair " + n + " = relpoint(" + l + ", " + relativeLocation + "); ";
+				if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", SE);\n";
+				else s+="\n";
+				return s;
+			}
+			else if(dependencies.get(0) instanceof Circle)
+			{
+				String c = dependencies.get(0).getName();
+				String s = "pair " + n + " = relpoint(" + c + ", " + -relativeLocation/(2*Math.PI) + "); ";
+				if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", SE);\n";
+				else s+="\n";
+				return s;
+			}
+		}
+		else if(type == POINT_TYPE.MIDPOINT)
+		{
+			String p1 = dependencies.get(0).getName();
+			String p2 = dependencies.get(1).getName();
+			String s = "pair " + n + " = (" + p1 + " + " + p2 + ")/2; ";
+			if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", SE);\n";
+			else s+="\n";
+			return s;
+		}
+		return null;
 	}
 }

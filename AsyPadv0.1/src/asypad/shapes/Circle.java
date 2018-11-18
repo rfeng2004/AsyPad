@@ -25,6 +25,7 @@ public class Circle extends Shape
 		circle.setFill(Color.TRANSPARENT);
 		circle.setStrokeWidth(StrokeWidth);
 		circle.setStroke(Color.BLACK);
+		label.setText("circ" + center.getName() + on.getName());
 	}
 
 	/**
@@ -44,6 +45,7 @@ public class Circle extends Shape
 		circle.setFill(Color.TRANSPARENT);
 		circle.setStrokeWidth(StrokeWidth);
 		circle.setStroke(Color.BLACK);
+		label.setText("cc" + p1.getName() + p2.getName() + p3.getName());
 	}
 
 	/**
@@ -116,6 +118,31 @@ public class Circle extends Shape
 	{
 		String s = "Circle: type = " + type + " x = " + x + " y = " + y + " radius = " + radius;
 		return s;
+	}
+	
+	public String toAsymptote()
+	{
+		String n = getName();
+		if(type == CIRCLE_TYPE.CIRCLE)
+		{
+			String p1 = dependencies.get(0).getName();
+			String p2 = dependencies.get(1).getName();
+			String s = "path " + n + " = Circle(" + p1 + ", abs(" + p1 + "-" + p2 + ")); ";
+			if(!hide) s+="draw(" + n + ");\n";
+			else s+="\n";
+			return s;
+		}
+		else if(type == CIRCLE_TYPE.CIRCUMCIRCLE)
+		{
+			String p1 = dependencies.get(0).getName();
+			String p2 = dependencies.get(1).getName();
+			String p3 = dependencies.get(2).getName();
+			String s = "path " + n + " = circumcircle(" + p1 + ", " + p2 + ", " + p3 + "); ";
+			if(!hide) s+="draw(" + n + ");\n";
+			else s+="\n";
+			return s;
+		}
+		return null;
 	}
 
 }

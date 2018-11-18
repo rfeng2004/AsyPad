@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import javafx.event.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 //import javafx.scene.paint.Color;
@@ -56,11 +56,32 @@ public class AsyPadPane extends Pane
 		currentTool = new Label("Tool: Mouse");
 		currentTool.setLayoutX(220);
 		currentTool.setLayoutY(10 + menus.getPrefHeight());
+		currentTool.setFocusTraversable(true);
+		currentTool.requestFocus(); //needed for key listener to be valid on the pane.
 		currentToolDescription = new Label("Drag points or double click on point to configure.");
 		currentToolDescription.setLayoutX(420);
 		currentToolDescription.setLayoutY(10 + menus.getPrefHeight());
 
 		getChildren().addAll(menus, tools, currentTool, currentToolDescription);
+		this.setOnKeyPressed(new EventHandler<KeyEvent>()
+		{
+			public void handle(KeyEvent event)
+			{
+				if(event.getCode() == KeyCode.ESCAPE)
+				{
+					resetSelectedShapes();
+					selectedShapes.clear();
+					if(getChildren().contains(currentLine))
+					{
+						getChildren().remove(currentLine);
+					}
+					if(getChildren().contains(currentCircle))
+					{
+						getChildren().remove(currentCircle);
+					}
+				}
+			}
+		});
 		this.setOnMouseMoved(new EventHandler<MouseEvent>()
 		{
 			public void handle(MouseEvent event)
@@ -217,13 +238,13 @@ public class AsyPadPane extends Pane
 					}
 					if(snappedIndex == -1)
 					{
-						addShape(new Point(event.getSceneX(), event.getSceneY()));
+						addShape(new Point(event.getSceneX(), event.getSceneY(), nextPointName(1)));
 						snappedIndex = shapes.size()-1;
 						setCursor(Cursor.HAND);
 					}
 					else if(!(shapes.get(snappedIndex) instanceof Point) && snappedShapes.size() == 1)
 					{
-						addShape(new Point(event.getSceneX(), event.getSceneY(), shapes.get(snappedIndex), ""));
+						addShape(new Point(event.getSceneX(), event.getSceneY(), shapes.get(snappedIndex), nextPointName(1)));
 						snappedIndex = shapes.size()-1;
 						setCursor(Cursor.HAND);
 					}
@@ -231,12 +252,12 @@ public class AsyPadPane extends Pane
 					{
 						if(lines.size() >= 2)
 						{
-							addShape(new Point(lines.get(0), lines.get(1), ""));
+							addShape(new Point(lines.get(0), lines.get(1), nextPointName(1)));
 						}
 						else if(lines.size() == 1 && circles.size() >= 1)
 						{
-							Point p1 = new Point((Line) lines.get(0), (Circle) circles.get(0), false, "");
-							Point p2 = new Point((Line) lines.get(0), (Circle) circles.get(0), true, "");
+							Point p1 = new Point((Line) lines.get(0), (Circle) circles.get(0), false, nextPointName(1));
+							Point p2 = new Point((Line) lines.get(0), (Circle) circles.get(0), true, nextPointName(1));
 							if(Utility.distToShape(event.getSceneX(), event.getSceneY(), p1) < Utility.distToShape(event.getSceneX(), event.getSceneY(), p2))
 							{
 								addShape(p1);
@@ -249,7 +270,7 @@ public class AsyPadPane extends Pane
 				{
 					if(snappedIndex != -1 && !(shapes.get(snappedIndex) instanceof Point))
 					{
-						addShape(new Point(event.getSceneX(), event.getSceneY(), shapes.get(snappedIndex), ""));
+						addShape(new Point(event.getSceneX(), event.getSceneY(), shapes.get(snappedIndex), nextPointName(1)));
 						snappedIndex = shapes.size()-1;
 						setCursor(Cursor.HAND);
 					}
@@ -271,12 +292,12 @@ public class AsyPadPane extends Pane
 					}
 					if(lines.size() >= 2)
 					{
-						addShape(new Point(lines.get(0), lines.get(1), ""));
+						addShape(new Point(lines.get(0), lines.get(1), nextPointName(1)));
 					}
 					else if(lines.size() == 1 && circles.size() >= 1)
 					{
-						Point p1 = new Point((Line) lines.get(0), (Circle) circles.get(0), false, "");
-						Point p2 = new Point((Line) lines.get(0), (Circle) circles.get(0), true, "");
+						Point p1 = new Point((Line) lines.get(0), (Circle) circles.get(0), false, nextPointName(1));
+						Point p2 = new Point((Line) lines.get(0), (Circle) circles.get(0), true, nextPointName(1));
 						if(Utility.distToShape(event.getSceneX(), event.getSceneY(), p1) < Utility.distToShape(event.getSceneX(), event.getSceneY(), p2))
 						{
 							addShape(p1);
@@ -294,7 +315,7 @@ public class AsyPadPane extends Pane
 					if(snappedIndex != -1 && shapes.get(snappedIndex) instanceof Point) selectedShapes.add(shapes.get(snappedIndex));
 					if(selectedShapes.size() == 2)
 					{
-						addShape(new Point((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), ""));
+						addShape(new Point((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), nextPointName(1)));
 						resetSelectedShapes();
 						selectedShapes.clear();
 					}
@@ -535,7 +556,7 @@ public class AsyPadPane extends Pane
 	{
 		Stage rename = new Stage();
 		FlowPane flowPane = new FlowPane();
-		Scene renameScene = new Scene(flowPane, 570, 50);
+		Scene renameScene = new Scene(flowPane, 580, 50);
 		flowPane.getChildren().add(new Label("Rename Point " + p.getLabel().getText() + ":"));
 		TextField name = new TextField();
 		name.setPromptText("Enter new name of point");
@@ -736,11 +757,77 @@ public class AsyPadPane extends Pane
 	}
 
 	/**
+	 * Returns the next available point name. The default point names are A, B,..., Z, AA, AB,..., AZ, BA,..., AAA,...
+	 * @param length length of name to search
+	 * @return next available point name
+	 */
+	private String nextPointName(int length)
+	{
+		for(int i = 0; i < Math.pow(27, length); i++)
+		{
+			int k = i;
+			String name = "";
+			for(int j = 0; j < length; j++)
+			{
+				if(k%27==0)
+				{
+					continue;
+				}
+				name=(char)('A'+k%27-1)+name;
+				k/=27;
+			}
+			if(name.equals("")) continue;
+			boolean broken = false;
+			for(Shape s : shapes)
+			{
+				if(s.getName().equals(name))
+				{
+					broken = true;
+					break;
+				}
+			}
+			if(!broken) return name;
+		}
+		return nextPointName(length+1);
+	}
+
+	/**
 	 * Converts the current state of the AsyPad into Asymptote code.
 	 * @return Asymptote code representing the current state
 	 */
 	public String toAsymptote()
 	{
-		return null;
+		String asy = "//Generated By AsyPadv0.1\n";
+		asy+="import olympiad;\nimport markers;\nimport math;\nimport graph;\n";
+		asy+="//change the unit size to fit your needs\n";
+		asy+="unitsize(1cm);\n";
+		int MAXLVL = 0;
+		for(Shape s : shapes)
+		{
+			if(s.getLevel() > MAXLVL) MAXLVL = s.getLevel();
+		}
+		for(int i = 0; i <= MAXLVL; i++)
+		{
+			asy += "//dependency level " + i + "\n";
+			if(i == 0)
+			{
+				asy += "/* You can change the coordinates of these points of dependency level 0.\n";
+				asy += "The drawing will keep the same qualities. */\n";
+			}
+			for(Shape s : shapes)
+			{
+				if(s.getLevel() == i)
+				{
+					asy += s.toAsymptote();
+				}
+			}
+		}
+		double xmin = 0;
+		double xmax = getWidth()/100;
+		double ymin = (Shape.INF-getHeight())/100;
+		double ymax = Shape.INF/100;
+		asy+="//clip the drawing view\n";
+		asy+="clip((" + xmin + ", " + ymin + ")--(" + xmin + ", " + ymax + ")--(" + xmax + ", " + ymax + ")--(" + xmax + ", " + ymin + ")--cycle);";
+		return asy;
 	}
 }

@@ -110,7 +110,7 @@
 				<attribute name="JavaFX-Feature-Proxy" value="None"/>
 			</manifest>
 		</fx:jar>
-	
+		
 		<fx:deploy 
 			height="700" width="1000"
 			outdir="build/dist" outfile="AsyPad"

@@ -27,6 +27,7 @@ public class Line extends Shape
 			y1 = p1.getY();
 			x2 = p2.getX();
 			y2 = p2.getY();
+			label.setText("seg"+p1.getName()+p2.getName());
 		}
 		else 
 		{
@@ -35,6 +36,7 @@ public class Line extends Shape
 			y1 = p1.getY()-INF*(p2.getY()-p1.getY());
 			x2 = p2.getX()+INF*(p2.getX()-p1.getX());
 			y2 = p2.getY()+INF*(p2.getY()-p1.getY());
+			label.setText("line"+p1.getName()+p2.getName());
 		}
 		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
 		line.setStrokeWidth(StrokeWidth);
@@ -66,6 +68,7 @@ public class Line extends Shape
 				x2 = p.getX()+INF*(l.getEndX()-l.getStartX());
 				y2 = p.getY()+INF*(l.getEndY()-l.getStartY());
 			}
+			label.setText("par"+p.getName()+l.getName());
 		}
 		else
 		{
@@ -84,6 +87,7 @@ public class Line extends Shape
 				x2 = p.getX()-INF*(l.getEndY()-l.getStartY());
 				y2 = p.getY()+INF*(l.getEndX()-l.getStartX());
 			}
+			label.setText("per"+p.getName()+l.getName());
 		}
 		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
 		line.setStrokeWidth(StrokeWidth);
@@ -105,6 +109,7 @@ public class Line extends Shape
 		y1 = p2.getY()-INF*(aby-p2.getY());
 		x2 = abx+INF*(abx-p2.getX());
 		y2 = aby+INF*(aby-p2.getY());
+		label.setText("ab"+p1.getName()+p2.getName()+p3.getName());
 		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
 		line.setStrokeWidth(StrokeWidth);
 	}
@@ -124,6 +129,7 @@ public class Line extends Shape
 		y1 = my-INF*(p2.getX()-p1.getX());
 		x2 = mx-INF*(p2.getY()-p1.getY());
 		y2 = my+INF*(p2.getX()-p1.getX());
+		label.setText("pb"+p1.getName()+p2.getName());
 		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
 		line.setStrokeWidth(StrokeWidth);
 	}
@@ -311,5 +317,68 @@ public class Line extends Shape
 	{
 		String s = "LINE: type = " + type + " startx = " + x1 + " starty = " + y1 + " endx = " + x2 + " endy = " + y2;
 		return s;
+	}
+	
+	public String toAsymptote()
+	{
+		String n = getName();
+		if(type == LINE_TYPE.SEGMENT)
+		{
+			String p1 = dependencies.get(0).getName();
+			String p2 = dependencies.get(1).getName();
+			String s = "path " + n + " = " + p1 + "--" + p2 + "; ";
+			if(!hide) s+="draw(" + n + ");\n";
+			else s+="\n";
+			return s;
+		}
+		else if(type == LINE_TYPE.LINE)
+		{
+			String p1 = dependencies.get(0).getName();
+			String p2 = dependencies.get(1).getName();
+			String s = "path " + n + " = (" + p1 + "-" + INF + "*(" + p2 + "-" + p1 + "))--(" + p2 + "+" + INF + "*(" + p2 + "-" + p1 + ")); ";
+			if(!hide) s+="draw(" + n + ");\n";
+			else s+="\n";
+			return s;
+		}
+		else if(type == LINE_TYPE.PARALLEL_LINE)
+		{
+			String p = dependencies.get(0).getName();
+			String l = dependencies.get(1).getName();
+			String s = "path " + n + " = (" + p + "-" + INF + "*dir(" + l + "))--" + "(" + p + "+" + INF + "*dir(" + l + ")); ";
+			if(!hide) s+="draw(" + n + ");\n";
+			else s+="\n";
+			return s;
+		}
+		else if(type == LINE_TYPE.PERPENDICULAR_LINE)
+		{
+			String p = dependencies.get(0).getName();
+			String l = dependencies.get(1).getName();
+			String s = "path " + n + " = (" + p + "-" + INF + "*(dir(" + l + ").y, -dir(" + l + ").x))--" + "(" + p + "+" + INF + "*(dir(" + l + ").y, -dir(" + l + ").x)); ";
+			if(!hide) s+="draw(" + n + ");\n";
+			else s+="\n";
+			return s;
+		}
+		else if(type == LINE_TYPE.ANGLE_BISECTOR)
+		{
+			String p1 = dependencies.get(0).getName();
+			String p2 = dependencies.get(1).getName();
+			String p3 = dependencies.get(2).getName();
+			String bisectorpoint = "(bisectorpoint(" + p1 + ", " + p2 + ", " + p3 + ")-" + p2 + ")";
+			String s = "path " + n + " = (" + p2 + "-" + INF + "*" + bisectorpoint + ")--(" + p2 + "+" + INF + "*" + bisectorpoint + "); ";
+			if(!hide) s+="draw(" + n + ");\n";
+			else s+="\n";
+			return s;
+		}
+		else if(type == LINE_TYPE.PERPENDICULAR_BISECTOR)
+		{
+			String p1 = dependencies.get(0).getName();
+			String p2 = dependencies.get(1).getName();
+			String p = "(" + p1 + "+" + p2 + ")/2";
+			String s = "path " + n + " = (" + p + "-" + INF + "*unit(((" + p2 + "-" + p1 + ").y, -(" + p2 + "-" + p1 + ").x)))--(" + p + "+" + INF + "*unit(((" + p2 + "-" + p1 + ").y, -(" + p2 + "-" + p1 + ").x))); ";
+			if(!hide) s+="draw(" + n + ");\n";
+			else s+="\n";
+			return s;
+		}
+		return null;
 	}
 }

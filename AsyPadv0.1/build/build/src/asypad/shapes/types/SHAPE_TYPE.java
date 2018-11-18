@@ -16,6 +16,9 @@ public interface SHAPE_TYPE
 		 * This is the default selected tool.
 		 */
 		MOUSE,
+		/**
+		 * This tool allows the user to delete shapes from the screen.
+		 */
 		DELETE;
 	};
 }

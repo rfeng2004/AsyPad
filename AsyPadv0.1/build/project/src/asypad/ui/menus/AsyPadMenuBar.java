@@ -1,14 +1,21 @@
 package asypad.ui.menus;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import asypad.shapes.Shape;
 import asypad.ui.AsyPadPane;
 import javafx.event.*;
 import javafx.geometry.*;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.*;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 /**
  * AsyPad menu bar used in the AsyPad application.
@@ -39,11 +46,34 @@ public class AsyPadMenuBar extends MenuBar
 		//file io
 		Menu file = new Menu("File");
 		file.getItems().addAll(new MenuItem("Save as Asy File"), new MenuItem("Load Asy File"));
+		if(os.startsWith("Mac"))
+		{
+			KeyCodeCombination commandS = new KeyCodeCombination(KeyCode.S, KeyCodeCombination.META_DOWN);
+			file.getItems().get(0).setAccelerator(commandS);
+		}
+		else
+		{
+			KeyCodeCombination controlS = new KeyCodeCombination(KeyCode.S, KeyCodeCombination.CONTROL_DOWN);
+			file.getItems().get(0).setAccelerator(controlS);
+		}
 		file.getItems().get(0).setOnAction(new EventHandler<ActionEvent>()
 		{
 			public void handle(ActionEvent event)
 			{
-
+				FileChooser saver = new FileChooser();
+				saver.getExtensionFilters().add(new ExtensionFilter("Asymptote Files", "*.asy"));
+				saver.setTitle("Save Diagram as Asymptote File");
+				File f = saver.showSaveDialog(new Stage());
+				if(f == null) return;
+				try(FileWriter fw = new FileWriter(f);
+						BufferedWriter bw = new BufferedWriter(fw);)
+				{
+					bw.write(parent.toAsymptote());
+				}
+				catch(IOException ioe)
+				{
+					ioe.printStackTrace();
+				}
 			}
 		});
 

@@ -1,5 +1,6 @@
 package asypad.shapes;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javafx.scene.control.Label;
@@ -15,47 +16,61 @@ public abstract class Shape
 	 * Stroke width of shapes.
 	 */
 	public static double StrokeWidth = 3;
+	
 	/**
 	 * Infinite that is used for drawing lines that should extend to infinity.
 	 */
-	public static final double INF = 1000;
+	public static final double INF = 2000;
+	
+	/**
+	 * The formatter used to round to 2 decimal places for file i/o.
+	 */
+	public static final DecimalFormat FORMATTER = new DecimalFormat("#0.00");
+	
 	/**
 	 * The shapes that this shape depends on.
 	 */
 	protected ArrayList<Shape> dependencies;
+	
 	/**
 	 * The shapes that depend on this shape.
 	 */
 	protected ArrayList<Shape> children;
+	
 	/**
 	 * If this shape should be removed.
 	 */
 	protected boolean remove;
+	
 	/**
 	 * If this shape should be hidden.
 	 */
 	protected boolean hide;
+	
 	/**
 	 * The shape's label.
 	 */
 	protected Label label;
+	
 	/**
 	 * The type of this shape.
 	 */
 	protected SHAPE_TYPE type;
+	
 	/**
 	 * The dependency level of this shape.
 	 */
 	protected int level;
 	
 	/**
-	 * Default superclass constructor called by all shapes, initializes dependencies, children, and level.
+	 * Default superclass constructor called by all shapes, initializes dependencies, children, level.
 	 * @param shapes dependencies
 	 */
 	public Shape(Shape... shapes)
 	{
 		dependencies = new ArrayList<Shape>();
 		children = new ArrayList<Shape>();
+		label = new Label();
 		level = -1;
 		for(Shape s : shapes)
 		{
@@ -120,7 +135,7 @@ public abstract class Shape
 	}
 	
 	/**
-	 * Renames the point.
+	 * Renames the shape.
 	 * @param name new name
 	 */
 	public void setName(String name)
@@ -129,8 +144,17 @@ public abstract class Shape
 	}
 	
 	/**
-	 * Returns the object's label.
-	 * @return the object label
+	 * Returns the name of the shape.
+	 * @return the name of the shape
+	 */
+	public String getName()
+	{
+		return label.getText();
+	}
+	
+	/**
+	 * Returns the shapes's label.
+	 * @return the shape label
 	 */
 	public Label getLabel()
 	{
@@ -173,8 +197,14 @@ public abstract class Shape
 	public abstract javafx.scene.shape.Shape getObject();
 	
 	/**
-	 * String representation of the shape.
+	 * String representation of the shape. Should only be used for debugging purposes.
 	 * @return string representation
 	 */
 	public abstract String toString();
+	
+	/**
+	 * Converts this shape into asymptote code.
+	 * @return asymptote representation.
+	 */
+	public abstract String toAsymptote();
 }
