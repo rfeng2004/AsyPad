@@ -315,7 +315,10 @@ public class AsyPadPane extends Pane
 					if(snappedIndex != -1 && shapes.get(snappedIndex) instanceof Point) selectedShapes.add(shapes.get(snappedIndex));
 					if(selectedShapes.size() == 2)
 					{
-						addShape(new Point((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), nextPointName(1)));
+						if(selectedShapes.get(0) != selectedShapes.get(1))
+						{
+							addShape(new Point((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), nextPointName(1)));
+						}
 						resetSelectedShapes();
 						selectedShapes.clear();
 					}
@@ -325,13 +328,16 @@ public class AsyPadPane extends Pane
 					if(snappedIndex != -1 && shapes.get(snappedIndex) instanceof Point) selectedShapes.add(shapes.get(snappedIndex));
 					if(selectedShapes.size() == 2)
 					{
-						if(tool == LINE_TYPE.SEGMENT)
+						if(selectedShapes.get(0) != selectedShapes.get(1))
 						{
-							addShape(new Line((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), true));
-						}
-						else 
-						{
-							addShape(new Line((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), false));
+							if(tool == LINE_TYPE.SEGMENT)
+							{
+								addShape(new Line((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), true));
+							}
+							else 
+							{
+								addShape(new Line((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), false));
+							}
 						}
 						resetSelectedShapes();
 						selectedShapes.clear();
@@ -396,7 +402,13 @@ public class AsyPadPane extends Pane
 					if(snappedIndex != -1 && shapes.get(snappedIndex) instanceof Point) selectedShapes.add(shapes.get(snappedIndex));
 					if(selectedShapes.size() == 3)
 					{
-						addShape(new Line((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), (Point) selectedShapes.get(2)));
+						Point p1 = (Point) selectedShapes.get(0);
+						Point p2 = (Point) selectedShapes.get(1);
+						Point p3 = (Point) selectedShapes.get(2);
+						if(p1!=p2 && p2!=p3 && p3!=p1)
+						{
+							addShape(new Line(p1, p2, p3));
+						}
 						resetSelectedShapes();
 						selectedShapes.clear();
 					}
@@ -406,7 +418,10 @@ public class AsyPadPane extends Pane
 					if(snappedIndex != -1 && shapes.get(snappedIndex) instanceof Point) selectedShapes.add(shapes.get(snappedIndex));
 					if(selectedShapes.size() == 2)
 					{
-						addShape(new Line((Point) selectedShapes.get(0), (Point) selectedShapes.get(1)));
+						if(selectedShapes.get(0) != selectedShapes.get(1))
+						{
+							addShape(new Line((Point) selectedShapes.get(0), (Point) selectedShapes.get(1)));
+						}
 						resetSelectedShapes();
 						selectedShapes.clear();
 					}
@@ -416,7 +431,10 @@ public class AsyPadPane extends Pane
 					if(snappedIndex != -1 && shapes.get(snappedIndex) instanceof Point) selectedShapes.add(shapes.get(snappedIndex));
 					if(selectedShapes.size() == 2)
 					{
-						addShape(new Circle((Point) selectedShapes.get(0), (Point) selectedShapes.get(1)));
+						if(selectedShapes.get(0) != selectedShapes.get(1))
+						{
+							addShape(new Circle((Point) selectedShapes.get(0), (Point) selectedShapes.get(1)));
+						}
 						resetSelectedShapes();
 						selectedShapes.clear();
 						getChildren().remove(currentCircle);
@@ -813,6 +831,10 @@ public class AsyPadPane extends Pane
 			{
 				asy += "/* You can change the coordinates of these points of dependency level 0.\n";
 				asy += "The drawing will keep the same qualities. */\n";
+			}
+			if(i == 1)
+			{
+				asy += "//Do not change anything below, unless you are experienced in Asymptote.\n";
 			}
 			for(Shape s : shapes)
 			{
