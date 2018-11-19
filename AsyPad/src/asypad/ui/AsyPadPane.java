@@ -1,18 +1,20 @@
 package asypad.ui;
 /*
- * TODO Implement Asymptote conversion and file i/o.
+ * FIXME Fix bug where intersection point of segment and shape will be buggy if the segment doesn't actually intersect a shape.
+ * FIXME Fix bug where naming breaks Asymptote code if you name a point " ".
+ * FIXME Fix bug of points on lines where the lines are dependent on other lines.
  * TODO Implement grid show and hide.
+ * TODO Add credits to chief tester.
+ * TODO Add user manual in help menu.
  */
 
 import java.util.ArrayList;
-
 import javafx.event.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-//import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import asypad.shapes.*;
 import asypad.shapes.types.*;
@@ -830,7 +832,8 @@ public class AsyPadPane extends Pane
 			if(i == 0)
 			{
 				asy += "/* You can change the coordinates of these points of dependency level 0.\n";
-				asy += "The drawing will keep the same qualities. */\n";
+				asy += "The drawing will retain the same relationships and qualities.\n";
+				asy += "Please be aware that as a result of this some of the image may be clipped off. */\n";
 			}
 			if(i == 1)
 			{
