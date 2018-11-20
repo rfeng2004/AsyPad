@@ -91,12 +91,12 @@ public class Utility
 	}
 
 	/**
-	 * The x-value of the point that lies on both lines.
+	 * The x-value of the point that lies on both lines. If the intersection point does not
+	 * lie in between the endpoints returns Double.POSITIVE_INFINITY.
 	 * @param l1 first line
 	 * @param l2 second line
 	 * @return x-coordinate of intersection point
 	 */
-	//fix vertical line treatment
 	public static double intersectX(Line l1, Line l2)
 	{
 		double m1 = (l1.getEndY()-l1.getStartY())/(l1.getEndX()-l1.getStartX());
@@ -105,7 +105,9 @@ public class Utility
 		double b2 = l2.getStartY()-m2*l2.getStartX();
 		if(l1.getEndX()-l1.getStartX()!=0 && l2.getEndX()-l2.getStartX()!=0)
 		{
-			return solveX(m1, b1, m2, b2);
+			double x = solveX(m1, b1, m2, b2);
+			if((l1.getStartX()-x)*(l1.getEndX()-x) < 0 && (l2.getStartX()-x)*(l2.getEndX()-x) < 0) return x;
+			else return Double.POSITIVE_INFINITY;
 		}
 		else
 		{
@@ -115,17 +117,20 @@ public class Utility
 			}
 			if(l1.getEndX()-l1.getStartX()==0)
 			{
-				return l1.getStartX();
+				if((l2.getStartX()-l1.getStartX())*(l2.getEndX()-l1.getStartX()) < 0) return l1.getStartX();
+				else return Double.POSITIVE_INFINITY;
 			}
 			else
 			{
-				return l2.getStartX();
+				if((l1.getStartX()-l2.getStartX())*(l1.getEndX()-l2.getStartX()) < 0) return l2.getStartX();
+				else return Double.POSITIVE_INFINITY;
 			}
 		}
 	}
 
 	/**
-	 * The y-value of the point that lies on both lines.
+	 * The y-value of the point that lies on both lines. If the intersection point does not
+	 * lie in between the endpoints returns Double.POSITIVE_INFINITY.
 	 * @param l1 first line
 	 * @param l2 second line
 	 * @return y-coordinate of intersection point
@@ -139,7 +144,9 @@ public class Utility
 		double b2 = l2.getStartY()-m2*l2.getStartX();
 		if(l1.getEndX()-l1.getStartX()!=0 && l2.getEndX()-l2.getStartX()!=0)
 		{
-			return solveY(m1, b1, m2, b2);
+			double y = solveY(m1, b1, m2, b2);
+			if((l1.getStartY()-y)*(l1.getEndY()-y) < 0 && (l2.getStartY()-y)*(l2.getEndY()-y) < 0) return y;
+			else return Double.POSITIVE_INFINITY;
 		}
 		else
 		{
@@ -149,11 +156,13 @@ public class Utility
 			}
 			if(l1.getEndX()-l1.getStartX()==0)
 			{
-				return m2*l1.getStartX()+b2;
+				if((l2.getStartX()-l1.getStartX())*(l2.getEndX()-l1.getStartX()) < 0) return m2*l1.getStartX()+b2;
+				else return Double.POSITIVE_INFINITY;
 			}
 			else
 			{
-				return m1*l2.getStartX()+b1;
+				if((l1.getStartX()-l2.getStartX())*(l1.getEndX()-l2.getStartX()) < 0) return m1*l2.getStartX()+b1;
+				else return Double.POSITIVE_INFINITY;
 			}
 		}
 	}
@@ -161,6 +170,7 @@ public class Utility
 	/**
 	 * Calculates an intersection point between the line and the circle. If there is more than one intersection point,
 	 * identifier = true means to return the x-coordinate of the intersection that is closer to the start of the line.
+	 * If such an intersection point is non-existent returns Double.POSITIVE_INFINTY.
 	 * @param l line
 	 * @param c circle
 	 * @param identifier distinguishes between the possibly 2 different intersection points
@@ -185,8 +195,8 @@ public class Utility
 		}
 		else
 		{
-			double ix1 = (D*dy+(Math.abs(dy)/dy)*dx*Math.sqrt(discriminant))/(dr*dr)+c.getCenterX();
-			double ix2 = (D*dy-(Math.abs(dy)/dy)*dx*Math.sqrt(discriminant))/(dr*dr)+c.getCenterX();
+			double ix1 = (D*dy+signumstar(dy)*dx*Math.sqrt(discriminant))/(dr*dr)+c.getCenterX();
+			double ix2 = (D*dy-signumstar(dy)*dx*Math.sqrt(discriminant))/(dr*dr)+c.getCenterX();
 			if(Math.abs(ix1-l.getStartX()) > Math.abs(ix2-l.getStartX()))
 			{
 				if(identifier)
@@ -215,6 +225,7 @@ public class Utility
 	/**
 	 * Calculates an intersection point between the line and the circle. If there is more than one intersection point,
 	 * identifier = true means to return the y-coordinate of the intersection that is closer to the start of the line.
+	 * If such an intersection point is non-existent returns Double.POSITIVE_INFINTY.
 	 * @param l line
 	 * @param c circle
 	 * @param identifier distinguishes between the possibly 2 different intersection points
@@ -468,5 +479,16 @@ public class Utility
 			return Math.abs(((Circle) s).getRadius()-dist(x, y, ((Circle) s).getCenterX(), ((Circle) s).getCenterY()));
 		}
 		return -1;
+	}
+	
+	/**
+	 * This is the equivalent of the sgn* function. Returns -1 if d < 0, 1 otherwise. (In particular, signumstar(0)=1)
+	 * @param d double to take sgn* of
+	 * @return sgn*(d)
+	 */
+	public static double signumstar(double d)
+	{
+		if(d < 0) return -1;
+		return 1;
 	}
 }

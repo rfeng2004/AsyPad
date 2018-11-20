@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
-	<project name="AsyPadv0.1" default="do-deploy" basedir="."  xmlns:fx="javafx:com.sun.javafx.tools.ant">
+	<project name="AsyPad" default="do-deploy" basedir="."  xmlns:fx="javafx:com.sun.javafx.tools.ant">
 	<target name="init-fx-tasks">
 		<path id="fxant">
 			<filelist>
@@ -24,7 +24,7 @@
 	
 		<mkdir dir="project" />
 		<copy todir="project">
-			<fileset dir="/Users/raymondfeng/Documents/GitHub/AsyPad/AsyPadv0.1">
+			<fileset dir="/Users/raymondfeng/Documents/GitHub/AsyPad/AsyPad">
 				<include name="src/**" />
 			</fileset>
 		</copy>
@@ -84,7 +84,7 @@
 	
 	
 		<fx:resources id="appRes">
-			<fx:fileset dir="dist" includes="AsyPadv0.1.jar"/>
+			<fx:fileset dir="dist" includes="AsyPad.jar"/>
 			<fx:fileset dir="dist" includes="libs/*"/>
 		</fx:resources>
 	
@@ -97,7 +97,7 @@
 	
 	
 	
-		<fx:jar destfile="dist/AsyPadv0.1.jar">
+		<fx:jar destfile="dist/AsyPad.jar">
 			<fx:application name="AsyPad" mainClass="asypad.ui.AsyPad"/>
 			<fileset dir="build/classes">
 			</fileset>
@@ -119,7 +119,7 @@
 			<fx:application name="AsyPad" mainClass="asypad.ui.AsyPad"/>
 			<fx:resources>
 				<fx:fileset dir="dist">
-					<include name="AsyPadv0.1.jar"/>
+					<include name="AsyPad.jar"/>
 				</fx:fileset>
 			</fx:resources>
 			<fx:info title="AsyPad" Description="Easy to use drawing application."/>

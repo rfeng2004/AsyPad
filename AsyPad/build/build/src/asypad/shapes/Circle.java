@@ -122,6 +122,7 @@ public class Circle extends Shape
 	
 	public String toAsymptote()
 	{
+		if(!inAsyCode) return "";
 		String n = getName();
 		if(type == CIRCLE_TYPE.CIRCLE)
 		{

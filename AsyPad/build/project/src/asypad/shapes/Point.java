@@ -333,6 +333,7 @@ public class Point extends Shape
 	
 	public String toAsymptote()
 	{
+		if(!inAsyCode) return "";
 		String n = getName();
 		if(type == POINT_TYPE.POINT)
 		{

@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="AsyPadv0.1.jar" size="156754" download="eager" />
+    <jar href="AsyPad.jar" size="157539" download="eager" />
   </resources>
   <jfx:javafx-desc  width="1000" height="700" main-class="asypad.ui.AsyPad"  name="AsyPad" />
   <update check="background"/>

@@ -321,6 +321,7 @@ public class Line extends Shape
 	
 	public String toAsymptote()
 	{
+		if(!inAsyCode) return "";
 		String n = getName();
 		if(type == LINE_TYPE.SEGMENT)
 		{
