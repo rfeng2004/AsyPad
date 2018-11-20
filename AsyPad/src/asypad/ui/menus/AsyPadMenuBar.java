@@ -182,11 +182,11 @@ public class AsyPadMenuBar extends MenuBar
 			{
 				Stage cred = new Stage();
 				FlowPane p = new FlowPane();
-				Scene scene = new Scene(p, 500, 60);
-				Label creds = new Label("AsyPad v0.2, created by Raymond Feng");
+				Scene scene = new Scene(p, 500, 120);
+				Label creds = new Label("AsyPad v0.1\nProgrammer: Raymond Feng\nHead Tester: Wenyi Feng");
 				creds.setAlignment(Pos.CENTER);
 				creds.setStyle("-fx-font: 24 arial");
-				creds.setPrefSize(500, 60);
+				creds.setPrefSize(500, 120);
 				p.getChildren().add(creds);
 				cred.setScene(scene);
 				cred.show();

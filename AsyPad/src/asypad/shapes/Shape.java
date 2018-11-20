@@ -48,6 +48,11 @@ public abstract class Shape
 	protected boolean hide;
 	
 	/**
+	 * If this shape's code should be added to the generated Asymptote file.
+	 */
+	protected boolean inAsyCode;
+	
+	/**
 	 * The shape's label.
 	 */
 	protected Label label;
@@ -63,7 +68,7 @@ public abstract class Shape
 	protected int level;
 	
 	/**
-	 * Default superclass constructor called by all shapes, initializes dependencies, children, level.
+	 * Default superclass constructor called by all shapes, initializes dependencies, children, and level.
 	 * @param shapes dependencies
 	 */
 	public Shape(Shape... shapes)
@@ -80,6 +85,8 @@ public abstract class Shape
 		}
 		level++;
 		remove = false;
+		hide = false;
+		inAsyCode = true;
 	}
 	
 	/**
@@ -111,6 +118,34 @@ public abstract class Shape
 		}
 	}
 	
+	/**
+	 * Adds this shape and all children to Asymptote code.
+	 */
+	public void addToAsy()
+	{
+		inAsyCode = true;
+		for(Shape s : children)
+		{
+			s.addToAsy();
+		}
+	}
+	
+	/**
+	 * Removes this shape and all children from Asymptote code.
+	 */
+	public void removeFromAsy()
+	{
+		inAsyCode = false;
+		for(Shape s : children)
+		{
+			s.removeFromAsy();
+		}
+	}
+	
+	/**
+	 * Sets whether the shape should be hidden.
+	 * @param hidden if the shape should be hidden
+	 */
 	public void setHidden(boolean hidden)
 	{
 		hide = hidden;
@@ -132,6 +167,15 @@ public abstract class Shape
 	public boolean isHidden()
 	{
 		return hide;
+	}
+	
+	/**
+	 * If this shape is in the Asymptote code.
+	 * @return inAsyCode
+	 */
+	public boolean isInAsyCode()
+	{
+		return inAsyCode;
 	}
 	
 	/**
@@ -203,8 +247,8 @@ public abstract class Shape
 	public abstract String toString();
 	
 	/**
-	 * Converts this shape into asymptote code.
-	 * @return asymptote representation.
+	 * Converts this shape into Asymptote code.
+	 * @return Asymptote representation.
 	 */
 	public abstract String toAsymptote();
 }
