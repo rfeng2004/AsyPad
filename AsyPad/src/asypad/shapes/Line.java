@@ -2,14 +2,37 @@ package asypad.shapes;
 
 import javafx.scene.layout.Pane;
 import asypad.shapes.types.LINE_TYPE;
+
 /**
- * Custom line used for drawing in AsyPad.
+ * Custom Line used for drawing in AsyPad.
  * @author Raymond Feng
  */
 public class Line extends Shape
 {
+	/**
+	 * Underlying line that is drawn to the screen.
+	 */
 	private javafx.scene.shape.Line line;
-	private double x1, y1, x2, y2;
+	
+	/**
+	 * x-coordinate of the start point of the line.
+	 */
+	private double x1;
+	
+	/**
+	 * y-coordinate of the start point of the line.
+	 */
+	private double y1;
+	
+	/**
+	 * x-coordinate of the end point of the line.
+	 */
+	private double x2;
+	
+	/**
+	 * y-coordinate of the end point of the line.
+	 */
+	private double y2;
 
 	/**
 	 * Constructs line through 2 points.
@@ -44,9 +67,9 @@ public class Line extends Shape
 
 	/**
 	 * Constructs line through specified point that is parallel or perpendicular to specified line.
-	 * @param p
-	 * @param l
-	 * @param isParallel
+	 * @param p point that line should go through
+	 * @param l line that will be used as reference
+	 * @param isParallel {@code true} for a parallel line, {@code false} for a perpendicular line
 	 */
 	public Line(Point p, Line l, boolean isParallel)
 	{
@@ -306,6 +329,37 @@ public class Line extends Shape
 		{
 			s.refresh();
 		}
+	}
+	
+	public void refreshName()
+	{
+		String d1 = dependencies.get(0).getName();
+		String d2 = dependencies.get(1).getName();
+		if(type == LINE_TYPE.SEGMENT)
+		{
+			label.setText("seg"+d1+d2);
+		}
+		else if(type == LINE_TYPE.LINE)
+		{
+			label.setText("line"+d1+d2);
+		}
+		else if(type == LINE_TYPE.PARALLEL_LINE)
+		{
+			label.setText("par"+d1+d2);
+		}
+		else if(type == LINE_TYPE.PERPENDICULAR_LINE)
+		{
+			label.setText("per"+d1+d2);
+		}
+		else if(type == LINE_TYPE.ANGLE_BISECTOR)
+		{
+			label.setText("ab"+d1+d2+dependencies.get(2).getName());
+		}
+		else if(type == LINE_TYPE.PERPENDICULAR_BISECTOR)
+		{
+			label.setText("pb"+d1+d2);
+		}
+		for(Shape s : children) s.refreshName();
 	}
 
 	public javafx.scene.shape.Line getObject()

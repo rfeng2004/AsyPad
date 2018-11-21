@@ -21,5 +21,9 @@ public enum POINT_TYPE implements SHAPE_TYPE
 	/**
 	 * The midpoint of 2 given points.
 	 */
-	MIDPOINT;
+	MIDPOINT,
+	/**
+	 * Point set relative to 2 given points by a user supplied ratio.
+	 */
+	RELATIVE_POINT;
 }

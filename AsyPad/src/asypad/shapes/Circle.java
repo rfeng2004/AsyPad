@@ -4,10 +4,31 @@ import asypad.shapes.types.CIRCLE_TYPE;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
+/**
+ * Custom Circle used for drawing in AsyPad.
+ * @author Raymond Feng
+ */
 public class Circle extends Shape
 {
+	/**
+	 * Underlying circle that is drawn onto the screen.
+	 */
 	private javafx.scene.shape.Circle circle;
-	private double x, y, radius;
+	
+	/**
+	 * x-coordinate of the center of the circle.
+	 */
+	private double x;
+	
+	/**
+	 * y-coordinate of the center of the circle.
+	 */
+	private double y;
+	
+	/**
+	 * Radius of the circle.
+	 */
+	private double radius;
 
 	/**
 	 * Constructs new Circle with center and a point on the circle.
@@ -107,6 +128,21 @@ public class Circle extends Shape
 		{
 			s.refresh();
 		}
+	}
+	
+	public void refreshName()
+	{
+		String d1 = dependencies.get(0).getName();
+		String d2 = dependencies.get(1).getName();
+		if(type == CIRCLE_TYPE.CIRCLE)
+		{
+			label.setText("circ"+d1+d2);
+		}
+		else if(type == CIRCLE_TYPE.CIRCUMCIRCLE)
+		{
+			label.setText("cc"+d1+d2+dependencies.get(2).getName());
+		}
+		for(Shape s : children) s.refreshName();
 	}
 
 	public javafx.scene.shape.Circle getObject()

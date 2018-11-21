@@ -12,6 +12,9 @@ import javafx.scene.image.*;
  */
 public class AsyPadToolBar extends MenuBar
 {
+	/**
+	 * The currently selected tool. The default is {@code MOUSE.MOUSE}.
+	 */
 	private SHAPE_TYPE selectedTool;
 
 	/**

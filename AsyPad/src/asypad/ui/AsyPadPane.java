@@ -14,6 +14,7 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import asypad.shapes.*;
 import asypad.shapes.types.*;
 import asypad.shapes.types.SHAPE_TYPE.MOUSE;
@@ -531,24 +532,26 @@ public class AsyPadPane extends Pane
 	}
 
 	/**
-	 * Adds a new shape to this pane.
+	 * Adds a new shape to this pane, checking whether a shape with the same name already exists.
 	 * @param shape shape to add
 	 */
 	public void addShape(Shape shape)
 	{
+		if(isDuplicateName(shape.getName())) return;
 		shapes.add(shape);
 		shape.draw(this);
 		shape.getObject().toBack();
 	}
 
 	/**
-	 * Adds new shapes to this pane.
+	 * Adds new shapes to this pane, checking whether a shape with the same name as each of shapes already exists.
 	 * @param shapes shapes to add
 	 */
 	public void addShapes(Shape... shapes)
 	{
 		for(Shape s : shapes)
 		{
+			if(isDuplicateName(s.getName())) continue;
 			this.shapes.add(s);
 			s.draw(this);
 			s.getObject().toBack();
@@ -557,8 +560,8 @@ public class AsyPadPane extends Pane
 
 	/**
 	 * Updates the AsyPadPane by 
-	 * deleting all shapes with remove = true (this should be called each time delete() is called on a shape),
-	 * hiding all shapes with hidden = true and showing shapes with hidden = false (should be called after each setHidden() call),
+	 * deleting all shapes with {@code remove == true} (this should be called each time {@code delete()} is called on a shape),
+	 * hiding all shapes with {@code hidden == true} and showing shapes with {@code hidden == false} (should be called after each {@code setHidden()} call),
 	 * and refreshing all shapes.
 	 */
 	public void update()
@@ -626,6 +629,7 @@ public class AsyPadPane extends Pane
 				String pname = name.getText();
 				if(!isValidPointName(pname)) return;
 				p.getLabel().setText(pname);
+				p.refreshName();
 				rename.close();
 			}
 		});
@@ -657,6 +661,9 @@ public class AsyPadPane extends Pane
 			}
 		});
 		rename.setScene(renameScene);
+		rename.setAlwaysOnTop(true);
+		rename.initStyle(StageStyle.UTILITY);
+		rename.setTitle("Point Options");
 		rename.show();
 	}
 
@@ -709,6 +716,9 @@ public class AsyPadPane extends Pane
 				}
 			});
 			configure.setScene(renameScene);
+			configure.setAlwaysOnTop(true);
+			configure.initStyle(StageStyle.UTILITY);
+			configure.setTitle("Shape Options");
 			configure.show();
 		}
 	}
@@ -765,9 +775,9 @@ public class AsyPadPane extends Pane
 
 	/**
 	 * Updates the current circle.
-	 * @param cx
-	 * @param cy
-	 * @param radius
+	 * @param cx x-coordinate of center
+	 * @param cy y-coordinate of center
+	 * @param radius radius of circle
 	 */
 	private void setCurrentCircle(double cx, double cy, double radius)
 	{
@@ -814,7 +824,7 @@ public class AsyPadPane extends Pane
 	}
 
 	/**
-	 * Returns the next available point name. The default point names are A, B,..., Z, AA, AB,..., AZ, BA,..., AAA,...
+	 * Returns the next available point name. The default point names are {@code A, B,..., Z, AA, AB,..., AZ, BA,..., AAA,...}
 	 * @param length length of name to search
 	 * @return next available point name
 	 */
@@ -855,10 +865,7 @@ public class AsyPadPane extends Pane
 	 */
 	private boolean isValidPointName(String pname)
 	{
-		for(Shape s : shapes) //check for duplicate name
-		{
-			if(s.getName().equals(pname)) return false;
-		}
+		if(isDuplicateName(pname)) return false; //check for duplicate name
 		boolean isAllLettersOrNumbers = true;
 		for(char c : pname.toCharArray())
 		{
@@ -880,6 +887,20 @@ public class AsyPadPane extends Pane
 			else return true;
 		}
 		else return false;
+	}
+	
+	/**
+	 * Checks if the given name is shared by a shape that is already drawn.
+	 * @param name name to check
+	 * @return if the name already exists
+	 */
+	private boolean isDuplicateName(String name)
+	{
+		for(Shape s : shapes)
+		{
+			if(s.getName().equals(name)) return true;
+		}
+		return false;
 	}
 
 	/**
