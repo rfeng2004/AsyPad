@@ -7,3 +7,6 @@ Points: Free point, Point locked onto another shape, Intersection Point, Midpoin
 Lines: Segment, Line, Parallel Line, Perpendicular Line, Angle Bisector, Perpendicular Bisector
 
 Circles: Center and Point on circle, Circumcircle
+
+# Keyboard Shortcuts
+Press Esc when you want to cancel drawing a shape.
