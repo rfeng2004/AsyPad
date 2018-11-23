@@ -10,9 +10,30 @@ import asypad.shapes.types.POINT_TYPE;
  */
 public class Point extends Shape
 {
+	/**
+	 * Underlying dot that is drawn onto the screen.
+	 */
 	private javafx.scene.shape.Circle dot;
-	private double x, y;
+	
+	/**
+	 * x-coordinate of the point.
+	 */
+	private double x;
+	
+	/**
+	 * y-coordinate of the point.
+	 */
+	private double y;
+	
+	/**
+	 * Relative location of point relative to shape that it is on, only used for {@code POINT_TYPE.POINT_ON_SHAPE}
+	 */
 	private double relativeLocation; //used for points that are snapped to another shape.
+	
+	/**
+	 * Identifier to distinguish between the 2 possible intersections of a point and a circle, 
+	 * only used for {@ POINT_TYPE.INTERSECTION_POINT} that depend on a line and a circle.
+	 */
 	private boolean identifier; //used for intersection of line and circle or 2 circles.
 
 	/**
@@ -318,6 +339,11 @@ public class Point extends Shape
 		{
 			s.refresh();
 		}
+	}
+	
+	public void refreshName()
+	{
+		for(Shape s : children) s.refreshName();
 	}
 
 	public javafx.scene.shape.Circle getObject()

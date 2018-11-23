@@ -1,9 +1,9 @@
 package asypad.ui;
 /*
- * FIXME Fix bug of points on lines where the lines are dependent on other lines.
  * TODO Add new tool: tangents, relative point.
  * TODO Implement grid show and hide.
  * TODO Add user manual in help menu.
+ * TODO Add undo/redo functionality.
  */
 
 import java.util.ArrayList;
@@ -152,6 +152,7 @@ public class AsyPadPane extends Pane
 				{
 					if(selectedShapes.size() == 1)
 					{
+						Line l;
 						Point p = (Point) selectedShapes.get(0);
 						double x = event.getSceneX();
 						double y = event.getSceneY();
@@ -163,12 +164,13 @@ public class AsyPadPane extends Pane
 						} 
 						if(tool == LINE_TYPE.SEGMENT)
 						{
-							setCurrentLine(p.getX(), p.getY(), x, y);
+							l = new Line(p, new Point(x, y), true);
 						}
 						else
 						{
-							setCurrentLine(p.getX()-Shape.INF*(x-p.getX()), p.getY()-Shape.INF*(y-p.getY()), x+Shape.INF*(x-p.getX()), y+Shape.INF*(y-p.getY()));
+							l = new Line(p, new Point(x, y), false);
 						}
+						setCurrentLine(l.getStartX(), l.getStartY(), l.getEndX(), l.getEndY());
 					}
 				}
 				else if(tool == LINE_TYPE.PARALLEL_LINE || tool == LINE_TYPE.PERPENDICULAR_LINE)
@@ -208,7 +210,8 @@ public class AsyPadPane extends Pane
 							x = point.getX();
 							y = point.getY();
 						}
-						setCurrentCircle(p.getX(), p.getY(), Utility.dist(p.getX(), p.getY(), x, y));
+						Circle c = new Circle(p, new Point(x, y));
+						setCurrentCircle(c.getCenterX(), c.getCenterY(), c.getRadius());
 					}
 				}
 				else if(tool == CIRCLE_TYPE.CIRCUMCIRCLE)

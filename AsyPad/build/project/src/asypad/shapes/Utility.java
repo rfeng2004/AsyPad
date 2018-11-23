@@ -409,47 +409,47 @@ public class Utility
 
 	/**
 	 * Calculates the x-coordinate of the point that lies on the angle bisector of angle p1p2p3,
-	 * and is 10 pixels away from p2.
+	 * and is 1 unit away from p2.
 	 * @param p1 first point
 	 * @param p2 second point (vertex of angle)
 	 * @param p3 third point
-	 * @return x-coordinate of point on angle bisector, 10 pixels away from p2.
+	 * @return x-coordinate of point on angle bisector, 1 unit away from p2.
 	 */
 	public static double angleBisectorX(Point p1, Point p2, Point p3)
 	{
 		double d1 = dist(p1, p2);
 		double d3 = dist(p2, p3);
-		double x1 = (d1-10)/d1*p2.getX()+10/d1*p1.getX();
-		double y1 = (d1-10)/d1*p2.getY()+10/d1*p1.getY();
-		double x3 = (d3-10)/d3*p2.getX()+10/d3*p3.getX();
-		double y3 = (d3-10)/d3*p2.getY()+10/d3*p3.getY();
+		double x1 = (d1-1)/d1*p2.getX()+1/d1*p1.getX();
+		double y1 = (d1-1)/d1*p2.getY()+1/d1*p1.getY();
+		double x3 = (d3-1)/d3*p2.getX()+1/d3*p3.getX();
+		double y3 = (d3-1)/d3*p2.getY()+1/d3*p3.getY();
 		double x2 = (x1+x3)/2;
 		double y2 = (y1+y3)/2;
 		double d2 = dist(p2.getX(), p2.getY(), x2, y2);
-		x2 = (d2-10)/d2*p2.getX()+10/d2*x2;
+		x2 = (d2-1)/d2*p2.getX()+1/d2*x2;
 		return x2;
 	}
 
 	/**
 	 * Calculates the y-coordinate of the point that lies on the angle bisector of angle p1p2p3,
-	 * and is 10 pixels away from p2.
+	 * and is 1 unit away from p2.
 	 * @param p1 first point
 	 * @param p2 second point (vertex of angle)
 	 * @param p3 third point
-	 * @return y-coordinate of point on angle bisector, 10 pixels away from p2.
+	 * @return y-coordinate of point on angle bisector, 1 unit away from p2.
 	 */
 	public static double angleBisectorY(Point p1, Point p2, Point p3)
 	{
 		double d1 = dist(p1, p2);
 		double d3 = dist(p2, p3);
-		double x1 = (d1-10)/d1*p2.getX()+10/d1*p1.getX();
-		double y1 = (d1-10)/d1*p2.getY()+10/d1*p1.getY();
-		double x3 = (d3-10)/d3*p2.getX()+10/d3*p3.getX();
-		double y3 = (d3-10)/d3*p2.getY()+10/d3*p3.getY();
+		double x1 = (d1-1)/d1*p2.getX()+1/d1*p1.getX();
+		double y1 = (d1-1)/d1*p2.getY()+1/d1*p1.getY();
+		double x3 = (d3-1)/d3*p2.getX()+1/d3*p3.getX();
+		double y3 = (d3-1)/d3*p2.getY()+1/d3*p3.getY();
 		double x2 = (x1+x3)/2;
 		double y2 = (y1+y3)/2;
 		double d2 = dist(p2.getX(), p2.getY(), x2, y2);
-		y2 = (d2-10)/d2*p2.getY()+10/d2*y2;
+		y2 = (d2-1)/d2*p2.getY()+1/d2*y2;
 		return y2;
 	}
 

@@ -55,10 +55,14 @@ public class Line extends Shape
 		else 
 		{
 			type = LINE_TYPE.LINE;
-			x1 = p1.getX()-INF*(p2.getX()-p1.getX());
-			y1 = p1.getY()-INF*(p2.getY()-p1.getY());
-			x2 = p2.getX()+INF*(p2.getX()-p1.getX());
-			y2 = p2.getY()+INF*(p2.getY()-p1.getY());
+			double dx = p2.getX()-p1.getX();
+			double dy = p2.getY()-p1.getY();
+			double dirx = dx/Math.sqrt(dx*dx+dy*dy);
+			double diry = dy/Math.sqrt(dx*dx+dy*dy);
+			x1 = p1.getX()-INF*dirx;
+			y1 = p1.getY()-INF*diry;
+			x2 = p2.getX()+INF*dirx;
+			y2 = p2.getY()+INF*diry;
 			label.setText("line"+p1.getName()+p2.getName());
 		}
 		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
@@ -77,39 +81,27 @@ public class Line extends Shape
 		if(isParallel)
 		{
 			type = LINE_TYPE.PARALLEL_LINE;
-			if(l.getType() != LINE_TYPE.SEGMENT)
-			{
-				x1 = p.getX()-(l.getEndX()-l.getStartX());
-				y1 = p.getY()-(l.getEndY()-l.getStartY());
-				x2 = p.getX()+(l.getEndX()-l.getStartX());
-				y2 = p.getY()+(l.getEndY()-l.getStartY());
-			}
-			else
-			{
-				x1 = p.getX()-INF*(l.getEndX()-l.getStartX());
-				y1 = p.getY()-INF*(l.getEndY()-l.getStartY());
-				x2 = p.getX()+INF*(l.getEndX()-l.getStartX());
-				y2 = p.getY()+INF*(l.getEndY()-l.getStartY());
-			}
+			double dx = l.getEndX()-l.getStartX();
+			double dy = l.getEndY()-l.getStartY();
+			double dirx = dx/Math.sqrt(dx*dx+dy*dy);
+			double diry = dy/Math.sqrt(dx*dx+dy*dy);
+			x1 = p.getX()-INF*dirx;
+			y1 = p.getY()-INF*diry;
+			x2 = p.getX()+INF*dirx;
+			y2 = p.getY()+INF*diry;
 			label.setText("par"+p.getName()+l.getName());
 		}
 		else
 		{
 			type = LINE_TYPE.PERPENDICULAR_LINE;
-			if(l.getType() != LINE_TYPE.SEGMENT)
-			{
-				x1 = p.getX()+(l.getEndY()-l.getStartY());
-				y1 = p.getY()-(l.getEndX()-l.getStartX());
-				x2 = p.getX()-(l.getEndY()-l.getStartY());
-				y2 = p.getY()+(l.getEndX()-l.getStartX());
-			}
-			else
-			{
-				x1 = p.getX()+INF*(l.getEndY()-l.getStartY());
-				y1 = p.getY()-INF*(l.getEndX()-l.getStartX());
-				x2 = p.getX()-INF*(l.getEndY()-l.getStartY());
-				y2 = p.getY()+INF*(l.getEndX()-l.getStartX());
-			}
+			double dx = l.getEndX()-l.getStartX();
+			double dy = l.getEndY()-l.getStartY();
+			double dirx = dx/Math.sqrt(dx*dx+dy*dy);
+			double diry = dy/Math.sqrt(dx*dx+dy*dy);
+			x1 = p.getX()+INF*diry;
+			y1 = p.getY()-INF*dirx;
+			x2 = p.getX()-INF*diry;
+			y2 = p.getY()+INF*dirx;
 			label.setText("per"+p.getName()+l.getName());
 		}
 		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
@@ -148,10 +140,14 @@ public class Line extends Shape
 		type = LINE_TYPE.PERPENDICULAR_BISECTOR;
 		double mx = (p1.getX()+p2.getX())/2;
 		double my = (p1.getY()+p2.getY())/2;
-		x1 = mx+INF*(p2.getY()-p1.getY());
-		y1 = my-INF*(p2.getX()-p1.getX());
-		x2 = mx-INF*(p2.getY()-p1.getY());
-		y2 = my+INF*(p2.getX()-p1.getX());
+		double dx = p2.getX()-p1.getX();
+		double dy = p2.getY()-p1.getY();
+		double dirx = dx/Math.sqrt(dx*dx+dy*dy);
+		double diry = dy/Math.sqrt(dx*dx+dy*dy);
+		x1 = mx+INF*diry;
+		y1 = my-INF*dirx;
+		x2 = mx-INF*diry;
+		y2 = my+INF*dirx;
 		label.setText("pb"+p1.getName()+p2.getName());
 		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
 		line.setStrokeWidth(StrokeWidth);
@@ -253,48 +249,40 @@ public class Line extends Shape
 		{
 			Point p1 = (Point) dependencies.get(0);
 			Point p2 = (Point) dependencies.get(1);
-			x1 = p1.getX()-INF*(p2.getX()-p1.getX());
-			y1 = p1.getY()-INF*(p2.getY()-p1.getY());
-			x2 = p2.getX()+INF*(p2.getX()-p1.getX());
-			y2 = p2.getY()+INF*(p2.getY()-p1.getY());
+			double dx = p2.getX()-p1.getX();
+			double dy = p2.getY()-p1.getY();
+			double dirx = dx/Math.sqrt(dx*dx+dy*dy);
+			double diry = dy/Math.sqrt(dx*dx+dy*dy);
+			x1 = p1.getX()-INF*dirx;
+			y1 = p1.getY()-INF*diry;
+			x2 = p2.getX()+INF*dirx;
+			y2 = p2.getY()+INF*diry;
 		}
 		else if(type == LINE_TYPE.PARALLEL_LINE)
 		{
 			Point p = (Point) dependencies.get(0);
 			Line l = (Line) dependencies.get(1);
-			if(l.getType() != LINE_TYPE.SEGMENT)
-			{
-				x1 = p.getX()-(l.getEndX()-l.getStartX());
-				y1 = p.getY()-(l.getEndY()-l.getStartY());
-				x2 = p.getX()+(l.getEndX()-l.getStartX());
-				y2 = p.getY()+(l.getEndY()-l.getStartY());
-			}
-			else
-			{
-				x1 = p.getX()-INF*(l.getEndX()-l.getStartX());
-				y1 = p.getY()-INF*(l.getEndY()-l.getStartY());
-				x2 = p.getX()+INF*(l.getEndX()-l.getStartX());
-				y2 = p.getY()+INF*(l.getEndY()-l.getStartY());
-			}
+			double dx = l.getEndX()-l.getStartX();
+			double dy = l.getEndY()-l.getStartY();
+			double dirx = dx/Math.sqrt(dx*dx+dy*dy);
+			double diry = dy/Math.sqrt(dx*dx+dy*dy);
+			x1 = p.getX()-INF*dirx;
+			y1 = p.getY()-INF*diry;
+			x2 = p.getX()+INF*dirx;
+			y2 = p.getY()+INF*diry;
 		}
 		else if(type == LINE_TYPE.PERPENDICULAR_LINE)
 		{
 			Point p = (Point) dependencies.get(0);
 			Line l = (Line) dependencies.get(1);
-			if(l.getType() != LINE_TYPE.SEGMENT)
-			{
-				x1 = p.getX()+(l.getEndY()-l.getStartY());
-				y1 = p.getY()-(l.getEndX()-l.getStartX());
-				x2 = p.getX()-(l.getEndY()-l.getStartY());
-				y2 = p.getY()+(l.getEndX()-l.getStartX());
-			}
-			else
-			{
-				x1 = p.getX()+INF*(l.getEndY()-l.getStartY());
-				y1 = p.getY()-INF*(l.getEndX()-l.getStartX());
-				x2 = p.getX()-INF*(l.getEndY()-l.getStartY());
-				y2 = p.getY()+INF*(l.getEndX()-l.getStartX());
-			}
+			double dx = l.getEndX()-l.getStartX();
+			double dy = l.getEndY()-l.getStartY();
+			double dirx = dx/Math.sqrt(dx*dx+dy*dy);
+			double diry = dy/Math.sqrt(dx*dx+dy*dy);
+			x1 = p.getX()+INF*diry;
+			y1 = p.getY()-INF*dirx;
+			x2 = p.getX()-INF*diry;
+			y2 = p.getY()+INF*dirx;
 		}
 		else if(type == LINE_TYPE.ANGLE_BISECTOR)
 		{
@@ -314,10 +302,14 @@ public class Line extends Shape
 			Point p2 = (Point) dependencies.get(1);
 			double mx = (p1.getX()+p2.getX())/2;
 			double my = (p1.getY()+p2.getY())/2;
-			x1 = mx+INF*(p2.getY()-p1.getY());
-			y1 = my-INF*(p2.getX()-p1.getX());
-			x2 = mx-INF*(p2.getY()-p1.getY());
-			y2 = my+INF*(p2.getX()-p1.getX());
+			double dx = p2.getX()-p1.getX();
+			double dy = p2.getY()-p1.getY();
+			double dirx = dx/Math.sqrt(dx*dx+dy*dy);
+			double diry = dy/Math.sqrt(dx*dx+dy*dy);
+			x1 = mx+INF*diry;
+			y1 = my-INF*dirx;
+			x2 = mx-INF*diry;
+			y2 = my+INF*dirx;
 		}
 		//System.out.println(this);
 		line.setStartX(x1);
@@ -390,7 +382,7 @@ public class Line extends Shape
 		{
 			String p1 = dependencies.get(0).getName();
 			String p2 = dependencies.get(1).getName();
-			String s = "path " + n + " = (" + p1 + "-" + INF + "*(" + p2 + "-" + p1 + "))--(" + p2 + "+" + INF + "*(" + p2 + "-" + p1 + ")); ";
+			String s = "path " + n + " = (" + p1 + "-" + INF/100 + "*unit(" + p2 + "-" + p1 + "))--(" + p2 + "+" + INF/100 + "*unit(" + p2 + "-" + p1 + ")); ";
 			if(!hide) s+="draw(" + n + ");\n";
 			else s+="\n";
 			return s;
@@ -399,7 +391,7 @@ public class Line extends Shape
 		{
 			String p = dependencies.get(0).getName();
 			String l = dependencies.get(1).getName();
-			String s = "path " + n + " = (" + p + "-" + INF + "*dir(" + l + "))--" + "(" + p + "+" + INF + "*dir(" + l + ")); ";
+			String s = "path " + n + " = (" + p + "-" + INF/100 + "*dir(" + l + "))--(" + p + "+" + INF/100 + "*dir(" + l + ")); ";
 			if(!hide) s+="draw(" + n + ");\n";
 			else s+="\n";
 			return s;
@@ -408,7 +400,7 @@ public class Line extends Shape
 		{
 			String p = dependencies.get(0).getName();
 			String l = dependencies.get(1).getName();
-			String s = "path " + n + " = (" + p + "-" + INF + "*(dir(" + l + ").y, -dir(" + l + ").x))--" + "(" + p + "+" + INF + "*(dir(" + l + ").y, -dir(" + l + ").x)); ";
+			String s = "path " + n + " = (" + p + "-" + INF/100 + "*(dir(" + l + ").y, -dir(" + l + ").x))--(" + p + "+" + INF/100 + "*(dir(" + l + ").y, -dir(" + l + ").x)); ";
 			if(!hide) s+="draw(" + n + ");\n";
 			else s+="\n";
 			return s;
@@ -419,7 +411,7 @@ public class Line extends Shape
 			String p2 = dependencies.get(1).getName();
 			String p3 = dependencies.get(2).getName();
 			String bisectorpoint = "(bisectorpoint(" + p1 + ", " + p2 + ", " + p3 + ")-" + p2 + ")";
-			String s = "path " + n + " = (" + p2 + "-" + INF + "*" + bisectorpoint + ")--(" + p2 + "+" + INF + "*" + bisectorpoint + "); ";
+			String s = "path " + n + " = (" + p2 + "-" + INF/100 + "*" + bisectorpoint + ")--(" + p2 + "+" + INF/100 + "*" + bisectorpoint + "); ";
 			if(!hide) s+="draw(" + n + ");\n";
 			else s+="\n";
 			return s;
@@ -429,7 +421,7 @@ public class Line extends Shape
 			String p1 = dependencies.get(0).getName();
 			String p2 = dependencies.get(1).getName();
 			String p = "(" + p1 + "+" + p2 + ")/2";
-			String s = "path " + n + " = (" + p + "-" + INF + "*unit(((" + p2 + "-" + p1 + ").y, -(" + p2 + "-" + p1 + ").x)))--(" + p + "+" + INF + "*unit(((" + p2 + "-" + p1 + ").y, -(" + p2 + "-" + p1 + ").x))); ";
+			String s = "path " + n + " = (" + p + "-" + INF/100 + "*unit(((" + p2 + "-" + p1 + ").y, -(" + p2 + "-" + p1 + ").x)))--(" + p + "+" + INF/100 + "*unit(((" + p2 + "-" + p1 + ").y, -(" + p2 + "-" + p1 + ").x))); ";
 			if(!hide) s+="draw(" + n + ");\n";
 			else s+="\n";
 			return s;

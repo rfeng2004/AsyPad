@@ -230,9 +230,14 @@ public abstract class Shape
 	public abstract void draw(Pane p);
 	
 	/**
-	 * Refreshes shape.
+	 * Refreshes shape and all of its children.
 	 */
 	public abstract void refresh();
+	
+	/**
+	 * Refreshes the name of this shape and all of its children.
+	 */
+	public abstract void refreshName();
 	
 	/**
 	 * Returns the underlying shape that is drawn onto the screen.

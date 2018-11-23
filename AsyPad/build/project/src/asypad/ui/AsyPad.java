@@ -5,6 +5,11 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
+/**
+ * AsyPad application.
+ * @author Raymond Feng
+ * @version 0.1
+ */
 public class AsyPad extends Application
 {
 	public static void main(String args[])
