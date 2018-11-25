@@ -1,9 +1,9 @@
 package asypad.ui;
 /*
+ * FIXME Bug where lines perpendicular to a line that is perfectly horizontal bug out.
  * TODO Add new tool: tangents, relative point.
  * TODO Implement grid show and hide.
  * TODO Add user manual in help menu.
- * TODO Add undo/redo functionality.
  */
 
 import java.util.ArrayList;
@@ -18,6 +18,7 @@ import javafx.stage.StageStyle;
 import asypad.shapes.*;
 import asypad.shapes.types.*;
 import asypad.shapes.types.SHAPE_TYPE.MOUSE;
+import asypad.ui.command.*;
 import asypad.ui.menus.*;
 
 /**
@@ -28,45 +29,60 @@ import asypad.ui.menus.*;
 public class AsyPadPane extends Pane
 {
 	/**
-	 * Arraylist of all drawn Shapes.
+	 * ArrayList of all drawn Shapes.
 	 */
 	private ArrayList<Shape> shapes;
-	
+
 	/**
 	 * Index pointing to the shape that the mouse is snapped to.
 	 */
 	private int snappedIndex;
-	
+
 	/**
-	 * Arraylist of user selected shapes.
+	 * Whether the mouse has been dragged.
+	 */
+	private boolean dragged;
+
+	/**
+	 * ArrayList of user selected shapes.
 	 */
 	private ArrayList<Shape> selectedShapes;
-	
+
 	/**
-	 * Arraylist of shapes that the mouse is snapped to.
+	 * ArrayList of shapes that the mouse is snapped to.
 	 */
 	private ArrayList<Shape> snappedShapes;
-	
+
+	/**
+	 * ArrayList of commands that stores previous states of the AsyPadPane for undo/redo.
+	 */
+	private ArrayList<Command> commands;
+
+	/**
+	 * The index that points to the position of the last command in the AsyPadPane.
+	 */
+	private int currentCommandIndex;
+
 	/**
 	 * Specifies the strength of the snapping system, i.e. how close the mouse has to be to snap.
 	 */
 	private static final double snapForce = 5*Shape.StrokeWidth;
-	
+
 	/**
 	 * Label specifying the current tool.
 	 */
 	private Label currentTool;
-	
+
 	/**
 	 * Label specifying the current tool description.
 	 */
 	private Label currentToolDescription;
-	
+
 	/**
 	 * Temporary line that is used for "animation", i.e. the one the user sees when not all dependencies have been specified.
 	 */
 	private javafx.scene.shape.Line currentLine;
-	
+
 	/**
 	 * Temporary circle that is used for "animation", i.e. the one the user sees when not all dependencies have been specified.
 	 */
@@ -81,6 +97,8 @@ public class AsyPadPane extends Pane
 		shapes = new ArrayList<Shape>();
 		selectedShapes = new ArrayList<Shape>();
 		snappedShapes = new ArrayList<Shape>();
+		commands = new ArrayList<Command>();
+		currentCommandIndex = -1;
 		currentLine = new javafx.scene.shape.Line();
 		currentCircle = new javafx.scene.shape.Circle();
 		currentCircle.setFill(Color.TRANSPARENT);
@@ -255,6 +273,7 @@ public class AsyPadPane extends Pane
 				{
 					if(snappedIndex != -1)
 					{
+						addCommand(new DeleteCommand(shapes.get(snappedIndex)));
 						shapes.get(snappedIndex).delete();
 						update();
 						snappedIndex = -1;
@@ -277,21 +296,27 @@ public class AsyPadPane extends Pane
 					}
 					if(snappedIndex == -1)
 					{
-						addShape(new Point(event.getSceneX(), event.getSceneY(), nextPointName(1)));
-						snappedIndex = shapes.size()-1;
+						Point p = new Point(event.getSceneX(), event.getSceneY(), nextPointName(1));
+						addShape(p);
+						addCommand(new DrawCommand(p, p.getX(), p.getY(), p.getName()));
+						//snappedIndex = shapes.size()-1;
 						setCursor(Cursor.HAND);
 					}
 					else if(!(shapes.get(snappedIndex) instanceof Point) && snappedShapes.size() == 1)
 					{
-						addShape(new Point(event.getSceneX(), event.getSceneY(), shapes.get(snappedIndex), nextPointName(1)));
-						snappedIndex = shapes.size()-1;
+						Point p = new Point(event.getSceneX(), event.getSceneY(), shapes.get(snappedIndex), nextPointName(1));
+						addShape(p);
+						addCommand(new DrawCommand(p, p.getX(), p.getY(), p.getName()));
+						//snappedIndex = shapes.size()-1;
 						setCursor(Cursor.HAND);
 					}
 					else
 					{
 						if(lines.size() >= 2)
 						{
-							addShape(new Point(lines.get(0), lines.get(1), nextPointName(1)));
+							Point p = new Point(lines.get(0), lines.get(1), nextPointName(1));
+							addShape(p);
+							addCommand(new DrawCommand(p, p.getX(), p.getY(), p.getName()));
 						}
 						else if(lines.size() == 1 && circles.size() >= 1)
 						{
@@ -300,8 +325,13 @@ public class AsyPadPane extends Pane
 							if(Utility.distToShape(event.getSceneX(), event.getSceneY(), p1) < Utility.distToShape(event.getSceneX(), event.getSceneY(), p2))
 							{
 								addShape(p1);
+								addCommand(new DrawCommand(p1, p1.getX(), p1.getY(), p1.getName()));
 							}
-							else addShape(p2);
+							else
+							{
+								addShape(p2);
+								addCommand(new DrawCommand(p2, p2.getX(), p2.getY(), p2.getName()));
+							}
 						}
 					}
 				}
@@ -309,8 +339,10 @@ public class AsyPadPane extends Pane
 				{
 					if(snappedIndex != -1 && !(shapes.get(snappedIndex) instanceof Point))
 					{
-						addShape(new Point(event.getSceneX(), event.getSceneY(), shapes.get(snappedIndex), nextPointName(1)));
-						snappedIndex = shapes.size()-1;
+						Point p = new Point(event.getSceneX(), event.getSceneY(), shapes.get(snappedIndex), nextPointName(1));
+						addShape(p);
+						addCommand(new DrawCommand(p, p.getX(), p.getY(), p.getName()));
+						//snappedIndex = shapes.size()-1;
 						setCursor(Cursor.HAND);
 					}
 				}
@@ -331,7 +363,9 @@ public class AsyPadPane extends Pane
 					}
 					if(lines.size() >= 2)
 					{
-						addShape(new Point(lines.get(0), lines.get(1), nextPointName(1)));
+						Point p = new Point(lines.get(0), lines.get(1), nextPointName(1));
+						addShape(p);
+						addCommand(new DrawCommand(p, p.getX(), p.getY(), p.getName()));
 					}
 					else if(lines.size() == 1 && circles.size() >= 1)
 					{
@@ -341,11 +375,13 @@ public class AsyPadPane extends Pane
 						{
 							addShape(p1);
 							//System.out.println(p1);
+							addCommand(new DrawCommand(p1, p1.getX(), p1.getY(), p1.getName()));
 						}
 						else 
 						{
 							addShape(p2);
 							//System.out.println(p2);
+							addCommand(new DrawCommand(p2, p2.getX(), p2.getY(), p2.getName()));
 						}
 					}
 				}
@@ -356,7 +392,9 @@ public class AsyPadPane extends Pane
 					{
 						if(selectedShapes.get(0) != selectedShapes.get(1))
 						{
-							addShape(new Point((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), nextPointName(1)));
+							Point p = new Point((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), nextPointName(1));
+							addShape(p);
+							addCommand(new DrawCommand(p, p.getX(), p.getY(), p.getName()));
 						}
 						resetSelectedShapes();
 						selectedShapes.clear();
@@ -371,11 +409,15 @@ public class AsyPadPane extends Pane
 						{
 							if(tool == LINE_TYPE.SEGMENT)
 							{
-								addShape(new Line((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), true));
+								Line l = new Line((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), true);
+								addShape(l);
+								addCommand(new DrawCommand(l));
 							}
 							else 
 							{
-								addShape(new Line((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), false));
+								Line l = new Line((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), false);
+								addShape(l);
+								addCommand(new DrawCommand(l));
 							}
 						}
 						resetSelectedShapes();
@@ -413,22 +455,30 @@ public class AsyPadPane extends Pane
 						{
 							if(tool == LINE_TYPE.PARALLEL_LINE)
 							{
-								addShape(new Line((Point) selectedShapes.get(0), (Line) selectedShapes.get(1), true));
+								Line l = new Line((Point) selectedShapes.get(0), (Line) selectedShapes.get(1), true);
+								addShape(l);
+								addCommand(new DrawCommand(l));
 							}
 							else 
 							{
-								addShape(new Line((Point) selectedShapes.get(0), (Line) selectedShapes.get(1), false));
+								Line l = new Line((Point) selectedShapes.get(0), (Line) selectedShapes.get(1), false);
+								addShape(l);
+								addCommand(new DrawCommand(l));
 							}
 						}
 						else 
 						{
 							if(tool == LINE_TYPE.PARALLEL_LINE)
 							{
-								addShape(new Line((Point) selectedShapes.get(1), (Line) selectedShapes.get(0), true));
+								Line l = new Line((Point) selectedShapes.get(1), (Line) selectedShapes.get(0), true);
+								addShape(l);
+								addCommand(new DrawCommand(l));
 							}
 							else
 							{
-								addShape(new Line((Point) selectedShapes.get(1), (Line) selectedShapes.get(0), false));
+								Line l = new Line((Point) selectedShapes.get(1), (Line) selectedShapes.get(0), false);
+								addShape(l);
+								addCommand(new DrawCommand(l));
 							}
 						}
 						resetSelectedShapes();
@@ -446,7 +496,9 @@ public class AsyPadPane extends Pane
 						Point p3 = (Point) selectedShapes.get(2);
 						if(p1!=p2 && p2!=p3 && p3!=p1)
 						{
-							addShape(new Line(p1, p2, p3));
+							Line l = new Line(p1, p2, p3);
+							addShape(l);
+							addCommand(new DrawCommand(l));
 						}
 						resetSelectedShapes();
 						selectedShapes.clear();
@@ -459,7 +511,9 @@ public class AsyPadPane extends Pane
 					{
 						if(selectedShapes.get(0) != selectedShapes.get(1))
 						{
-							addShape(new Line((Point) selectedShapes.get(0), (Point) selectedShapes.get(1)));
+							Line l = new Line((Point) selectedShapes.get(0), (Point) selectedShapes.get(1));
+							addShape(l);
+							addCommand(new DrawCommand(l));
 						}
 						resetSelectedShapes();
 						selectedShapes.clear();
@@ -472,7 +526,9 @@ public class AsyPadPane extends Pane
 					{
 						if(selectedShapes.get(0) != selectedShapes.get(1))
 						{
-							addShape(new Circle((Point) selectedShapes.get(0), (Point) selectedShapes.get(1)));
+							Circle c = new Circle((Point) selectedShapes.get(0), (Point) selectedShapes.get(1));
+							addShape(c);
+							addCommand(new DrawCommand(c));
 						}
 						resetSelectedShapes();
 						selectedShapes.clear();
@@ -489,7 +545,9 @@ public class AsyPadPane extends Pane
 						Point p3 = (Point) selectedShapes.get(2);
 						if(p1 != p2 && p2 != p3 && p1 != p3)
 						{
-							addShape(new Circle(p1, p2, p3));
+							Circle c = new Circle(p1, p2, p3);
+							addShape(c);
+							addCommand(new DrawCommand(c));
 						}
 						resetSelectedShapes();
 						selectedShapes.clear();
@@ -512,15 +570,41 @@ public class AsyPadPane extends Pane
 						Shape s = shapes.get(snappedIndex);
 						if(s.getType() == POINT_TYPE.POINT)
 						{
+							dragged = true;
 							((Point) s).setX(Math.max(0, event.getSceneX()));
 							((Point) s).setY(Math.max(0, event.getSceneY()));
 						}
 						else if(s.getType() == POINT_TYPE.POINT_ON_SHAPE)
 						{
+							dragged = true;
 							((Point) s).setRelativeLocation(event.getSceneX(), event.getSceneY());
 						}
 					}
 				}
+			}
+		});
+		this.setOnMouseReleased(new EventHandler<MouseEvent>()
+		{
+			public void handle(MouseEvent event)
+			{
+				if(dragged)
+				{
+					Shape s = shapes.get(snappedIndex);
+					if(s.getType() == POINT_TYPE.POINT)
+					{
+						double x = Math.max(0, event.getSceneX());
+						double y = Math.max(0, event.getSceneY());
+						((Point) s).setX(x);
+						((Point) s).setY(y);
+						addCommand(new MoveCommand((Point) s, x, y));
+					}
+					else if(s.getType() == POINT_TYPE.POINT_ON_SHAPE)
+					{
+						((Point) s).setRelativeLocation(event.getSceneX(), event.getSceneY());
+						addCommand(new MoveCommand((Point) s, event.getSceneX(), event.getSceneY()));
+					}
+				}
+				dragged = false;
 			}
 		});
 	}
@@ -544,6 +628,7 @@ public class AsyPadPane extends Pane
 		shapes.add(shape);
 		shape.draw(this);
 		shape.getObject().toBack();
+		shape.getLabel().toBack();
 	}
 
 	/**
@@ -558,7 +643,59 @@ public class AsyPadPane extends Pane
 			this.shapes.add(s);
 			s.draw(this);
 			s.getObject().toBack();
+			s.getLabel().toBack();
 		}
+	}
+
+	/**
+	 * Clears the AsyPadPane by deleting all shapes and resetting the Stroke Width to the default.
+	 */
+	public void clear()
+	{
+		for(Shape s : shapes) s.delete();
+		update();
+		Shape.StrokeWidth = 3;
+	}
+
+	/**
+	 * Adds a new command to the AsyPadPane.
+	 * @param c the new command
+	 */
+	public void addCommand(Command c)
+	{
+		while(commands.size()-1 > currentCommandIndex)
+		{
+			commands.remove(commands.size()-1);
+		}
+		commands.add(c);
+		currentCommandIndex++;
+	}
+
+	/**
+	 * Undoes a command in the AsyPadPane.
+	 */
+	public void undo()
+	{
+		if(currentCommandIndex > -1) currentCommandIndex--;
+		clear();
+		for(int i = 0; i <= currentCommandIndex; i++)
+		{
+			commands.get(i).doAction(this);
+		}
+		update();
+	}
+
+	/**
+	 * Redoes a command in the AsyPadPane.
+	 */
+	public void redo()
+	{
+		if(currentCommandIndex < commands.size()-1)
+		{
+			currentCommandIndex++;
+			commands.get(currentCommandIndex).doAction(this);
+		}
+		update();
 	}
 
 	/**
@@ -633,6 +770,7 @@ public class AsyPadPane extends Pane
 				if(!isValidPointName(pname)) return;
 				p.getLabel().setText(pname);
 				p.refreshName();
+				addCommand(new RenameCommand(p, pname));
 				rename.close();
 			}
 		});
@@ -647,6 +785,7 @@ public class AsyPadPane extends Pane
 		{
 			public void handle(ActionEvent event)
 			{
+				addCommand(new DeleteCommand(p));
 				p.delete();
 				update();
 				snappedIndex = -1;
@@ -657,6 +796,7 @@ public class AsyPadPane extends Pane
 		{
 			public void handle(ActionEvent event)
 			{
+				addCommand(new HideCommand(p));
 				p.setHidden(true);
 				update();
 				snappedIndex = -1;
@@ -702,6 +842,7 @@ public class AsyPadPane extends Pane
 			{
 				public void handle(ActionEvent event)
 				{
+					addCommand(new DeleteCommand(s));
 					s.delete();
 					update();
 					snappedIndex = -1;
@@ -712,6 +853,7 @@ public class AsyPadPane extends Pane
 			{
 				public void handle(ActionEvent event)
 				{
+					addCommand(new HideCommand(s));
 					s.setHidden(true);
 					update();
 					snappedIndex = -1;
@@ -860,7 +1002,7 @@ public class AsyPadPane extends Pane
 		}
 		return nextPointName(length+1);
 	}
-	
+
 	/**
 	 * Checks whether the string is a valid point name.
 	 * @param pname
@@ -874,7 +1016,7 @@ public class AsyPadPane extends Pane
 		{
 			if((c < '0' || c > '9') && (c < 'A' || c > 'Z')) isAllLettersOrNumbers = false;
 		}
-		
+
 		if(isAllLettersOrNumbers) return true;
 		else if(pname.length() == 2) //check if is a point prime
 		{
@@ -891,7 +1033,7 @@ public class AsyPadPane extends Pane
 		}
 		else return false;
 	}
-	
+
 	/**
 	 * Checks if the given name is shared by a shape that is already drawn.
 	 * @param name name to check

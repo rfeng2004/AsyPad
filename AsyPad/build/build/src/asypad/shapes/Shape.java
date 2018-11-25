@@ -119,6 +119,15 @@ public abstract class Shape
 	}
 	
 	/**
+	 * Sets the value of remove for this shape.
+	 * @param remove new value of remove
+	 */
+	public void setRemove(boolean remove)
+	{
+		this.remove = remove;
+	}
+	
+	/**
 	 * Adds this shape and all children to Asymptote code.
 	 */
 	public void addToAsy()
