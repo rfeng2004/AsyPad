@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import asypad.shapes.Shape;
 import asypad.ui.AsyPadPane;
+import asypad.ui.command.*;
 import javafx.event.*;
 import javafx.geometry.*;
 import javafx.scene.Scene;
@@ -32,12 +33,15 @@ public class AsyPadMenuBar extends MenuBar
 
 		//uses system menu bar on mac
 		final String os = System.getProperty("os.name");
+		final KeyCombination.Modifier c;
 		if (os != null && os.startsWith("Mac"))
 		{
 			useSystemMenuBarProperty().set(true);
+			c = KeyCodeCombination.META_DOWN;
 		}
 		else
 		{
+			c = KeyCodeCombination.CONTROL_DOWN;
 			setPrefSize(5000, 30);
 			setLayoutX(0);
 			setLayoutY(0);
@@ -46,16 +50,8 @@ public class AsyPadMenuBar extends MenuBar
 		//file io
 		Menu file = new Menu("File");
 		file.getItems().addAll(new MenuItem("Save as Asy File"), new MenuItem("Load Asy File"));
-		if(os.startsWith("Mac"))
-		{
-			KeyCodeCombination commandS = new KeyCodeCombination(KeyCode.S, KeyCodeCombination.META_DOWN);
-			file.getItems().get(0).setAccelerator(commandS);
-		}
-		else
-		{
-			KeyCodeCombination controlS = new KeyCodeCombination(KeyCode.S, KeyCodeCombination.CONTROL_DOWN);
-			file.getItems().get(0).setAccelerator(controlS);
-		}
+		KeyCodeCombination cs = new KeyCodeCombination(KeyCode.S, c);
+		file.getItems().get(0).setAccelerator(cs);
 		file.getItems().get(0).setOnAction(new EventHandler<ActionEvent>()
 		{
 			public void handle(ActionEvent event)
@@ -84,6 +80,30 @@ public class AsyPadMenuBar extends MenuBar
 
 			}
 		});
+
+		//undo+redo
+		Menu edit = new Menu("Edit");
+		MenuItem undo = new MenuItem("Undo");
+		KeyCodeCombination cz = new KeyCodeCombination(KeyCode.Z, c);
+		undo.setAccelerator(cz);
+		MenuItem redo = new MenuItem("Redo");
+		KeyCodeCombination cy = new KeyCodeCombination(KeyCode.Y, c);
+		redo.setAccelerator(cy);
+		undo.setOnAction(new EventHandler<ActionEvent>()
+		{
+			public void handle(ActionEvent event)
+			{
+				parent.undo();
+			}
+		});
+		redo.setOnAction(new EventHandler<ActionEvent>()
+		{
+			public void handle(ActionEvent event)
+			{
+				parent.redo();
+			}
+		});
+		edit.getItems().addAll(undo, redo);
 
 		//settings
 		Menu settings = new Menu("Settings");
@@ -114,8 +134,7 @@ public class AsyPadMenuBar extends MenuBar
 				sw.valueProperty().addListener((observable, oldValue, newValue)->
 				{
 					int j = newValue.intValue();
-					Shape.StrokeWidth = (double) (j)/10;
-					label.setText("Set the Stroke Width: " + Double.toString(Shape.StrokeWidth));
+					label.setText("Set the Stroke Width: " + Double.toString((double) (j)/10));
 				});
 				Button refresh = new Button("Refresh");
 				refresh.setPrefHeight(30);
@@ -125,6 +144,8 @@ public class AsyPadMenuBar extends MenuBar
 				{
 					public void handle(ActionEvent event)
 					{
+						Shape.StrokeWidth = (double)((int)(sw.getValue()))/10;
+						parent.addCommand(new StrokeWidthCommand(Shape.StrokeWidth));
 						setSW.close();
 						parent.update();
 					}
@@ -145,6 +166,7 @@ public class AsyPadMenuBar extends MenuBar
 				{
 					s.setHidden(false);
 				}
+				parent.addCommand(new HideCommand());
 				parent.update();
 			}
 		});
@@ -193,6 +215,6 @@ public class AsyPadMenuBar extends MenuBar
 			}
 		});
 
-		getMenus().addAll(file, settings, view, help);
+		getMenus().addAll(file, edit, settings, view, help);
 	}
 }
