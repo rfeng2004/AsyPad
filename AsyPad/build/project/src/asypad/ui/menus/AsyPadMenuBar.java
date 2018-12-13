@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import asypad.shapes.Shape;
+import asypad.ui.AsyPad;
 import asypad.ui.AsyPadPane;
 import asypad.ui.command.*;
 import javafx.event.*;
@@ -49,10 +50,36 @@ public class AsyPadMenuBar extends MenuBar
 
 		//file io
 		Menu file = new Menu("File");
-		file.getItems().addAll(new MenuItem("Save as Asy File"), new MenuItem("Load Asy File"));
+		MenuItem saveApad = new MenuItem("Save as AsyPad File");
+		MenuItem saveAsy = new MenuItem("Save as Asymptote File");
+		MenuItem loadApad = new MenuItem("Load AsyPad File");
+		
 		KeyCodeCombination cs = new KeyCodeCombination(KeyCode.S, c);
-		file.getItems().get(0).setAccelerator(cs);
-		file.getItems().get(0).setOnAction(new EventHandler<ActionEvent>()
+		saveApad.setAccelerator(cs);
+		saveApad.setOnAction(new EventHandler<ActionEvent>()
+		{
+			public void handle(ActionEvent event)
+			{
+				FileChooser saver = new FileChooser();
+				saver.getExtensionFilters().add(new ExtensionFilter("AsyPad Files", "*.apad"));
+				saver.setTitle("Save Diagram as AsyPad File");
+				File f = saver.showSaveDialog(new Stage());
+				if(f == null) return;
+				try(FileWriter fw = new FileWriter(f);
+						BufferedWriter bw = new BufferedWriter(fw);)
+				{
+					bw.write(parent.toApad());
+				}
+				catch(IOException ioe)
+				{
+					ioe.printStackTrace();
+				}
+			}
+		});
+		
+		KeyCodeCombination shiftcs = new KeyCodeCombination(KeyCode.S, c, KeyCodeCombination.SHIFT_DOWN);
+		saveAsy.setAccelerator(shiftcs);
+		saveAsy.setOnAction(new EventHandler<ActionEvent>()
 		{
 			public void handle(ActionEvent event)
 			{
@@ -73,13 +100,22 @@ public class AsyPadMenuBar extends MenuBar
 			}
 		});
 
-		file.getItems().get(1).setOnAction(new EventHandler<ActionEvent>()
+		KeyCodeCombination co = new KeyCodeCombination(KeyCode.O, c);
+		loadApad.setAccelerator(co);
+		loadApad.setOnAction(new EventHandler<ActionEvent>()
 		{
 			public void handle(ActionEvent event)
 			{
-
+				FileChooser opener = new FileChooser();
+				opener.getExtensionFilters().add(new ExtensionFilter("AsyPad Files", "*.apad"));
+				opener.setTitle("Load Diagram from AsyPad File");
+				File f = opener.showOpenDialog(new Stage());
+				if(f == null) return;
+				parent.loadApad(f);
 			}
 		});
+		
+		file.getItems().addAll(saveApad, saveAsy, loadApad);
 
 		//undo+redo
 		Menu edit = new Menu("Edit");
@@ -107,8 +143,8 @@ public class AsyPadMenuBar extends MenuBar
 
 		//settings
 		Menu settings = new Menu("Settings");
-		settings.getItems().add(new MenuItem("Set Stroke Width"));
-		settings.getItems().get(0).setOnAction(new EventHandler<ActionEvent>()
+		MenuItem setStrokeWidth = new MenuItem("Set Stroke Width");
+		setStrokeWidth.setOnAction(new EventHandler<ActionEvent>()
 		{
 			public void handle(ActionEvent event)
 			{
@@ -152,9 +188,11 @@ public class AsyPadMenuBar extends MenuBar
 				});
 				p.getChildren().addAll(label, sw, refresh);
 				setSW.setScene(scene);
+				setSW.setAlwaysOnTop(true);
 				setSW.show();
 			}
 		});
+		settings.getItems().add(setStrokeWidth);
 
 		Menu view = new Menu("View");
 		MenuItem showHidden = new MenuItem("Show Hidden Shapes");
@@ -175,45 +213,75 @@ public class AsyPadMenuBar extends MenuBar
 		//help menu (about and credits)
 		Menu help = new Menu("Help");
 		Menu about = new Menu("About");
-		about.getItems().addAll(new MenuItem("About"), new MenuItem("Credits"));
-		help.getItems().add(about);
+		MenuItem aboutAsyPad = new MenuItem("About AsyPad");
+		MenuItem credits = new MenuItem("Credits");
 
 		//about the program (description)
-		about.getItems().get(0).setOnAction(new EventHandler<ActionEvent>()
+		aboutAsyPad.setOnAction(new EventHandler<ActionEvent>()
 		{
 			public void handle(ActionEvent event)
 			{
 				Stage a = new Stage();
 				FlowPane p = new FlowPane();
-				Scene scene = new Scene(p, 500, 100);
-				Label ab = new Label("AsyPad allows you to draw diagrams\n and save them into Asymptote Files.");
-				ab.setAlignment(Pos.CENTER);
-				ab.setTextAlignment(TextAlignment.CENTER);
-				ab.setStyle("-fx-font: 24 arial");
-				ab.setPrefSize(500, 100);
-				p.getChildren().add(ab);
+				Scene scene = new Scene(p, 500, 300);
+				
+				Label description = new Label("AsyPad allows you to draw diagrams\n and save them into Asymptote Files.");
+				description.setAlignment(Pos.CENTER);
+				description.setStyle("-fx-font: 24 arial");
+				description.setPrefSize(500, 100);
+				
+				Label license = new Label("GNU General Public License Information");
+				license.setAlignment(Pos.CENTER);
+				license.setStyle("-fx-font: 14 arial");
+				license.setPrefSize(500, 50);
+				
+				TextArea licenseInfo = new TextArea();
+				licenseInfo.setPrefSize(500, 150);
+				licenseInfo.setEditable(false);
+				licenseInfo.setText("AsyPad: A simple drawing tool that can convert diagrams into Asymptote code.\n" + 
+						"For more information visit: https://github.com/rfeng2004/AsyPad\n" + 
+						"\n" + 
+						"Copyright (C) 2018 Raymond Feng\n" + 
+						"\n" + 
+						"This program is free software: you can redistribute it and/or modify\n" + 
+						"it under the terms of the GNU General Public License as published by\n" + 
+						"the Free Software Foundation, either version 3 of the License, or\n" + 
+						"(at your option) any later version.\n" + 
+						"\n" + 
+						"This program is distributed in the hope that it will be useful,\n" + 
+						"but WITHOUT ANY WARRANTY; without even the implied warranty of\n" + 
+						"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n" + 
+						"GNU General Public License for more details.\n" + 
+						"\n" + 
+						"You should have received a copy of the GNU General Public License\n" + 
+						"along with this program.  If not, see https://www.gnu.org/licenses/.");
+				p.getChildren().addAll(description, license, licenseInfo);
 				a.setScene(scene);
+				a.setAlwaysOnTop(true);
 				a.show();
 			}
 		});
 
 		//credits
-		about.getItems().get(1).setOnAction(new EventHandler<ActionEvent>()
+		credits.setOnAction(new EventHandler<ActionEvent>()
 		{
 			public void handle(ActionEvent event)
 			{
 				Stage cred = new Stage();
 				FlowPane p = new FlowPane();
 				Scene scene = new Scene(p, 500, 120);
-				Label creds = new Label("AsyPad v0.1\nProgrammer: Raymond Feng\nHead Tester: Wenyi Feng");
+				Label creds = new Label("AsyPad v" + AsyPad.VERSION + "\nProgrammer: Raymond Feng\nHead Tester: Wenyi Feng");
 				creds.setAlignment(Pos.CENTER);
 				creds.setStyle("-fx-font: 24 arial");
 				creds.setPrefSize(500, 120);
 				p.getChildren().add(creds);
 				cred.setScene(scene);
+				cred.setAlwaysOnTop(true);
 				cred.show();
 			}
 		});
+		about.getItems().addAll(aboutAsyPad, credits);
+		help.getItems().add(about);
 
 		getMenus().addAll(file, edit, settings, view, help);
 	}

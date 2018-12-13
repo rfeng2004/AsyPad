@@ -34,4 +34,10 @@ public class RenameCommand extends Command
 	{
 		rename.setName(newName);
 	}
+	
+	public String toString()
+	{
+		String s = "rename(" + rename.getName() + ", " + newName + ")\n";
+		return s;
+	}
 }

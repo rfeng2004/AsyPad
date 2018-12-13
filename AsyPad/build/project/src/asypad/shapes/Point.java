@@ -14,22 +14,22 @@ public class Point extends Shape
 	 * Underlying dot that is drawn onto the screen.
 	 */
 	private javafx.scene.shape.Circle dot;
-	
+
 	/**
 	 * x-coordinate of the point.
 	 */
 	private double x;
-	
+
 	/**
 	 * y-coordinate of the point.
 	 */
 	private double y;
-	
+
 	/**
 	 * Relative location of point relative to shape that it is on, only used for {@code POINT_TYPE.POINT_ON_SHAPE}
 	 */
 	private double relativeLocation; //used for points that are snapped to another shape.
-	
+
 	/**
 	 * Identifier to distinguish between the 2 possible intersections of a point and a circle, 
 	 * only used for {@ POINT_TYPE.INTERSECTION_POINT} that depend on a line and a circle.
@@ -45,7 +45,7 @@ public class Point extends Shape
 	{
 		this(x, y, "");
 	}
-	
+
 	/**
 	 * Creates a new point that snaps onto the specified shape with no label.
 	 * @param cx current x-coordinate
@@ -56,7 +56,7 @@ public class Point extends Shape
 	{
 		this(cx, cy, snap, "");
 	}
-	
+
 	/**
 	 * Constructs an intersection point between lines l1 and l2 with no label.
 	 * @param l1 first line
@@ -66,7 +66,7 @@ public class Point extends Shape
 	{
 		this(l1, l2, "");
 	}
-	
+
 	/**
 	 * Constructs an intersection point between a line and a circle with no label. 
 	 * Identifier = true represents the intersection point that is closer to the start of the line.
@@ -78,7 +78,7 @@ public class Point extends Shape
 	{
 		this(l, c, identifier, "");
 	}
-	
+
 	/**
 	 * Constructs the midpoint of 2 points with no label.
 	 * @param p1 first point
@@ -137,6 +137,38 @@ public class Point extends Shape
 			y = c.getCenterY()+(cy-c.getCenterY())*c.getRadius()/Utility.dist(cx, cy, c.getCenterX(), c.getCenterY());
 			relativeLocation = Math.atan((y-c.getCenterY())/(x-c.getCenterX()));
 			if(x < c.getCenterX()) relativeLocation += Math.PI;
+		}
+		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
+		dot.setStroke(Color.BLACK);
+		dot.setStrokeWidth(StrokeWidth);
+		label.setText(name);
+		label.setLayoutX(x+StrokeWidth);
+		label.setLayoutY(y+StrokeWidth);
+	}
+
+	/**
+	 * Creates a new point that snaps onto the specified shape.
+	 * @param snap shape that this point will lie on
+	 * @param relativeLocation relative location of the point on the shape
+	 * @param name name of point
+	 */
+	public Point(Shape snap, double relativeLocation, String name)
+	{
+		super(snap);
+		type = POINT_TYPE.POINT_ON_SHAPE;
+		identifier = false;
+		this.relativeLocation = relativeLocation;
+		if(snap instanceof Line)
+		{
+			Line l = (Line) snap;
+			x = l.getStartX()+relativeLocation*(l.getEndX()-l.getStartX());
+			y = l.getStartY()+relativeLocation*(l.getEndY()-l.getStartY());
+		}
+		else if(snap instanceof Circle)
+		{
+			Circle c = (Circle) snap;
+			x = c.getCenterX()+c.getRadius()*Math.cos(relativeLocation);
+			y = c.getCenterY()+c.getRadius()*Math.sin(relativeLocation);
 		}
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
 		dot.setStroke(Color.BLACK);
@@ -319,7 +351,7 @@ public class Point extends Shape
 				Circle c = (Circle) dependencies.get(1);
 				x = Utility.intersectX(l, c, identifier);
 				y = Utility.intersectY(l, c, identifier);
-				
+
 			}
 		}
 		else if(type == POINT_TYPE.MIDPOINT)
@@ -340,7 +372,7 @@ public class Point extends Shape
 			s.refresh();
 		}
 	}
-	
+
 	public void refreshName()
 	{
 		for(Shape s : children) s.refreshName();
@@ -353,10 +385,32 @@ public class Point extends Shape
 
 	public String toString()
 	{
-		String s = "POINT: type = " + type + " x = " + x + " y = " + y;
+		String s = "";
+		if(type == POINT_TYPE.POINT)
+		{
+			s = "POINT: type = " + type + " name: " + getName() + " x = " + x + " y = " + y;
+		}
+		else if(type == POINT_TYPE.POINT_ON_SHAPE)
+		{
+			s = "POINT: type = " + type + " name: " + getName() + " dependency: " + dependencies.get(0).getName() 
+					+ " relativeLocation = " + relativeLocation;
+		}
+		else if(type == POINT_TYPE.INTERSECTION_POINT || type == POINT_TYPE.MIDPOINT)
+		{
+			if(type == POINT_TYPE.INTERSECTION_POINT && dependencies.get(1) instanceof Circle)
+			{
+				s = "POINT: type = " + type + " name: " + getName() + " dependencies: " + dependencies.get(0).getName()
+						+ ", " + dependencies.get(1).getName() + " identifier = " + identifier;
+			}
+			else
+			{
+				s = "POINT: type = " + type + " name: " + getName() + " dependencies: " + dependencies.get(0).getName()
+						+ ", " + dependencies.get(1).getName();
+			}
+		}
 		return s;
 	}
-	
+
 	public String toAsymptote()
 	{
 		if(!inAsyCode) return "";

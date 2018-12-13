@@ -28,4 +28,10 @@ public class DeleteCommand extends Command
 		shape.delete();
 		target.update();
 	}
+	
+	public String toString()
+	{
+		String s = "delete(" + shape.getName() + ")\n";
+		return s;
+	}
 }

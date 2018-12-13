@@ -52,4 +52,18 @@ public class HideCommand extends Command
 			target.update();
 		}
 	}
+	
+	public String toString()
+	{
+		String s;
+		if(!showAll)
+		{
+			s = "hide(" + shape.getName() + ")\n";
+		}
+		else
+		{
+			s = "hide(all)\n";
+		}
+		return s;
+	}
 }

@@ -13,22 +13,22 @@ public class Line extends Shape
 	 * Underlying line that is drawn to the screen.
 	 */
 	private javafx.scene.shape.Line line;
-	
+
 	/**
 	 * x-coordinate of the start point of the line.
 	 */
 	private double x1;
-	
+
 	/**
 	 * y-coordinate of the start point of the line.
 	 */
 	private double y1;
-	
+
 	/**
 	 * x-coordinate of the end point of the line.
 	 */
 	private double x2;
-	
+
 	/**
 	 * y-coordinate of the end point of the line.
 	 */
@@ -128,7 +128,7 @@ public class Line extends Shape
 		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
 		line.setStrokeWidth(StrokeWidth);
 	}
-	
+
 	/**
 	 * Constructs the perpendicular bisector of the 2 points.
 	 * @param p1 first point
@@ -322,7 +322,7 @@ public class Line extends Shape
 			s.refresh();
 		}
 	}
-	
+
 	public void refreshName()
 	{
 		String d1 = dependencies.get(0).getName();
@@ -361,10 +361,22 @@ public class Line extends Shape
 
 	public String toString()
 	{
-		String s = "LINE: type = " + type + " startx = " + x1 + " starty = " + y1 + " endx = " + x2 + " endy = " + y2;
+		String s = "";
+		if(type == LINE_TYPE.SEGMENT || type == LINE_TYPE.LINE 
+				|| type == LINE_TYPE.PARALLEL_LINE || type == LINE_TYPE.PERPENDICULAR_LINE
+				|| type == LINE_TYPE.PERPENDICULAR_BISECTOR)
+		{
+			s = "LINE: type = " + type + " dependencies: " + dependencies.get(0).getName()
+					+ ", " + dependencies.get(1).getName();
+		}
+		else if(type == LINE_TYPE.ANGLE_BISECTOR)
+		{
+			s = "LINE: type = " + type + " dependencies: " + dependencies.get(0).getName()
+					+ ", " + dependencies.get(1).getName() + ", " + dependencies.get(2).getName();
+		}
 		return s;
 	}
-	
+
 	public String toAsymptote()
 	{
 		if(!inAsyCode) return "";

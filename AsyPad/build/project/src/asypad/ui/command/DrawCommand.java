@@ -63,4 +63,10 @@ public class DrawCommand extends Command
 			target.addShape(p);
 		}
 	}
+	
+	public String toString()
+	{
+		String s = "draw(" + shape.toString() + ")\n";
+		return s;
+	}
 }

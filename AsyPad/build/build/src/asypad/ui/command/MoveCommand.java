@@ -50,4 +50,10 @@ public class MoveCommand extends Command
 			move.setRelativeLocation(x, y);
 		}
 	}
+	
+	public String toString()
+	{
+		String s = "move(" + move.getName() + ", " + x + ", " + y + ")\n";
+		return s;
+	}
 }

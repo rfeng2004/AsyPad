@@ -14,17 +14,17 @@ public class Circle extends Shape
 	 * Underlying circle that is drawn onto the screen.
 	 */
 	private javafx.scene.shape.Circle circle;
-	
+
 	/**
 	 * x-coordinate of the center of the circle.
 	 */
 	private double x;
-	
+
 	/**
 	 * y-coordinate of the center of the circle.
 	 */
 	private double y;
-	
+
 	/**
 	 * Radius of the circle.
 	 */
@@ -129,7 +129,7 @@ public class Circle extends Shape
 			s.refresh();
 		}
 	}
-	
+
 	public void refreshName()
 	{
 		String d1 = dependencies.get(0).getName();
@@ -152,10 +152,20 @@ public class Circle extends Shape
 
 	public String toString()
 	{
-		String s = "Circle: type = " + type + " x = " + x + " y = " + y + " radius = " + radius;
+		String s = "";
+		if(type == CIRCLE_TYPE.CIRCLE)
+		{
+			s = "CIRCLE: type = " + type + " dependencies: " + dependencies.get(0).getName()
+					+ ", " + dependencies.get(1).getName();
+		}
+		else if(type == CIRCLE_TYPE.CIRCUMCIRCLE)
+		{
+			s = "CIRCLE: type = " + type + " dependencies: " + dependencies.get(0).getName()
+					+ ", " + dependencies.get(1).getName() + ", " + dependencies.get(2).getName();
+		}
 		return s;
 	}
-	
+
 	public String toAsymptote()
 	{
 		if(!inAsyCode) return "";

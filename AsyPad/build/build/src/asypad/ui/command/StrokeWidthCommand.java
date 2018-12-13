@@ -28,4 +28,10 @@ public class StrokeWidthCommand extends Command
 		Shape.StrokeWidth = newStrokeWidth;
 		target.update();
 	}
+	
+	public String toString()
+	{
+		String s = "stroke(" + newStrokeWidth + ")\n";
+		return s;
+	}
 }

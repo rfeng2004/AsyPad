@@ -57,6 +57,7 @@ public class Utility
 
 	public static double solveY(double m1, double b1, double m2, double b2)
 	{
+		if(m1 == m2) return Double.POSITIVE_INFINITY;
 		return m1*solveX(m1, b1, m2, b2)+b1;
 	}
 
@@ -314,11 +315,12 @@ public class Utility
 	 */
 	public static double footX(double x, double y, Line l)
 	{
+		if(l.getStartX() == l.getEndX()) return l.getStartX();
 		double m1 = (l.getEndY()-l.getStartY())/(l.getEndX()-l.getStartX());
 		double b1 = l.getStartY()-m1*l.getStartX();
+		if(m1 == 0) return x;
 		double m2 = -1/m1;
 		double b2 = y-m2*x;
-		if(m1 == 0) return x;
 		return solveX(m1, b1, m2, b2);
 	}
 
@@ -331,11 +333,12 @@ public class Utility
 	 */
 	public static double footY(double x, double y, Line l)
 	{
+		if(l.getStartX() == l.getEndX()) return y;
 		double m1 = (l.getEndY()-l.getStartY())/(l.getEndX()-l.getStartX());
 		double b1 = l.getStartY()-m1*l.getStartX();
+		if(m1 == 0) return l.getStartY();
 		double m2 = -1/m1;
 		double b2 = y-m2*x;
-		if(m1 == 0) return b1;
 		return solveY(m1, b1, m2, b2);
 	}
 
