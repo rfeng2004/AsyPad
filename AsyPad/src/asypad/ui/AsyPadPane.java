@@ -3,8 +3,6 @@ package asypad.ui;
  * TODO Add new tool: tangents, relative point, intersection point of 2 circles.
  * TODO Implement grid show and hide.
  * TODO Add user manual in help menu.
- * TODO Add .apad file i/o.
- * TODO Implement Command toString and loadCommand methods.
  */
 
 import java.io.*;
@@ -1097,10 +1095,16 @@ public class AsyPadPane extends Pane
 	public String toApad()
 	{
 		String apad = "";
+		clear();
 		for(int i = 0; i <= currentCommandIndex; i++)
 		{
+			//renaming a point makes the command's generated string buggy so for rename
+			//commands we execute it after adding it to the apad string.
+			if(!(commands.get(i) instanceof RenameCommand)) commands.get(i).doAction(this);
 			apad += commands.get(i).toString();
+			if(commands.get(i) instanceof RenameCommand) commands.get(i).doAction(this);
 		}
+		update();
 		return apad;
 	}
 
