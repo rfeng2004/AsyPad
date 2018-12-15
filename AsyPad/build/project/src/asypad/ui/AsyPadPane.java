@@ -1086,6 +1086,7 @@ public class AsyPadPane extends Pane
 		{
 			ioe.printStackTrace();
 		}
+		update();
 	}
 
 	/**

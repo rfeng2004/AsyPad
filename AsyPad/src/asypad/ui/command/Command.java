@@ -87,9 +87,9 @@ public abstract class Command
 			String newName = command.substring(comma+2, command.length()-1);
 			load = new RenameCommand((Point) target.findShapeByName(name), newName);
 		}
-		else if(command.substring(0, 5).equals("stroke"))
+		else if(command.substring(0, 6).equals("stroke"))
 		{
-			String newStrokeWidth = command.substring(6, command.length()-1);
+			String newStrokeWidth = command.substring(7, command.length()-1);
 			double stroke = Double.parseDouble(newStrokeWidth);
 			load = new StrokeWidthCommand(stroke);
 		}
