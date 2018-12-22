@@ -33,6 +33,7 @@ public class RenameCommand extends Command
 	public void doAction(AsyPadPane target) 
 	{
 		rename.setName(newName);
+		rename.refreshName();
 	}
 	
 	public String toString()

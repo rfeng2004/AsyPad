@@ -122,7 +122,9 @@
 					<include name="AsyPad.jar"/>
 				</fx:fileset>
 			</fx:resources>
-			<fx:info title="AsyPad" Description="Easy to use drawing application."/>
+			<fx:info title="AsyPad" description="Easy to use drawing application.">
+				<fx:association extension="apad" description="AsyPad File"/>
+			</fx:info>
 		</fx:deploy>
 	
 	

@@ -1066,7 +1066,7 @@ public class AsyPadPane extends Pane
 
 	/**
 	 * Loads an AsyPad file into the AsyPad.
-	 * @param apad
+	 * @param apad file to be loaded
 	 */
 	public void loadApad(File apad)
 	{

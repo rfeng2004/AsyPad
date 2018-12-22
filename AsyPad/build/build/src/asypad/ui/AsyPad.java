@@ -23,6 +23,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import java.io.File;
 
 /**
  * AsyPad: A simple drawing tool that can convert diagrams into Asymptote code.
@@ -35,7 +36,33 @@ public class AsyPad extends Application
 	 * Version number of AsyPad.
 	 */
 	public static final String VERSION = "1.0";
-	
+
+	/**
+	 * The main component of the AsyPad Application.
+	 */
+	private AsyPadPane rootNode;
+
+	/**
+	 * Creates a new AsyPad Application that can handle .apad file opening.
+	 */
+	public AsyPad()
+	{
+		rootNode = new AsyPadPane();
+		com.sun.glass.ui.Application glassApp = com.sun.glass.ui.Application.GetApplication();
+		glassApp.setEventHandler(new com.sun.glass.ui.Application.EventHandler()
+		{
+			public void handleOpenFilesAction(com.sun.glass.ui.Application app, long time, String[] filenames)
+			{
+				super.handleOpenFilesAction(app, time, filenames);
+				if(filenames[0].endsWith(".apad"))
+				{
+					rootNode.loadApad(new File(filenames[0]));
+					rootNode.updateToolDescription("Loaded diagram from " + filenames[0]);
+				}
+			}
+		});
+	}
+
 	public static void main(String args[])
 	{
 		launch(args);
@@ -43,7 +70,6 @@ public class AsyPad extends Application
 
 	public void start(Stage primaryStage)
 	{
-		AsyPadPane rootNode = new AsyPadPane();
 		Scene scene = new Scene(rootNode, 1000, 700);
 		primaryStage.getIcons().add(new Image("resources/AsyPad.icns"));
 		primaryStage.setTitle("AsyPad");

@@ -32,6 +32,54 @@
   <string>1.0</string>
   <key>NSHumanReadableCopyright</key>
   <string>Copyright (C) 2018</string>
+  <key>CFBundleDocumentTypes</key>
+  <array>
+    <dict>
+      <key>LSItemContentTypes</key>
+      <array>
+        <string>asypad.ui.apad</string>
+      </array>
+
+      <key>CFBundleTypeName</key>
+      <string>AsyPad File</string>
+
+      <key>LSHandlerRank</key>
+      <string>Owner</string>
+
+      <key>CFBundleTypeRole</key>
+      <string>Editor</string>
+
+      <key>LSIsAppleDefaultForType</key>
+      <true/>
+
+    </dict>
+  </array>
+
+  <key>UTExportedTypeDeclarations</key>
+  <array>
+    <dict>
+      <key>UTTypeIdentifier</key>
+      <string>asypad.ui.apad</string>
+
+      <key>UTTypeDescription</key>
+      <string>AsyPad File</string>
+      <key>UTTypeConformsTo</key>
+      <array>
+          <string>public.data</string>
+      </array>
+
+
+      <key>UTTypeTagSpecification</key>
+      <dict>
+
+        <key>public.filename-extension</key>
+        <array>
+          <string>apad</string>
+        </array>
+      </dict>
+    </dict>
+  </array>
+
   <key>NSHighResolutionCapable</key>
   <string>true</string>
  </dict>
