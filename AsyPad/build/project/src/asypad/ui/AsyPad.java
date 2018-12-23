@@ -81,11 +81,11 @@ public class AsyPad extends Application
 		if(OS != null && OS.startsWith("Windows"))
 		{
 			String filename = getParameters().getRaw().toString();
-			if(filename.endsWith(".apad"))
-			{
+			//if(filename.endsWith(".apad"))
+			//{
 				rootNode.loadApad(new File(filename));
 				rootNode.updateToolDescription("Loaded diagram from " + filename);
-			}
+			//}
 		}
 		Scene scene = new Scene(rootNode, 1000, 700);
 		primaryStage.getIcons().add(new Image("resources/AsyPad.icns"));
