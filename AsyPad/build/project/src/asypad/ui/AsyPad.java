@@ -38,6 +38,11 @@ public class AsyPad extends Application
 	public static final String VERSION = "1.0";
 
 	/**
+	 * Operating system the AsyPad is running on.
+	 */
+	public static final String OS = System.getProperty("os.name");
+
+	/**
 	 * The main component of the AsyPad Application.
 	 */
 	private AsyPadPane rootNode;
@@ -48,19 +53,22 @@ public class AsyPad extends Application
 	public AsyPad()
 	{
 		rootNode = new AsyPadPane();
-		com.sun.glass.ui.Application glassApp = com.sun.glass.ui.Application.GetApplication();
-		glassApp.setEventHandler(new com.sun.glass.ui.Application.EventHandler()
+		if(OS != null && OS.startsWith("Mac"))
 		{
-			public void handleOpenFilesAction(com.sun.glass.ui.Application app, long time, String[] filenames)
+			com.sun.glass.ui.Application glassApp = com.sun.glass.ui.Application.GetApplication();
+			glassApp.setEventHandler(new com.sun.glass.ui.Application.EventHandler()
 			{
-				super.handleOpenFilesAction(app, time, filenames);
-				if(filenames[0].endsWith(".apad"))
+				public void handleOpenFilesAction(com.sun.glass.ui.Application app, long time, String[] filenames)
 				{
-					rootNode.loadApad(new File(filenames[0]));
-					rootNode.updateToolDescription("Loaded diagram from " + filenames[0]);
+					super.handleOpenFilesAction(app, time, filenames);
+					if(filenames[0].endsWith(".apad"))
+					{
+						rootNode.loadApad(new File(filenames[0]));
+						rootNode.updateToolDescription("Loaded diagram from " + filenames[0]);
+					}
 				}
-			}
-		});
+			});
+		}
 	}
 
 	public static void main(String args[])
@@ -70,6 +78,15 @@ public class AsyPad extends Application
 
 	public void start(Stage primaryStage)
 	{
+		if(OS != null && OS.startsWith("Windows"))
+		{
+			String filename = getParameters().getRaw().toString();
+			if(filename.endsWith(".apad"))
+			{
+				rootNode.loadApad(new File(filename));
+				rootNode.updateToolDescription("Loaded diagram from " + filename);
+			}
+		}
 		Scene scene = new Scene(rootNode, 1000, 700);
 		primaryStage.getIcons().add(new Image("resources/AsyPad.icns"));
 		primaryStage.setTitle("AsyPad");
