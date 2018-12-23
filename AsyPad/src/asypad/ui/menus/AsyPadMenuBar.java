@@ -33,9 +33,8 @@ public class AsyPadMenuBar extends MenuBar
 		super();
 
 		//uses system menu bar on mac
-		final String os = System.getProperty("os.name");
 		final KeyCombination.Modifier c;
-		if (os != null && os.startsWith("Mac"))
+		if (AsyPad.OS != null && AsyPad.OS.startsWith("Mac"))
 		{
 			useSystemMenuBarProperty().set(true);
 			c = KeyCodeCombination.META_DOWN;
