@@ -64,7 +64,6 @@ public class AsyPad extends Application
 					if(filenames[0].endsWith(".apad"))
 					{
 						rootNode.loadApad(new File(filenames[0]));
-						rootNode.updateToolDescription("Loaded diagram from " + filenames[0]);
 					}
 				}
 			});
@@ -85,7 +84,6 @@ public class AsyPad extends Application
 			if(filename.endsWith(".apad"))
 			{
 				rootNode.loadApad(new File(filename));
-				rootNode.updateToolDescription("Loaded diagram from " + filename);
 			}
 		}
 		Scene scene = new Scene(rootNode, 1000, 700);
