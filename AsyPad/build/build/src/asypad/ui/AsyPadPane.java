@@ -1035,11 +1035,11 @@ public class AsyPadPane extends Pane
 		}
 
 		if(isAllLettersOrNumbers) return true;
-		else if(pname.length() == 2) //check for a point prime
+		/*else if(pname.length() == 2) //check for a point prime
 		{
 			if(pname.charAt(1) != '\'') return false;
 			else return true;
-		}
+		}*/
 		else if(pname.length() == 3) //subscript names
 		{
 			if(pname.charAt(1) != '_') return false;
