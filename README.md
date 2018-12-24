@@ -11,8 +11,7 @@ Circles: Center and Point on circle, Circumcircle
 # Valid Point Names
 Rename a point by double clicking on it.
 The following are valid point names:
-- The name is made only of capital letters and numbers.
-- The name is a capital letter followed by a prime.
+- The name is made only of capital letters and numbers, and starts with a capital letter.
 - The name is a capital letter, followed by an underscore, followed by a number or lowercase letter.
 
 # Keyboard Shortcuts
