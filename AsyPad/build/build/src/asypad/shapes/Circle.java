@@ -46,7 +46,7 @@ public class Circle extends Shape
 		circle.setFill(Color.TRANSPARENT);
 		circle.setStrokeWidth(StrokeWidth);
 		circle.setStroke(Color.BLACK);
-		label.setText("circ" + center.getName() + on.getName());
+		label.setText("circ" + center.getName() + SEPARATOR + on.getName());
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class Circle extends Shape
 		circle.setFill(Color.TRANSPARENT);
 		circle.setStrokeWidth(StrokeWidth);
 		circle.setStroke(Color.BLACK);
-		label.setText("cc" + p1.getName() + p2.getName() + p3.getName());
+		label.setText("cc" + p1.getName() + SEPARATOR + p2.getName() + SEPARATOR + p3.getName());
 	}
 
 	/**
@@ -136,11 +136,11 @@ public class Circle extends Shape
 		String d2 = dependencies.get(1).getName();
 		if(type == CIRCLE_TYPE.CIRCLE)
 		{
-			label.setText("circ"+d1+d2);
+			label.setText("circ"+d1+SEPARATOR+d2);
 		}
 		else if(type == CIRCLE_TYPE.CIRCUMCIRCLE)
 		{
-			label.setText("cc"+d1+d2+dependencies.get(2).getName());
+			label.setText("cc"+d1+SEPARATOR+d2+SEPARATOR+dependencies.get(2).getName());
 		}
 		for(Shape s : children) s.refreshName();
 	}

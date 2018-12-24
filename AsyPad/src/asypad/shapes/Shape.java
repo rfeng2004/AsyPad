@@ -29,6 +29,11 @@ public abstract class Shape
 	public static final DecimalFormat FORMATTER = new DecimalFormat("#0.00");
 	
 	/**
+	 * String used to separate dependencies in a shape's name;
+	 */
+	protected static final String SEPARATOR = "_";
+	
+	/**
 	 * The shapes that this shape depends on.
 	 */
 	protected ArrayList<Shape> dependencies;

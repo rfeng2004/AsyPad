@@ -1027,6 +1027,7 @@ public class AsyPadPane extends Pane
 	{
 		if(isDuplicateName(pname)) return false; //check for duplicate name
 		if(pname.length() == 0) return false; //no empty name
+		if(pname.charAt(0) < 'A' || pname.charAt(0) > 'Z') return false; //must start with capital letter
 		boolean isAllLettersOrNumbers = true;
 		for(char c : pname.toCharArray())
 		{
@@ -1034,15 +1035,13 @@ public class AsyPadPane extends Pane
 		}
 
 		if(isAllLettersOrNumbers) return true;
-		else if(pname.length() == 2) //check if is a point prime
+		else if(pname.length() == 2) //check for a point prime
 		{
-			if(pname.charAt(0) < 'A' || pname.charAt(0) > 'Z') return false;
 			if(pname.charAt(1) != '\'') return false;
 			else return true;
 		}
 		else if(pname.length() == 3) //subscript names
 		{
-			if(pname.charAt(0) < 'A' || pname.charAt(0) > 'Z') return false;
 			if(pname.charAt(1) != '_') return false;
 			if((pname.charAt(2) < '0' || pname.charAt(2) > '9') && (pname.charAt(2) < 'a' || pname.charAt(2) > 'z')) return false;
 			else return true;

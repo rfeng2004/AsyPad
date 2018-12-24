@@ -50,7 +50,7 @@ public class Line extends Shape
 			y1 = p1.getY();
 			x2 = p2.getX();
 			y2 = p2.getY();
-			label.setText("seg"+p1.getName()+p2.getName());
+			label.setText("seg"+p1.getName()+SEPARATOR+p2.getName());
 		}
 		else 
 		{
@@ -63,7 +63,7 @@ public class Line extends Shape
 			y1 = p1.getY()-INF*diry;
 			x2 = p2.getX()+INF*dirx;
 			y2 = p2.getY()+INF*diry;
-			label.setText("line"+p1.getName()+p2.getName());
+			label.setText("line"+p1.getName()+SEPARATOR+p2.getName());
 		}
 		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
 		line.setStrokeWidth(StrokeWidth);
@@ -89,7 +89,7 @@ public class Line extends Shape
 			y1 = p.getY()-INF*diry;
 			x2 = p.getX()+INF*dirx;
 			y2 = p.getY()+INF*diry;
-			label.setText("par"+p.getName()+l.getName());
+			label.setText("par"+p.getName()+SEPARATOR+l.getName());
 		}
 		else
 		{
@@ -102,7 +102,7 @@ public class Line extends Shape
 			y1 = p.getY()-INF*dirx;
 			x2 = p.getX()-INF*diry;
 			y2 = p.getY()+INF*dirx;
-			label.setText("per"+p.getName()+l.getName());
+			label.setText("per"+p.getName()+SEPARATOR+l.getName());
 		}
 		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
 		line.setStrokeWidth(StrokeWidth);
@@ -124,7 +124,7 @@ public class Line extends Shape
 		y1 = p2.getY()-INF*(aby-p2.getY());
 		x2 = abx+INF*(abx-p2.getX());
 		y2 = aby+INF*(aby-p2.getY());
-		label.setText("ab"+p1.getName()+p2.getName()+p3.getName());
+		label.setText("ab"+p1.getName()+SEPARATOR+p2.getName()+SEPARATOR+p3.getName());
 		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
 		line.setStrokeWidth(StrokeWidth);
 	}
@@ -148,7 +148,7 @@ public class Line extends Shape
 		y1 = my-INF*dirx;
 		x2 = mx-INF*diry;
 		y2 = my+INF*dirx;
-		label.setText("pb"+p1.getName()+p2.getName());
+		label.setText("pb"+p1.getName()+SEPARATOR+p2.getName());
 		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
 		line.setStrokeWidth(StrokeWidth);
 	}
@@ -329,27 +329,27 @@ public class Line extends Shape
 		String d2 = dependencies.get(1).getName();
 		if(type == LINE_TYPE.SEGMENT)
 		{
-			label.setText("seg"+d1+d2);
+			label.setText("seg"+d1+SEPARATOR+d2);
 		}
 		else if(type == LINE_TYPE.LINE)
 		{
-			label.setText("line"+d1+d2);
+			label.setText("line"+d1+SEPARATOR+d2);
 		}
 		else if(type == LINE_TYPE.PARALLEL_LINE)
 		{
-			label.setText("par"+d1+d2);
+			label.setText("par"+d1+SEPARATOR+d2);
 		}
 		else if(type == LINE_TYPE.PERPENDICULAR_LINE)
 		{
-			label.setText("per"+d1+d2);
+			label.setText("per"+d1+SEPARATOR+d2);
 		}
 		else if(type == LINE_TYPE.ANGLE_BISECTOR)
 		{
-			label.setText("ab"+d1+d2+dependencies.get(2).getName());
+			label.setText("ab"+d1+SEPARATOR+d2+SEPARATOR+dependencies.get(2).getName());
 		}
 		else if(type == LINE_TYPE.PERPENDICULAR_BISECTOR)
 		{
-			label.setText("pb"+d1+d2);
+			label.setText("pb"+d1+SEPARATOR+d2);
 		}
 		for(Shape s : children) s.refreshName();
 	}

@@ -48,7 +48,7 @@ public class AsyPad extends Application
 	private AsyPadPane rootNode;
 
 	/**
-	 * Creates a new AsyPad Application that can handle .apad file opening.
+	 * Creates a new AsyPad Application that can handle .apad file opening (for Mac).
 	 */
 	public AsyPad()
 	{
@@ -77,6 +77,7 @@ public class AsyPad extends Application
 
 	public void start(Stage primaryStage)
 	{
+		//file handling for windows
 		if(OS != null && OS.startsWith("Windows"))
 		{
 			String filename = getParameters().getRaw().toString();
@@ -86,6 +87,7 @@ public class AsyPad extends Application
 				rootNode.loadApad(new File(filename));
 			}
 		}
+		
 		Scene scene = new Scene(rootNode, 1000, 700);
 		primaryStage.getIcons().add(new Image("resources/AsyPad.icns"));
 		primaryStage.setTitle("AsyPad");

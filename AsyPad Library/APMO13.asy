@@ -13,34 +13,34 @@ pair O = (3.91, 17.09); dot(O); label("$O$", O, SE);
 pair A = (5.11, 17.34); dot(A); label("$A$", A, SE);
 //dependency level 1
 //Do not change anything below, unless you are experienced in Asymptote.
-path circOA = Circle(O, abs(O-A)); draw(circOA);
+path circO_A = Circle(O, abs(O-A)); draw(circO_A);
 //dependency level 2
-pair B = relpoint(circOA, -0.7215088337730656); dot(B); label("$B$", B, SE);
-pair D = relpoint(circOA, -0.15943168564932905); dot(D); label("$D$", D, SE);
+pair B = relpoint(circO_A, -0.7215088337730656); dot(B); label("$B$", B, SE);
+pair D = relpoint(circO_A, -0.15943168564932905); dot(D); label("$D$", D, SE);
 //dependency level 3
-path segOB = O--B; 
-path segOD = O--D; 
-path lineAD = (A-20.0*unit(D-A))--(D+20.0*unit(D-A)); draw(lineAD);
+path segO_B = O--B; 
+path segO_D = O--D; 
+path lineA_D = (A-20.0*unit(D-A))--(D+20.0*unit(D-A)); draw(lineA_D);
 //dependency level 4
-path perBsegOB = (B-20.0*(dir(segOB).y, -dir(segOB).x))--(B+20.0*(dir(segOB).y, -dir(segOB).x)); draw(perBsegOB);
-path perDsegOD = (D-20.0*(dir(segOD).y, -dir(segOD).x))--(D+20.0*(dir(segOD).y, -dir(segOD).x)); draw(perDsegOD);
+path perB_segO_B = (B-20.0*(dir(segO_B).y, -dir(segO_B).x))--(B+20.0*(dir(segO_B).y, -dir(segO_B).x)); draw(perB_segO_B);
+path perD_segO_D = (D-20.0*(dir(segO_D).y, -dir(segO_D).x))--(D+20.0*(dir(segO_D).y, -dir(segO_D).x)); draw(perD_segO_D);
 //dependency level 5
-pair P = intersectionpoint(perBsegOB, perDsegOD); dot(P); label("$P$", P, SE);
+pair P = intersectionpoint(perB_segO_B, perD_segO_D); dot(P); label("$P$", P, SE);
 //dependency level 6
-path linePA = (P-20.0*unit(A-P))--(A+20.0*unit(A-P)); 
+path lineP_A = (P-20.0*unit(A-P))--(A+20.0*unit(A-P)); 
 //dependency level 7
-pair C = intersectionpoints(linePA, circOA)[1]; dot(C); label("$C$", C, SE);
+pair C = intersectionpoints(lineP_A, circO_A)[1]; dot(C); label("$C$", C, SE);
 //dependency level 8
-path segOC = O--C; 
+path segO_C = O--C; 
 //dependency level 9
-path perCsegOC = (C-20.0*(dir(segOC).y, -dir(segOC).x))--(C+20.0*(dir(segOC).y, -dir(segOC).x)); draw(perCsegOC);
+path perC_segO_C = (C-20.0*(dir(segO_C).y, -dir(segO_C).x))--(C+20.0*(dir(segO_C).y, -dir(segO_C).x)); draw(perC_segO_C);
 //dependency level 10
-pair Q = intersectionpoint(perDsegOD, perCsegOC); dot(Q); label("$Q$", Q, SE);
-pair R = intersectionpoint(perCsegOC, lineAD); dot(R); label("$R$", R, SE);
+pair Q = intersectionpoint(perD_segO_D, perC_segO_C); dot(Q); label("$Q$", Q, SE);
+pair R = intersectionpoint(perC_segO_C, lineA_D); dot(R); label("$R$", R, SE);
 //dependency level 11
-path segAQ = A--Q; draw(segAQ);
-path segBR = B--R; draw(segBR);
+path segA_Q = A--Q; draw(segA_Q);
+path segB_R = B--R; draw(segB_R);
 //dependency level 12
-pair E = intersectionpoints(segAQ, circOA)[1]; dot(E); label("$E$", E, SE);
+pair E = intersectionpoints(segA_Q, circO_A)[1]; dot(E); label("$E$", E, SE);
 //clip the drawing view
-clip((0.0, 13.19)--(0.0, 20.0)--(10.0, 20.0)--(10.0, 13.19)--cycle);
+clip((0.0, 13.16)--(0.0, 20.0)--(10.0, 20.0)--(10.0, 13.16)--cycle);

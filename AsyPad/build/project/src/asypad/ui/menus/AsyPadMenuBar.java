@@ -126,7 +126,7 @@ public class AsyPadMenuBar extends MenuBar
 		KeyCodeCombination cy = new KeyCodeCombination(KeyCode.Y, c);
 		redo.setAccelerator(cy);
 		
-		MenuItem clear = new MenuItem("Clear");
+		//MenuItem clear = new MenuItem("Clear");
 		undo.setOnAction(new EventHandler<ActionEvent>()
 		{
 			public void handle(ActionEvent event)
@@ -141,14 +141,14 @@ public class AsyPadMenuBar extends MenuBar
 				parent.redo();
 			}
 		});
-		clear.setOnAction(new EventHandler<ActionEvent>()
+		/*clear.setOnAction(new EventHandler<ActionEvent>()
 		{
 			public void handle(ActionEvent event)
 			{
 				parent.clear();
 			}
-		});
-		edit.getItems().addAll(undo, redo, clear);
+		});*/
+		edit.getItems().addAll(undo, redo/*, clear*/);
 
 		//settings
 		Menu settings = new Menu("Settings");
