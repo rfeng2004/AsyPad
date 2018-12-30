@@ -19,6 +19,10 @@ public interface SHAPE_TYPE
 		/**
 		 * This tool allows the user to delete shapes from the screen.
 		 */
-		DELETE;
+		DELETE,
+		/**
+		 * This tool allows the user to drag the labels of points.
+		 */
+		DRAG;
 	};
 }
