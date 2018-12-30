@@ -32,7 +32,7 @@ public class Point extends Shape
 
 	/**
 	 * Identifier to distinguish between the 2 possible intersections of a point and a circle, 
-	 * only used for {@ POINT_TYPE.INTERSECTION_POINT} that depend on a line and a circle.
+	 * only used for {@code POINT_TYPE.INTERSECTION_POINT} that depend on a line and a circle.
 	 */
 	private boolean identifier; //used for intersection of line and circle or 2 circles.
 
@@ -107,8 +107,7 @@ public class Point extends Shape
 		dot.setStroke(Color.BLACK);
 		dot.setStrokeWidth(StrokeWidth);
 		label.setText(name);
-		label.setLayoutX(x+StrokeWidth);
-		label.setLayoutY(y+StrokeWidth);
+		label.refresh();
 	}
 
 	/**
@@ -142,8 +141,7 @@ public class Point extends Shape
 		dot.setStroke(Color.BLACK);
 		dot.setStrokeWidth(StrokeWidth);
 		label.setText(name);
-		label.setLayoutX(x+StrokeWidth);
-		label.setLayoutY(y+StrokeWidth);
+		label.refresh();
 	}
 
 	/**
@@ -174,8 +172,7 @@ public class Point extends Shape
 		dot.setStroke(Color.BLACK);
 		dot.setStrokeWidth(StrokeWidth);
 		label.setText(name);
-		label.setLayoutX(x+StrokeWidth);
-		label.setLayoutY(y+StrokeWidth);
+		label.refresh();
 	}
 
 	/**
@@ -196,8 +193,7 @@ public class Point extends Shape
 		dot.setStroke(Color.BLACK);
 		dot.setStrokeWidth(StrokeWidth);
 		label.setText(name);
-		label.setLayoutX(x+StrokeWidth);
-		label.setLayoutY(y+StrokeWidth);
+		label.refresh();
 	}
 
 	/**
@@ -220,8 +216,7 @@ public class Point extends Shape
 		dot.setStroke(Color.BLACK);
 		dot.setStrokeWidth(StrokeWidth);
 		label.setText(name);
-		label.setLayoutX(x+StrokeWidth);
-		label.setLayoutY(y+StrokeWidth);
+		label.refresh();
 	}
 
 	/**
@@ -241,8 +236,7 @@ public class Point extends Shape
 		dot.setStroke(Color.BLACK);
 		dot.setStrokeWidth(StrokeWidth);
 		label.setText(name);
-		label.setLayoutX(x+StrokeWidth);
-		label.setLayoutY(y+StrokeWidth);
+		label.refresh();
 	}
 
 	/**
@@ -365,8 +359,7 @@ public class Point extends Shape
 		dot.setCenterY(y);
 		dot.setRadius(StrokeWidth);
 		dot.setStrokeWidth(StrokeWidth);
-		label.setLayoutX(x+StrokeWidth);
-		label.setLayoutY(y+StrokeWidth);
+		label.refresh();
 		for(Shape s : children)
 		{
 			s.refresh();
@@ -415,10 +408,11 @@ public class Point extends Shape
 	{
 		if(!inAsyCode) return "";
 		String n = getName();
+		double dir = (getLabel().getDirection()*180/Math.PI+360)%360;
 		if(type == POINT_TYPE.POINT)
 		{
 			String s = "pair " + n + " = (" + FORMATTER.format(x/100) + ", " + FORMATTER.format((INF-y)/100) + "); ";
-			if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", SE);\n";
+			if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
 			else s+="\n";
 			return s;
 		}
@@ -429,7 +423,7 @@ public class Point extends Shape
 				String l1 = dependencies.get(0).getName();
 				String l2 = dependencies.get(1).getName();
 				String s = "pair " + n + " = intersectionpoint(" + l1 + ", " + l2 + "); ";
-				if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", SE);\n";
+				if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
 				else s+="\n";
 				return s;
 			}
@@ -440,7 +434,7 @@ public class Point extends Shape
 				int a = 1;
 				if(identifier) a = 0;
 				String s = "pair " + n + " = intersectionpoints(" + l + ", " + c + ")[" + a + "]; ";
-				if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", SE);\n";
+				if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
 				else s+="\n";
 				return s;
 			}
@@ -451,7 +445,7 @@ public class Point extends Shape
 			{
 				String l = dependencies.get(0).getName();
 				String s = "pair " + n + " = relpoint(" + l + ", " + relativeLocation + "); ";
-				if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", SE);\n";
+				if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
 				else s+="\n";
 				return s;
 			}
@@ -459,7 +453,7 @@ public class Point extends Shape
 			{
 				String c = dependencies.get(0).getName();
 				String s = "pair " + n + " = relpoint(" + c + ", " + -relativeLocation/(2*Math.PI) + "); ";
-				if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", SE);\n";
+				if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
 				else s+="\n";
 				return s;
 			}
@@ -469,7 +463,7 @@ public class Point extends Shape
 			String p1 = dependencies.get(0).getName();
 			String p2 = dependencies.get(1).getName();
 			String s = "pair " + n + " = (" + p1 + " + " + p2 + ")/2; ";
-			if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", SE);\n";
+			if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
 			else s+="\n";
 			return s;
 		}

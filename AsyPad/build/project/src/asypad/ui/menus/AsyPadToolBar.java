@@ -37,7 +37,10 @@ public class AsyPadToolBar extends MenuBar
 		Image delete = new Image("resources/delete.png");
 		Tool trash = new Tool(delete, "Delete", "Click on shapes to delete.", MOUSE.DELETE, mouse, this, parent);
 		
-		mouse.getItems().addAll(defaultMouse, trash);
+		Image dragIcon = new Image("resources/drag.png");
+		Tool drag = new Tool(dragIcon, "Drag Labels", "Use this tool to drag labels.", MOUSE.DRAG, mouse, this, parent);
+		
+		mouse.getItems().addAll(defaultMouse, trash, drag);
 		
 		
 		Menu point = new Menu();

@@ -1,6 +1,7 @@
 package asypad.ui.command;
 
 import asypad.shapes.*;
+import asypad.shapes.types.POINT_TYPE;
 import asypad.ui.AsyPadPane;
 
 /**
@@ -57,13 +58,19 @@ public class DrawCommand extends Command
 			Point p = (Point) shape;
 			p.setX(defaultX);
 			p.setY(defaultY);
+			if(p.getType() == POINT_TYPE.POINT_ON_SHAPE)
+			{
+				//reset relative location for a point on shape
+				p.setRelativeLocation(defaultX, defaultY);
+			}
 			p.setName(defaultName);
 			p.setRemove(false);
 			p.setHidden(false);
+			p.getLabel().setDirection(-Math.PI/4);
 			target.addShape(p);
 		}
 	}
-	
+
 	public String toString()
 	{
 		String s = "draw(" + shape.toString() + ")\n";

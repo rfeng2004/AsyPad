@@ -3,8 +3,8 @@ package asypad.shapes;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
+import asypad.shapes.labels.DraggableLabel;
 import asypad.shapes.types.SHAPE_TYPE;
 import asypad.ui.AsyPadPane;
 /**
@@ -61,7 +61,7 @@ public abstract class Shape
 	/**
 	 * The shape's label.
 	 */
-	protected Label label;
+	protected DraggableLabel label;
 	
 	/**
 	 * The type of this shape.
@@ -365,7 +365,7 @@ public abstract class Shape
 	{
 		dependencies = new ArrayList<Shape>();
 		children = new ArrayList<Shape>();
-		label = new Label();
+		label = new DraggableLabel(this, -Math.PI/4); //default direction SE
 		level = -1;
 		for(Shape s : shapes)
 		{
@@ -499,7 +499,7 @@ public abstract class Shape
 	 * Returns the shapes's label.
 	 * @return the shape label
 	 */
-	public Label getLabel()
+	public DraggableLabel getLabel()
 	{
 		return label;
 	}

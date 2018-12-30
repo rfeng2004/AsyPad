@@ -1,5 +1,7 @@
 package asypad.ui;
 /*
+ * FIXME Dragging a point on shape cannot be undoed. (done)
+ * TODO Draggable Labels (done)
  * TODO Add new tool: tangents, relative point, intersection point of 2 circles.
  * TODO Implement grid show and hide.
  * TODO Add user manual in help menu.
@@ -265,7 +267,7 @@ public class AsyPadPane extends Pane
 				SHAPE_TYPE tool = tools.getSelectedTool();
 				if(tool == MOUSE.MOUSE || tool instanceof POINT_TYPE)
 				{
-					if(snappedIndex != -1 && event.getClickCount() == 2)
+					if(snappedIndex != -1 && (event.getClickCount() == 2 || event.isSecondaryButtonDown()))
 					{
 						showConfigureShape(shapes.get(snappedIndex));
 					}
@@ -582,27 +584,60 @@ public class AsyPadPane extends Pane
 						}
 					}
 				}
+				else if(tool == MOUSE.DRAG)
+				{
+					if(snappedIndex != -1 && shapes.get(snappedIndex) instanceof Point)
+					{
+						dragged = true;
+						Point p = (Point) shapes.get(snappedIndex);
+						double cx = event.getSceneX();
+						double cy = event.getSceneY();
+						double direction = 0;
+						double x = p.getX()+(cx-p.getX())/Utility.dist(cx, cy, p.getX(), p.getY());
+						double y = p.getY()+(cy-p.getY())/Utility.dist(cx, cy, p.getX(), p.getY());
+						direction = Math.atan((y-p.getY())/(x-p.getX()));
+						if(x < p.getX()) direction += Math.PI;
+						p.getLabel().setDirection(-direction);
+					}
+				}
 			}
 		});
 		this.setOnMouseReleased(new EventHandler<MouseEvent>()
 		{
 			public void handle(MouseEvent event)
 			{
+				SHAPE_TYPE tool = tools.getSelectedTool();
 				if(dragged)
 				{
-					Shape s = shapes.get(snappedIndex);
-					if(s.getType() == POINT_TYPE.POINT)
+					if(tool == MOUSE.MOUSE)
 					{
-						double x = Math.max(0, event.getSceneX());
-						double y = Math.max(0, event.getSceneY());
-						((Point) s).setX(x);
-						((Point) s).setY(y);
-						addCommand(new MoveCommand((Point) s, x, y));
+						Shape s = shapes.get(snappedIndex);
+						if(s.getType() == POINT_TYPE.POINT)
+						{
+							double x = Math.max(0, event.getSceneX());
+							double y = Math.max(0, event.getSceneY());
+							((Point) s).setX(x);
+							((Point) s).setY(y);
+							addCommand(new MoveCommand((Point) s, x, y));
+						}
+						else if(s.getType() == POINT_TYPE.POINT_ON_SHAPE)
+						{
+							((Point) s).setRelativeLocation(event.getSceneX(), event.getSceneY());
+							addCommand(new MoveCommand((Point) s, event.getSceneX(), event.getSceneY()));
+						}
 					}
-					else if(s.getType() == POINT_TYPE.POINT_ON_SHAPE)
+					else if(tool == MOUSE.DRAG)
 					{
-						((Point) s).setRelativeLocation(event.getSceneX(), event.getSceneY());
-						addCommand(new MoveCommand((Point) s, event.getSceneX(), event.getSceneY()));
+						Point p = (Point) shapes.get(snappedIndex);
+						double cx = event.getSceneX();
+						double cy = event.getSceneY();
+						double direction = 0;
+						double x = p.getX()+(cx-p.getX())/Utility.dist(cx, cy, p.getX(), p.getY());
+						double y = p.getY()+(cy-p.getY())/Utility.dist(cx, cy, p.getX(), p.getY());
+						direction = Math.atan((y-p.getY())/(x-p.getX()));
+						if(x < p.getX()) direction += Math.PI;
+						p.getLabel().setDirection(-direction);
+						addCommand(new DragCommand(p, -direction));
 					}
 				}
 				dragged = false;
@@ -647,7 +682,7 @@ public class AsyPadPane extends Pane
 			s.getLabel().toBack();
 		}
 	}
-	
+
 	/**
 	 * Searches the current shapes in the AsyPadPane for a shape with the given name.
 	 * @param name name of shape to search for

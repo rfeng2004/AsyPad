@@ -38,6 +38,21 @@ public abstract class Command
 			String name = command.substring(7, command.length()-1);
 			load = new DeleteCommand(target.findShapeByName(name));
 		}
+		else if(command.substring(0, 4).equals("drag"))
+		{
+			int comma = 0;
+			for(int i = 5; i < command.length(); i++)
+			{
+				if(command.charAt(i) == ',')
+				{
+					comma = i;
+					break;
+				}
+			}
+			String name = command.substring(5, comma);
+			double dir = Double.parseDouble(command.substring(comma+2, command.length()-1));
+			load = new DragCommand((Point) target.findShapeByName(name), dir);
+		}
 		else if(command.substring(0, 4).equals("hide"))
 		{
 			String name = command.substring(5, command.length()-1);
@@ -92,6 +107,11 @@ public abstract class Command
 			String newStrokeWidth = command.substring(7, command.length()-1);
 			double stroke = Double.parseDouble(newStrokeWidth);
 			load = new StrokeWidthCommand(stroke);
+		}
+		else
+		{
+			//safety to avoid crashing
+			return;
 		}
 		target.addCommand(load);
 		load.doAction(target);
