@@ -1,7 +1,5 @@
 package asypad.ui;
 /*
- * FIXME Dragging a point on shape cannot be undoed. (done)
- * TODO Draggable Labels (done)
  * TODO Add new tool: tangents, relative point, intersection point of 2 circles.
  * TODO Implement grid show and hide.
  * TODO Add user manual in help menu.
@@ -305,7 +303,12 @@ public class AsyPadPane extends Pane
 						//snappedIndex = shapes.size()-1;
 						setCursor(Cursor.HAND);
 					}
-					else if(!(shapes.get(snappedIndex) instanceof Point) && snappedShapes.size() == 1)
+					else if(shapes.get(snappedIndex) instanceof Point) 
+					{
+						//dont draw a point over another point
+						return;
+					}
+					else if(snappedShapes.size() == 1)
 					{
 						Point p = new Point(event.getSceneX(), event.getSceneY(), shapes.get(snappedIndex), nextPointName(1));
 						addShape(p);
@@ -351,6 +354,7 @@ public class AsyPadPane extends Pane
 				}
 				else if(tool == POINT_TYPE.INTERSECTION_POINT)
 				{
+					if(snappedIndex != -1 && shapes.get(snappedIndex) instanceof Point) return;
 					ArrayList<Line> lines = new ArrayList<Line>();
 					ArrayList<Circle> circles = new ArrayList<Circle>();
 					for(Shape s : snappedShapes)
