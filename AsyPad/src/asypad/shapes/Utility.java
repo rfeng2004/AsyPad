@@ -409,6 +409,62 @@ public class Utility
 			}
 		}
 	}
+	
+	/**
+	 * Finds the x-coordinate of the incenter of 3 points.
+	 * @param p1 first point
+	 * @param p2 second point
+	 * @param p3 third point
+	 * @return x-coordinate of incenter
+	 */
+	public static double incenterX(Point p1, Point p2, Point p3)
+	{
+		double a = dist(p2, p3), b = dist(p1, p3), c = dist(p1, p2);
+		
+		return (a * p1.getX() + b * p2.getX() + c * p3.getX()) / (a+b+c);
+	}
+	
+	/**
+	 * Finds the y-coordinate of the incenter of 3 points.
+	 * @param p1 first point
+	 * @param p2 second point
+	 * @param p3 third point
+	 * @return y-coordinate of incenter
+	 */
+	public static double incenterY(Point p1, Point p2, Point p3)
+	{
+		double a = dist(p2, p3), b = dist(p1, p3), c = dist(p1, p2);
+		
+		return (a * p1.getY() + b * p2.getY() + c * p3.getY()) / (a+b+c);
+	}
+	
+	/**
+	 * Finds the x-coordinate of the orthocenter of 3 points.
+	 * @param p1 first point
+	 * @param p2 second point
+	 * @param p3 third point
+	 * @return x-coordinate of orthocenter
+	 */
+	public static double orthocenterX(Point p1, Point p2, Point p3)
+	{
+		Line a1 = new Line(p1, new Point(footX(p1.getX(), p1.getY(), new Line(p2, p3)), footY(p1.getX(), p1.getY(), new Line(p2, p3))));
+		Line a2 = new Line(p2, new Point(footX(p2.getX(), p2.getY(), new Line(p1, p3)), footY(p2.getX(), p2.getY(), new Line(p1, p3))));
+		return intersectX(a1, a2);
+	}
+	
+	/**
+	 * Finds the y-coordinate of the orthocenter of 3 points.
+	 * @param p1 first point
+	 * @param p2 second point
+	 * @param p3 third point
+	 * @return y-coordinate of orthocenter
+	 */
+	public static double orthocenterY(Point p1, Point p2, Point p3)
+	{
+		Line a1 = new Line(p1, new Point(footX(p1.getX(), p1.getY(), new Line(p2, p3)), footY(p1.getX(), p1.getY(), new Line(p2, p3))));
+		Line a2 = new Line(p2, new Point(footX(p2.getX(), p2.getY(), new Line(p1, p3)), footY(p2.getX(), p2.getY(), new Line(p1, p3))));
+		return intersectY(a1, a2);
+	}
 
 	/**
 	 * Calculates the x-coordinate of the point that lies on the angle bisector of angle p1p2p3,
