@@ -511,6 +511,29 @@ public class Utility
 		y2 = (d2-1)/d2*p2.getY()+1/d2*y2;
 		return y2;
 	}
+	
+	/**
+	 * Finds the line tangent to the circle at a point
+	 * @param x x-coordinate
+	 * @param y y-coordinate
+	 * @param c circle
+	 * @return line object that is tangent to c at (x, y)
+	 */
+	public static Line tangent(double x, double y, Circle c)
+	{
+		// translate the circle to be centered at the origin
+		double translationX = x - c.getCenterX(), translationY = y - c.getCenterY();
+		
+		// if it is a vertical line
+		if(translationY == 0)
+		{
+			return new Line(new Point(x, y), new Point(x, y - 1));
+		}
+		 
+		double m = -translationX / translationY;
+		
+		return new Line(new Point(x, y), new Point(x + 1, y + m));
+	}
 
 	/**
 	 * Finds distance from (x, y) to shape s.
