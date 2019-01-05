@@ -50,23 +50,39 @@ public class Circle extends Shape
 	}
 
 	/**
-	 * Constructs the circumcircle of 3 points.
+	 * Constructs a circle based on 3 points.
 	 * @param p1 first point
 	 * @param p2 second point
 	 * @param p3 third point
+	 * @param circ which type of circle it is. (1 = circumcircle, 2 = incircle)
 	 */
-	public Circle(Point p1, Point p2, Point p3)
+	public Circle(Point p1, Point p2, Point p3, int circ)
 	{
 		super(p1, p2, p3);
-		x = Utility.circumcenterX(p1, p2, p3);
-		y = Utility.circumcenterY(p1, p2, p3);
-		radius = Utility.dist(x, y, p1.getX(), p1.getY());
-		type = CIRCLE_TYPE.CIRCUMCIRCLE;
-		circle = new javafx.scene.shape.Circle(x, y, radius);
-		circle.setFill(Color.TRANSPARENT);
-		circle.setStrokeWidth(StrokeWidth);
-		circle.setStroke(Color.BLACK);
-		label.setText("cc" + p1.getName() + SEPARATOR + p2.getName() + SEPARATOR + p3.getName());
+		if(circ == 1)
+		{
+			x = Utility.circumcenterX(p1, p2, p3);
+			y = Utility.circumcenterY(p1, p2, p3);
+			radius = Utility.dist(x, y, p1.getX(), p1.getY());
+			type = CIRCLE_TYPE.CIRCUMCIRCLE;
+			circle = new javafx.scene.shape.Circle(x, y, radius);
+			circle.setFill(Color.TRANSPARENT);
+			circle.setStrokeWidth(StrokeWidth);
+			circle.setStroke(Color.BLACK);
+			label.setText("cc" + p1.getName() + SEPARATOR + p2.getName() + SEPARATOR + p3.getName());
+		}
+		else if(circ == 2)
+		{
+			x = Utility.incenterX(p1, p2, p3);
+			y = Utility.incenterY(p1, p2, p3);
+			radius = Utility.distToL(p1.getX(), p1.getY(), p2.getX(), p2.getY(), x, y);
+			type = CIRCLE_TYPE.INCIRCLE;
+			circle = new javafx.scene.shape.Circle(x, y, radius);
+			circle.setFill(Color.TRANSPARENT);
+			circle.setStrokeWidth(StrokeWidth);
+			circle.setStroke(Color.BLACK);
+			label.setText("ic" + p1.getName() + SEPARATOR + p2.getName() + SEPARATOR + p3.getName());
+		}
 	}
 
 	/**

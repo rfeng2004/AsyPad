@@ -252,7 +252,30 @@ public class AsyPadPane extends Pane
 								y = (p1.getY()+p2.getY())/2;
 							}
 						}
-						Circle c = new Circle(new Point(x, y), p1, p2);
+						Circle c = new Circle(new Point(x, y), p1, p2, 1);
+						setCurrentCircle(c.getCenterX(), c.getCenterY(), c.getRadius());
+					}
+				}
+				else if(tool == CIRCLE_TYPE.INCIRCLE)
+				{
+					if(selectedShapes.size() == 2)
+					{
+						Point p1 = (Point) selectedShapes.get(0);
+						Point p2 = (Point) selectedShapes.get(1);
+						double x = event.getSceneX();
+						double y = event.getSceneY();
+						if(snappedIndex != -1 && shapes.get(snappedIndex) instanceof Point)
+						{
+							Point point = (Point) shapes.get(snappedIndex);
+							x = point.getX();
+							y = point.getY();
+							if(point == p1 || point == p2)
+							{
+								x = (p1.getX()+p2.getX())/2;
+								y = (p1.getY()+p2.getY())/2;
+							}
+						}
+						Circle c = new Circle(new Point(x, y), p1, p2, 2);
 						setCurrentCircle(c.getCenterX(), c.getCenterY(), c.getRadius());
 					}
 				}
@@ -552,7 +575,26 @@ public class AsyPadPane extends Pane
 						Point p3 = (Point) selectedShapes.get(2);
 						if(p1 != p2 && p2 != p3 && p1 != p3)
 						{
-							Circle c = new Circle(p1, p2, p3);
+							Circle c = new Circle(p1, p2, p3, 1);
+							addShape(c);
+							addCommand(new DrawCommand(c));
+						}
+						resetSelectedShapes();
+						selectedShapes.clear();
+						getChildren().remove(currentCircle);
+					}
+				}
+				else if(tool == CIRCLE_TYPE.INCIRCLE)
+				{
+					if(snappedIndex != -1 && shapes.get(snappedIndex) instanceof Point) selectedShapes.add(shapes.get(snappedIndex));
+					if(selectedShapes.size() == 3)
+					{
+						Point p1 = (Point) selectedShapes.get(0);
+						Point p2 = (Point) selectedShapes.get(1);
+						Point p3 = (Point) selectedShapes.get(2);
+						if(p1 != p2 && p2 != p3 && p1 != p3)
+						{
+							Circle c = new Circle(p1, p2, p3, 2);
 							addShape(c);
 							addCommand(new DrawCommand(c));
 						}

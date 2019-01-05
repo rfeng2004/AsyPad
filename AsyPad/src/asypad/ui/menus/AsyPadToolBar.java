@@ -91,11 +91,13 @@ public class AsyPadToolBar extends MenuBar
 		circle.setGraphic(circleGraphic);
 		
 		Image cc = new Image("resources/circumcircle.png");
-		
+		Image ic = new Image("resources/incircle.png");
+
 		Tool defaultCircle = new Tool(c, "Circle", "Select the center, then a point on the circle.", CIRCLE_TYPE.CIRCLE, circle, this, parent);
 		Tool circumcircle = new Tool(cc, "Circumircle", "Select 3 points to create a circumcircle.", CIRCLE_TYPE.CIRCUMCIRCLE, circle, this, parent);
-		
-		circle.getItems().addAll(defaultCircle, circumcircle);
+		Tool incircle = new Tool(ic, "Incircle", "Select 3 points to create a incircle.", CIRCLE_TYPE.INCIRCLE, circle, this, parent);
+
+		circle.getItems().addAll(defaultCircle, circumcircle, incircle);
 		
 		getMenus().addAll(mouse, point, line, circle);
 		setPrefSize(5000, 40);
