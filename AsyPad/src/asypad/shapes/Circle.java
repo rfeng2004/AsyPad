@@ -205,6 +205,16 @@ public class Circle extends Shape
 			else s+="\n";
 			return s;
 		}
+		else if(type == CIRCLE_TYPE.INCIRCLE)
+		{
+			String p1 = dependencies.get(0).getName();
+			String p2 = dependencies.get(1).getName();
+			String p3 = dependencies.get(2).getName();
+			String s = "path " + n + " = incircle(" + p1 + ", " + p2 + ", " + p3 + "); ";
+			if(!hide) s+="draw(" + n + ");\n";
+			else s+="\n";
+			return s;
+		}
 		return null;
 	}
 
