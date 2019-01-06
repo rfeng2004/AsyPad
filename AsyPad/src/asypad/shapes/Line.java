@@ -37,7 +37,7 @@ public class Line extends Shape
 	
 	/**
 	 * Identifier to distinguish between the 2 possible intersections of a point and a circle, 
-	 * only used for {@code LINE_TYPE.TANGENT_LINE} that depend on a line and a circle.
+	 * only used for {@code LINE_TYPE.TANGENT_LINE} that depend on a point and a circle.
 	 */
 	private boolean identifier; //used for tangent to a circle through a point.
 
@@ -189,7 +189,7 @@ public class Line extends Shape
 		
 		this.identifier = identifier;
 		
-		label.setText("tl"+identifier + p.getName()+SEPARATOR+c.getName());
+		label.setText("tl"+(identifier ? 2 : 1)+p.getName()+SEPARATOR+c.getName());
 		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
 		line.setStrokeWidth(StrokeWidth);
 	}
@@ -361,7 +361,7 @@ public class Line extends Shape
 			y1 = p.getY();
 			x2 = Utility.tangentX(x1, y1, c, identifier);
 			y2 = Utility.tangentY(x1, y1, c, identifier);
-								
+			
 			double dx = x2-p.getX();
 			double dy = y2-p.getY();
 			double dirx = dx/Math.sqrt(dx*dx+dy*dy);
@@ -414,7 +414,7 @@ public class Line extends Shape
 		}
 		else if(type == LINE_TYPE.TANGENT_LINE)
 		{
-			label.setText("tl"+identifier+d1+SEPARATOR+d2);
+			label.setText("tl"+(identifier ? 2 : 1)+d1+SEPARATOR+d2);
 		}
 		for(Shape s : children) s.refreshName();
 	}
@@ -429,8 +429,7 @@ public class Line extends Shape
 		String s = "";
 		if(type == LINE_TYPE.SEGMENT || type == LINE_TYPE.LINE 
 				|| type == LINE_TYPE.PARALLEL_LINE || type == LINE_TYPE.PERPENDICULAR_LINE
-				|| type == LINE_TYPE.PERPENDICULAR_BISECTOR
-				|| type == LINE_TYPE.TANGENT_LINE)
+				|| type == LINE_TYPE.PERPENDICULAR_BISECTOR)
 		{
 			s = "LINE: type = " + type + " dependencies: " + dependencies.get(0).getName()
 					+ ", " + dependencies.get(1).getName();
@@ -439,6 +438,11 @@ public class Line extends Shape
 		{
 			s = "LINE: type = " + type + " dependencies: " + dependencies.get(0).getName()
 					+ ", " + dependencies.get(1).getName() + ", " + dependencies.get(2).getName();
+		}
+		else if(type == LINE_TYPE.TANGENT_LINE)
+		{
+			s = "LINE: type = " + type + " dependencies: " + dependencies.get(0).getName()
+					+ ", " + dependencies.get(1).getName() + " identifier = " + identifier;
 		}
 		return s;
 	}
@@ -528,8 +532,8 @@ public class Line extends Shape
 				center = "incenter(" + dependencies.get(1).dependencies.get(0).getName() + ", " + dependencies.get(1).dependencies.get(1).getName() + ", " + dependencies.get(1).dependencies.get(2).getName() + ")";
 				rad = "inradius(" + dependencies.get(1).dependencies.get(0).getName() + ", " + dependencies.get(1).dependencies.get(1).getName() + ", " + dependencies.get(1).dependencies.get(2).getName() + ")";
 			}
-			
-			String s = "pair " + p + "_" + c + "_tangent = tangent(" + p + ", " + center + ", " + rad + ", " + identifier + " ? 2 : 1); path " + n + " = (" + p + "-" + INF/100 + "*unit(" + p + "_" + c + "_tangent" + "-" + p + "))--(" + p + "_" + c + "_tangent" + "+" + INF/100 + "*unit(" + p + "_" + c + "_tangent" + "-" + p + ")); ";
+			int id = (identifier ? 2 : 1);
+			String s = "pair " + p + "_" + c + "_tangent" + id + " = tangent(" + p + ", " + center + ", " + rad + ", " + id + ");\npath " + n + " = (" + p + "-" + INF/100 + "*unit(" + p + "_" + c + "_tangent" + id + "-" + p + "))--(" + p + "_" + c + "_tangent" + id + "+" + INF/100 + "*unit(" + p + "_" + c + "_tangent" + id + "-" + p + ")); ";
 			if(!hide) s+="draw(" + n + ");\n";
 			else s+="\n";
 			return s;
