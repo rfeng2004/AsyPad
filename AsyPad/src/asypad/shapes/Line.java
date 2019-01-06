@@ -176,17 +176,17 @@ public class Line extends Shape
 		y1 = p.getY();
 		x2 = Utility.tangentX(x1, y1, c, identifier);
 		y2 = Utility.tangentY(x1, y1, c, identifier);
-		
-		double dx = x2-x1;
-		double dy = y2-y1;
+				
+		double dx = x2-p.getX();
+		double dy = y2-p.getY();
 		double dirx = dx/Math.sqrt(dx*dx+dy*dy);
 		double diry = dy/Math.sqrt(dx*dx+dy*dy);
 		
-		x1 = x1+INF*diry;
-		y1 = y1-INF*dirx;
-		x2 = x2-INF*diry;
-		y2 = y2+INF*dirx;
-				
+		x1 = p.getX()-INF*dirx;
+		y1 = p.getY()-INF*diry;
+		x2 = x2+INF*dirx;
+		y2 = y2+INF*diry;
+		
 		label.setText("tl"+p.getName()+SEPARATOR+c.getName());
 		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
 		line.setStrokeWidth(StrokeWidth);

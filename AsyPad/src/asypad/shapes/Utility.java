@@ -589,7 +589,7 @@ public class Utility
 		if(equal(dist(c.getCenterX(), c.getCenterY(), x, y), c.getRadius()))
 		{
 			// translate the circle to be centered at the origin
-			double translationX = x - c.getCenterX(), translationY = y - c.getCenterY();
+			double translationX = x - c.getCenterX(), translationY = - y + c.getCenterY();
 			
 			// if it is a vertical line
 			if(translationY == 0)
@@ -627,7 +627,7 @@ public class Utility
 		if(equal(dist(c.getCenterX(), c.getCenterY(), x, y), c.getRadius()))
 		{
 			// translate the circle to be centered at the origin
-			double translationX = x - c.getCenterX(), translationY = y - c.getCenterY();
+			double translationX = x - c.getCenterX(), translationY = - y + c.getCenterY();
 			
 			// if it is a vertical line
 			if(translationY == 0)
@@ -637,8 +637,7 @@ public class Utility
 			 
 			double m = -translationX / translationY;
 			
-			
-			return y + m / (m * m + 1);
+			return y - m / (m * m + 1);
 		}
 		else if(dist(c.getCenterX(), c.getCenterY(), x, y) < c.getRadius())
 		{
@@ -698,7 +697,7 @@ public class Utility
 	public static boolean equal(double d1, double d2)
 	{
 		double epsilon = 0.0001;
-		return Math.abs(d1 - d1) < epsilon;
+		return Math.abs(d1 - d2) < epsilon;
 	}
 	
 }
