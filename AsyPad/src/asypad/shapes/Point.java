@@ -218,6 +218,29 @@ public class Point extends Shape
 		label.setText(name);
 		label.refresh();
 	}
+	
+	/**
+	 * Constructs an intersection point between circles c1 and c2. Identifier = true represents
+	 * the intersection point that is more counterclockwise wrt the first circle.
+	 * @param l line
+	 * @param c circle
+	 * @param identifier which intersection point this will be
+	 * @param name
+	 */
+	public Point(Circle c1, Circle c2, boolean identifier, String name)
+	{
+		super(c1, c2);
+		type = POINT_TYPE.INTERSECTION_POINT;
+		relativeLocation = -1;
+		this.identifier = identifier;
+		this.x = Utility.intersectX(c1, c2, identifier);
+		this.y = Utility.intersectY(c1, c2, identifier);
+		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
+		dot.setStroke(Color.BLACK);
+		dot.setStrokeWidth(StrokeWidth);
+		label.setText(name);
+		label.refresh();
+	}
 
 	/**
 	 * Constructs the midpoint of 2 points.
@@ -347,6 +370,14 @@ public class Point extends Shape
 				y = Utility.intersectY(l, c, identifier);
 
 			}
+			else if(dependencies.get(0) instanceof Circle && dependencies.get(1) instanceof Circle)
+			{
+				Circle c1 = (Circle) dependencies.get(0);
+				Circle c2 = (Circle) dependencies.get(1);
+				x = Utility.intersectX(c1, c2, identifier);
+				y = Utility.intersectY(c1, c2, identifier);
+
+			}
 		}
 		else if(type == POINT_TYPE.MIDPOINT)
 		{
@@ -427,13 +458,24 @@ public class Point extends Shape
 				else s+="\n";
 				return s;
 			}
-			else if(dependencies.get(1) instanceof Circle)
+			else if(dependencies.get(0) instanceof Line && dependencies.get(1) instanceof Circle)
 			{
 				String l = dependencies.get(0).getName();
 				String c = dependencies.get(1).getName();
 				int a = 1;
 				if(identifier) a = 0;
 				String s = "pair " + n + " = intersectionpoints(" + l + ", " + c + ")[" + a + "]; ";
+				if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
+				else s+="\n";
+				return s;
+			}
+			else if(dependencies.get(0) instanceof Circle)
+			{
+				String c1 = dependencies.get(0).getName();
+				String c2 = dependencies.get(1).getName();
+				int a = 1;
+				if(identifier) a = 0;
+				String s = "pair " + n + " = intersectionpoints(" + c1 + ", " + c2 + ")[" + a + "]; ";
 				if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
 				else s+="\n";
 				return s;

@@ -1,6 +1,6 @@
 package asypad.ui;
 /*
- * TODO Add new tool: tangents, relative point, intersection point of 2 circles.
+ * TODO Add new tool: relative point, intersection point of 2 circles, conic sections.
  * TODO Implement grid show and hide.
  * TODO Add user manual in help menu.
  */
@@ -379,6 +379,23 @@ public class AsyPadPane extends Pane
 								addCommand(new DrawCommand(p2, p2.getX(), p2.getY(), p2.getName()));
 							}
 						}
+						else if(circles.size() >= 2)
+						{
+							Point p1 = new Point((Circle) circles.get(0), (Circle) circles.get(1), false, nextPointName(1));
+							Point p2 = new Point((Circle) circles.get(0), (Circle) circles.get(1), true, nextPointName(1));
+							if(Utility.distToShape(event.getSceneX(), event.getSceneY(), p1) < Utility.distToShape(event.getSceneX(), event.getSceneY(), p2))
+							{
+								addShape(p1);
+								//System.out.println(p1);
+								addCommand(new DrawCommand(p1, p1.getX(), p1.getY(), p1.getName()));
+							}
+							else 
+							{
+								addShape(p2);
+								//System.out.println(p2);
+								addCommand(new DrawCommand(p2, p2.getX(), p2.getY(), p2.getName()));
+							}
+						}
 					}
 				}
 				else if(tool == POINT_TYPE.POINT_ON_SHAPE)
@@ -418,6 +435,23 @@ public class AsyPadPane extends Pane
 					{
 						Point p1 = new Point((Line) lines.get(0), (Circle) circles.get(0), false, nextPointName(1));
 						Point p2 = new Point((Line) lines.get(0), (Circle) circles.get(0), true, nextPointName(1));
+						if(Utility.distToShape(event.getSceneX(), event.getSceneY(), p1) < Utility.distToShape(event.getSceneX(), event.getSceneY(), p2))
+						{
+							addShape(p1);
+							//System.out.println(p1);
+							addCommand(new DrawCommand(p1, p1.getX(), p1.getY(), p1.getName()));
+						}
+						else 
+						{
+							addShape(p2);
+							//System.out.println(p2);
+							addCommand(new DrawCommand(p2, p2.getX(), p2.getY(), p2.getName()));
+						}
+					}
+					else if(circles.size() >= 2)
+					{
+						Point p1 = new Point((Circle) circles.get(0), (Circle) circles.get(1), false, nextPointName(1));
+						Point p2 = new Point((Circle) circles.get(0), (Circle) circles.get(1), true, nextPointName(1));
 						if(Utility.distToShape(event.getSceneX(), event.getSceneY(), p1) < Utility.distToShape(event.getSceneX(), event.getSceneY(), p2))
 						{
 							addShape(p1);

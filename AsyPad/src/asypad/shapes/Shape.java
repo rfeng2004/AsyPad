@@ -148,16 +148,21 @@ public abstract class Shape
 					d2Name = args.substring(d2+2, id-12);
 				}
 				else d2Name = args.substring(d2+2, args.length());
-				Line dependency1 = (Line) target.findShapeByName(d1Name);
+				Shape dependency1 = target.findShapeByName(d1Name);
 				Shape dependency2 = target.findShapeByName(d2Name);
-				if(dependency2 instanceof Line)
+				if(dependency1 instanceof Line && dependency2 instanceof Line)
 				{
-					s = new Point(dependency1, (Line) dependency2, name);
+					s = new Point((Line) dependency1, (Line) dependency2, name);
 				}
-				else
+				else if(dependency1 instanceof Line && dependency2 instanceof Circle)
 				{
 					boolean identifier = Boolean.parseBoolean(args.substring(id+2, args.length()));
-					s = new Point(dependency1, (Circle) dependency2, identifier, name);
+					s = new Point((Line) dependency1, (Circle) dependency2, identifier, name);
+				}
+				else if(dependency1 instanceof Circle && dependency2 instanceof Circle)
+				{
+					boolean identifier = Boolean.parseBoolean(args.substring(id+2, args.length()));
+					s = new Point((Circle) dependency1, (Circle) dependency2, identifier, name);
 				}
 			}
 			else if(args.substring(14, 22).equals("MIDPOINT"))
