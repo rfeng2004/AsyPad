@@ -529,7 +529,7 @@ public class Line extends Shape
 				rad = "inradius(" + dependencies.get(1).dependencies.get(0).getName() + ", " + dependencies.get(1).dependencies.get(1).getName() + ", " + dependencies.get(1).dependencies.get(2).getName() + ")";
 			}
 			
-			String s = "pair " + p + "_" + c + "_tangent = tangent( " + p + ", " + center + ", " + rad + ", + " + identifier + "); path " + n + " = (" + p + "-" + INF/100 + "*unit(" + p + "_" + c + "_tangent" + "-" + p + "))--(" + p + "_" + c + "_tangent" + "+" + INF/100 + "*unit(" + p + "_" + c + "_tangent" + "-" + p + ")); ";
+			String s = "pair " + p + "_" + c + "_tangent = tangent(" + p + ", " + center + ", " + rad + ", " + identifier + " ? 2 : 1); path " + n + " = (" + p + "-" + INF/100 + "*unit(" + p + "_" + c + "_tangent" + "-" + p + "))--(" + p + "_" + c + "_tangent" + "+" + INF/100 + "*unit(" + p + "_" + c + "_tangent" + "-" + p + ")); ";
 			if(!hide) s+="draw(" + n + ");\n";
 			else s+="\n";
 			return s;
