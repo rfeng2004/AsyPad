@@ -29,5 +29,9 @@ public enum LINE_TYPE implements SHAPE_TYPE
 	/**
 	 * Perpendicular bisector of the segment specified by 2 given points.
 	 */
-	PERPENDICULAR_BISECTOR;
+	PERPENDICULAR_BISECTOR,
+	/**
+	 * Line tangent to a circle at a point.
+	 */
+	TANGENT_LINE,
 }

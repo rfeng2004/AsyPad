@@ -513,13 +513,14 @@ public class Utility
 	}
 	
 	/**
-	 * Finds the line tangent to the circle at a point
+	 * Finds the x-coordinate of the point 1 unit away and in the positive x direction from a point, 
+	 * such that the line formed by the two points tangent to the circle 
 	 * @param x x-coordinate
 	 * @param y y-coordinate
 	 * @param c circle
 	 * @return line object that is tangent to c at (x, y)
 	 */
-	public static Line tangent(double x, double y, Circle c)
+	public static double tangentX(double x, double y, Circle c)
 	{
 		// translate the circle to be centered at the origin
 		double translationX = x - c.getCenterX(), translationY = y - c.getCenterY();
@@ -527,13 +528,39 @@ public class Utility
 		// if it is a vertical line
 		if(translationY == 0)
 		{
-			return new Line(new Point(x, y), new Point(x, y - 1));
+			return x;
 		}
 		 
 		double m = -translationX / translationY;
 		
-		return new Line(new Point(x, y), new Point(x + 1, y + m));
+		return x + 1 / (m * m + 1);
 	}
+	
+	/**
+	 * Finds the y-coordinate of the point 1 unit away and in the positive x direction from a point, 
+	 * such that the line formed by the two points tangent to the circle.
+	 * (It will be 1 down from the point if such a line is vertical)
+	 * @param x x-coordinate
+	 * @param y y-coordinate
+	 * @param c circle
+	 * @return line object that is tangent to c at (x, y)
+	 */
+	public static double tangentY(double x, double y, Circle c)
+	{
+		// translate the circle to be centered at the origin
+		double translationX = x - c.getCenterX(), translationY = y - c.getCenterY();
+		
+		// if it is a vertical line
+		if(translationY == 0)
+		{
+			return y - 1;
+		}
+		 
+		double m = -translationX / translationY;
+		
+		return y + m / (m * m + 1);
+	}
+
 
 	/**
 	 * Finds distance from (x, y) to shape s.
