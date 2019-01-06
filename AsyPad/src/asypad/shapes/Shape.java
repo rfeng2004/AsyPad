@@ -353,10 +353,10 @@ public abstract class Shape
 				Point dependency3 = (Point) target.findShapeByName(d3Name);
 				s = new Circle(dependency1, dependency2, dependency3, 1);
 			}
-			else if(args.substring(15, 27).equals("INCIRCLE"))
+			else if(args.substring(15, 23).equals("INCIRCLE"))
 			{
 				int d1 = 0, d2 = 0, d3 = 0;
-				for(int i = 27; i < args.length(); i++)
+				for(int i = 23; i < args.length(); i++)
 				{
 					if(args.charAt(i) == ':')
 					{
@@ -568,7 +568,7 @@ public abstract class Shape
 	public abstract javafx.scene.shape.Shape getObject();
 	
 	/**
-	 * String representation of the shape. Should only be used for debugging purposes.
+	 * String representation of the shape. Is used in .apad file i/o.
 	 * @return string representation
 	 */
 	public abstract String toString();

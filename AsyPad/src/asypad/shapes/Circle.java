@@ -136,6 +136,15 @@ public class Circle extends Shape
 			y = Utility.circumcenterY(p1, p2, p3);
 			radius = Utility.dist(x, y, p1.getX(), p1.getY());
 		}
+		else if(type == CIRCLE_TYPE.INCIRCLE)
+		{
+			Point p1 = (Point) dependencies.get(0);
+			Point p2 = (Point) dependencies.get(1);
+			Point p3 = (Point) dependencies.get(2);
+			x = Utility.incenterX(p1, p2, p3);
+			y = Utility.incenterY(p1, p2, p3);
+			radius = Utility.distToL(p1.getX(), p1.getY(), p2.getX(), p2.getY(), x, y);
+		}
 		circle.setCenterX(x);
 		circle.setCenterY(y);
 		circle.setRadius(radius);
@@ -174,7 +183,7 @@ public class Circle extends Shape
 			s = "CIRCLE: type = " + type + " dependencies: " + dependencies.get(0).getName()
 					+ ", " + dependencies.get(1).getName();
 		}
-		else if(type == CIRCLE_TYPE.CIRCUMCIRCLE)
+		else if(type == CIRCLE_TYPE.CIRCUMCIRCLE || type == CIRCLE_TYPE.INCIRCLE)
 		{
 			s = "CIRCLE: type = " + type + " dependencies: " + dependencies.get(0).getName()
 					+ ", " + dependencies.get(1).getName() + ", " + dependencies.get(2).getName();

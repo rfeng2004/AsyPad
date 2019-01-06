@@ -189,8 +189,8 @@ public class Utility
 		double D = x1*y2-x2*y1;
 		double r = c.getRadius();
 		double discriminant = r*r*dr*dr-D*D;
-		if(discriminant < 0) return Double.POSITIVE_INFINITY;
-		else if(discriminant == 0)
+		if(discriminant < -0.0001) return Double.POSITIVE_INFINITY;
+		else if(discriminant < 0.0001)
 		{
 			return D*dy/(dr*dr)+c.getCenterX();
 		}
@@ -244,8 +244,8 @@ public class Utility
 		double D = x1*y2-x2*y1;
 		double r = c.getRadius();
 		double discriminant = r*r*dr*dr-D*D;
-		if(discriminant < 0) return Double.POSITIVE_INFINITY;
-		else if(discriminant == 0)
+		if(discriminant < -0.0001) return Double.POSITIVE_INFINITY;
+		else if(discriminant < 0.0001)
 		{
 			return -D*dx/(dr*dr)+c.getCenterY();
 		}
