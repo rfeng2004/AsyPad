@@ -17,10 +17,18 @@ The following are valid point names:
 # Keyboard Shortcuts
 Press Esc when you want to cancel drawing a shape.
 
+Press ⌘S/Ctrl+S to save as an AsyPad (.apad) file.
+
+Press ⌘Shift+S/Ctrl+Shift+S to save as an asymptote (.asy) file.
+
+Press ⌘O/Ctrl+O to load an AsyPad (.apad) file.
+
 # Undo/Redo Functionality
-Use ⌘Z for undoing the last command, if there is one.
-Use ⌘Y for redoing the command that was undone, if there is one.
-Functions that can be undoed/redoed: Drawing a shape, Deleting a shape, Dragging a Label, Moving a shape, Hiding a shape, Renaming a point, Setting the Stroke Width.
+Use ⌘Z/Ctrl+Z for undoing the last command, if there is one.
+
+Use ⌘Y/Ctrl+Y for redoing the command that was undone, if there is one.
+
+Functions that can be undone/redone: Drawing a shape, Deleting a shape, Dragging a Label, Moving a shape, Hiding a shape, Renaming a point, Setting the Stroke Width.
 
 # Internal Structure
 Each shape has a set of dependencies and children. A shape's dependencies are the shapes that it needs to define itself. For example, a midpoint will need 2 points as its dependencies. A shape's children are the shapes that depend on it. This is important because when deleting a shape you need to also delete its children, since they are not defined anymore, and then delete the children's children, etc. 
