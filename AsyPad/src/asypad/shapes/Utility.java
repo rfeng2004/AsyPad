@@ -277,6 +277,68 @@ public class Utility
 			}
 		}
 	}
+	
+	/**
+	 * Calculates an intersection point between the two circles. If there is more than one intersection point,
+	 * identifier = true means to return the x-coordinate of the intersection that is more counterclockwise wrt the first circle.
+	 * If such an intersection point is non-existent returns Double.POSITIVE_INFINTY.
+	 * @param c1 circle 1
+	 * @param c2 circle 2
+	 * @param identifier distinguishes between the possibly 2 different intersection points
+	 * @return x-coordinate of the appropriate intersection
+	 */
+	public static double intersectX(Circle c1, Circle c2, boolean identifier)
+	{
+		double dx = c2.getCenterX() - c1.getCenterX();
+		double dy = c2.getCenterY() - c1.getCenterY();
+		double d = dist(c1.getCenterX(), c1.getCenterY(), c2.getCenterX(), c2.getCenterY());
+		if(equal(d, c1.getRadius() + c2.getRadius()))
+		{
+			return c1.getRadius() + dx * c1.getRadius() / d;
+		}
+		else if(d > c1.getRadius() + c2.getRadius())
+		{
+			return Double.POSITIVE_INFINITY;
+		}
+		
+		double a = (c1.getRadius() * c1.getRadius() - c2.getRadius() * c2.getRadius() + d * d)/ (2 * d);
+		double h = Math.sqrt(c1.getRadius() * c1.getRadius() - a * a);
+		
+		double x2 = c1.getCenterX() + dx * a / d + h * (identifier ? 1 : -1) * (dy / d);
+		
+		return x2;
+	}
+	
+	/**
+	 * Calculates an intersection point between the two circles. If there is more than one intersection point,
+	 * identifier = true means to return the y-coordinate of the intersection that is more counterclockwise wrt the first circle.
+	 * If such an intersection point is non-existent returns Double.POSITIVE_INFINTY.
+	 * @param c1 circle 1
+	 * @param c2 circle 2
+	 * @param identifier distinguishes between the possibly 2 different intersection points
+	 * @return y-coordinate of the appropriate intersection
+	 */
+	public static double intersectY(Circle c1, Circle c2, boolean identifier)
+	{
+		double dx = c2.getCenterX() - c1.getCenterX();
+		double dy = c2.getCenterY() - c1.getCenterY();
+		double d = dist(c1.getCenterX(), c1.getCenterY(), c2.getCenterX(), c2.getCenterY());
+		if(equal(d, c1.getRadius() + c2.getRadius()))
+		{
+			return c1.getRadius() + dx * c1.getRadius() / d;
+		}
+		else if(d > c1.getRadius() + c2.getRadius())
+		{
+			return Double.POSITIVE_INFINITY;
+		}
+		
+		double a = (c1.getRadius() * c1.getRadius() - c2.getRadius() * c2.getRadius() + d * d)/ (2 * d);
+		double h = Math.sqrt(c1.getRadius() * c1.getRadius() - a * a);
+		
+		double y2 = c1.getCenterY() + dy * a / d + h * (identifier ? -1 : 1) * (dx / d);
+		
+		return y2;
+	}
 
 	/**
 	 * Calculates distance from a point (x1, y1) to the line containing (lx1, ly1) and (lx2, ly2).
@@ -513,55 +575,80 @@ public class Utility
 	}
 	
 	/**
-	 * Finds the x-coordinate of the point 1 unit away and in the positive x direction from a point, 
-	 * such that the line formed by the two points tangent to the circle 
+	 * Finds the x-coordinate of the point such that the line formed by the point and the given point
+	 * is tangent to the circle. identifier is used to find which point (true = point more counterclockwise wrt the first circle).
+	 * If it is on the circle, finds the point 1 unit away and in the positive x direction from the given point.
+	 * If it is inside the circle, returns Double.POSITIVE_INFINITY.
 	 * @param x x-coordinate
 	 * @param y y-coordinate
 	 * @param c circle
-	 * @return line object that is tangent to c at (x, y)
+	 * @return x coordinate of the point described above
 	 */
-	public static double tangentX(double x, double y, Circle c)
+	public static double tangentX(double x, double y, Circle c, boolean identifier)
 	{
-		// translate the circle to be centered at the origin
-		double translationX = x - c.getCenterX(), translationY = y - c.getCenterY();
-		
-		// if it is a vertical line
-		if(translationY == 0)
+		if(equal(dist(c.getCenterX(), c.getCenterY(), x, y), c.getRadius()))
 		{
-			return x;
+			// translate the circle to be centered at the origin
+			double translationX = x - c.getCenterX(), translationY = y - c.getCenterY();
+			
+			// if it is a vertical line
+			if(translationY == 0)
+			{
+				return x;
+			}
+			 
+			double m = -translationX / translationY;
+			
+			return x + 1 / (m * m + 1);
 		}
-		 
-		double m = -translationX / translationY;
+		else if(dist(c.getCenterX(), c.getCenterY(), x, y) < c.getRadius())
+		{
+			return Double.POSITIVE_INFINITY;
+		}
 		
-		return x + 1 / (m * m + 1);
+		Circle dCirc = new Circle(new Point((x + c.getCenterX()) / 2, (y + c.getCenterY()) / 2), new Point(x, y));
+		
+		return intersectX(dCirc, c, identifier);
 	}
 	
 	/**
-	 * Finds the y-coordinate of the point 1 unit away and in the positive x direction from a point, 
-	 * such that the line formed by the two points tangent to the circle.
-	 * (It will be 1 down from the point if such a line is vertical)
+	 * Finds the y-coordinate of the point such that the line formed by the point and the given point
+	 * is tangent to the circle. identifier is used to find which point (true = point more counterclockwise wrt the first circle).
+	 * If it is on the circle, finds the point 1 unit away and in the positive y direction from the given point.
+	 * If it is a vertical line, returns 1 unit down.
+	 * If it is inside the circle, returns Double.POSITIVE_INFINITY.
 	 * @param x x-coordinate
 	 * @param y y-coordinate
 	 * @param c circle
-	 * @return line object that is tangent to c at (x, y)
+	 * @return x coordinate of the point described above
 	 */
-	public static double tangentY(double x, double y, Circle c)
+	public static double tangentY(double x, double y, Circle c, boolean identifier)
 	{
-		// translate the circle to be centered at the origin
-		double translationX = x - c.getCenterX(), translationY = y - c.getCenterY();
-		
-		// if it is a vertical line
-		if(translationY == 0)
+		if(equal(dist(c.getCenterX(), c.getCenterY(), x, y), c.getRadius()))
 		{
-			return y - 1;
+			// translate the circle to be centered at the origin
+			double translationX = x - c.getCenterX(), translationY = y - c.getCenterY();
+			
+			// if it is a vertical line
+			if(translationY == 0)
+			{
+				return y - 1;
+			}
+			 
+			double m = -translationX / translationY;
+			
+			return y + m / (m * m + 1);
 		}
-		 
-		double m = -translationX / translationY;
+		else if(dist(c.getCenterX(), c.getCenterY(), x, y) < c.getRadius())
+		{
+			return Double.POSITIVE_INFINITY;
+		}
 		
-		return y + m / (m * m + 1);
+		Circle dCirc = new Circle(new Point((x + c.getCenterX()) / 2, (y + c.getCenterY()) / 2), new Point(x, y));
+		
+		return intersectY(dCirc, c, identifier);
 	}
-
-
+	
 	/**
 	 * Finds distance from (x, y) to shape s.
 	 * @param x x-coordinate
@@ -600,4 +687,17 @@ public class Utility
 		if(d < 0) return -1;
 		return 1;
 	}
+	
+	/**
+	 * Whether the two doubles are equal (since rounding errors exist)
+	 * @param d1 first double
+	 * @param d2 second double
+	 * @return whether |d1-d2| < 0.0001 = epsilon
+	 */
+	public static boolean equal(double d1, double d2)
+	{
+		double epsilon = 0.0001;
+		return Math.abs(d1 - d1) < epsilon;
+	}
+	
 }

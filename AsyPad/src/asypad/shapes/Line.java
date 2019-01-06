@@ -154,11 +154,11 @@ public class Line extends Shape
 	}
 	
 	/**
-	 * Constructs the line tangent to a circle at a point
+	 * Constructs the line tangent line to a circle that goes through a point
 	 * @param p point
 	 * @param c circle
 	 */
-	public Line(Point p, Circle c)
+	public Line(Point p, Circle c, boolean identifier)
 	{
 		super(p, c);
 		
@@ -166,8 +166,8 @@ public class Line extends Shape
 		
 		x1 = p.getX();
 		y1 = p.getY();
-		x2 = Utility.tangentX(x1, y1, c);
-		y2 = Utility.tangentY(x1, y1, c);
+		x2 = Utility.tangentX(x1, y1, c, identifier);
+		y2 = Utility.tangentY(x1, y1, c, identifier);
 				
 		label.setText("pb"+p.getName()+SEPARATOR+c.getName());
 		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
