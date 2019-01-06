@@ -594,15 +594,48 @@ public class AsyPadPane extends Pane
 					{
 						if(selectedShapes.get(0) instanceof Point)
 						{
-							Line l = new Line((Point) selectedShapes.get(0), (Circle) selectedShapes.get(1), false);
-							addShape(l);
-							addCommand(new DrawCommand(l));
+							Point p1 = new Point(Utility.tangentX(((Point) selectedShapes.get(0)).getX(), ((Point) selectedShapes.get(0)).getY(), (Circle) selectedShapes.get(1), false), 
+									Utility.tangentY(((Point) selectedShapes.get(0)).getX(), ((Point) selectedShapes.get(0)).getY(), (Circle) selectedShapes.get(1), false));
+							Point p2 = new Point(Utility.tangentX(((Point) selectedShapes.get(0)).getX(), ((Point) selectedShapes.get(0)).getY(), (Circle) selectedShapes.get(1), true), 
+									Utility.tangentY(((Point) selectedShapes.get(0)).getX(), ((Point) selectedShapes.get(0)).getY(), (Circle) selectedShapes.get(1), true));
+							System.out.println(p1.getX() + " " + p1.getY());
+							System.out.println(p2.getX() + " " + p2.getY());
+							double mx = event.getSceneX();
+							double my = event.getSceneY();
+							System.out.println(mx + " " + my);
+							System.out.println(Utility.dist(mx, my, p1.getX(), p1.getY()) + " " + Utility.dist(mx, my, p2.getX(), p2.getY()));
+							if(Utility.dist(mx, my, p1.getX(), p1.getY()) < Utility.dist(mx, my, p2.getX(), p2.getY()))
+							{
+								Line l = new Line((Point) selectedShapes.get(0), (Circle) selectedShapes.get(1), false);
+								addShape(l);
+								addCommand(new DrawCommand(l));
+							}
+							else 
+							{
+								Line l = new Line((Point) selectedShapes.get(0), (Circle) selectedShapes.get(1), true);
+								addShape(l);
+								addCommand(new DrawCommand(l));
+							}
+
 						}
 						else
 						{
-							Line l = new Line((Point) selectedShapes.get(1), (Circle) selectedShapes.get(0), false);
-							addShape(l);
-							addCommand(new DrawCommand(l));
+							Point p1 = new Point(Utility.tangentX(((Point) selectedShapes.get(1)).getX(), ((Point) selectedShapes.get(1)).getY(), (Circle) selectedShapes.get(0), false), 
+									Utility.tangentY(((Point) selectedShapes.get(1)).getX(), ((Point) selectedShapes.get(1)).getY(), (Circle) selectedShapes.get(0), false));
+							Point p2 = new Point(Utility.tangentX(((Point) selectedShapes.get(1)).getX(), ((Point) selectedShapes.get(1)).getY(), (Circle) selectedShapes.get(0), true), 
+									Utility.tangentY(((Point) selectedShapes.get(1)).getX(), ((Point) selectedShapes.get(1)).getY(), (Circle) selectedShapes.get(0), true));
+							if(Utility.distToShape(event.getSceneX(), event.getSceneY(), p1) < Utility.distToShape(event.getSceneX(), event.getSceneY(), p2))
+							{
+								Line l = new Line((Point) selectedShapes.get(1), (Circle) selectedShapes.get(0), false);
+								addShape(l);
+								addCommand(new DrawCommand(l));
+							}
+							else 
+							{
+								Line l = new Line((Point) selectedShapes.get(1), (Circle) selectedShapes.get(0), true);
+								addShape(l);
+								addCommand(new DrawCommand(l));
+							}
 						}
 						resetSelectedShapes();
 						selectedShapes.clear();
