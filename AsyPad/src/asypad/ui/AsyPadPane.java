@@ -216,6 +216,23 @@ public class AsyPadPane extends Pane
 						setCurrentLine(l.getStartX(), l.getStartY(), l.getEndX(), l.getEndY());
 					}
 				}
+				else if(tool == LINE_TYPE.TANGENT_LINE)
+				{
+					if(selectedShapes.size() == 1 && selectedShapes.get(0) instanceof Circle)
+					{
+						Line l;
+						double x = event.getSceneX();
+						double y = event.getSceneY();
+						if(snappedIndex != -1 && shapes.get(snappedIndex) instanceof Point)
+						{
+							Point point = (Point) shapes.get(snappedIndex);
+							x = point.getX();
+							y = point.getY();
+						}
+						l = new Line(new Point(x, y), (Circle) selectedShapes.get(0), false);
+						setCurrentLine(l.getStartX(), l.getStartY(), l.getEndX(), l.getEndY());
+					}
+				}
 				else if(tool == CIRCLE_TYPE.CIRCLE)
 				{
 					if(selectedShapes.size() == 1)
@@ -542,6 +559,48 @@ public class AsyPadPane extends Pane
 						if(selectedShapes.get(0) != selectedShapes.get(1))
 						{
 							Line l = new Line((Point) selectedShapes.get(0), (Point) selectedShapes.get(1));
+							addShape(l);
+							addCommand(new DrawCommand(l));
+						}
+						resetSelectedShapes();
+						selectedShapes.clear();
+					}
+				}
+				else if(tool == LINE_TYPE.TANGENT_LINE)
+				{
+					if(snappedIndex != -1 && shapes.get(snappedIndex) instanceof Point)
+					{
+						if(selectedShapes.size() == 0)
+						{
+							selectedShapes.add(shapes.get(snappedIndex));
+						}
+						else if(selectedShapes.size() == 1 && selectedShapes.get(0) instanceof Circle)
+						{
+							selectedShapes.add(shapes.get(snappedIndex));
+						}
+					}
+					else if(snappedIndex != -1 && shapes.get(snappedIndex) instanceof Circle)
+					{
+						if(selectedShapes.size() == 0)
+						{
+							selectedShapes.add(shapes.get(snappedIndex));
+						}
+						else if(selectedShapes.size() == 1 && selectedShapes.get(0) instanceof Point)
+						{
+							selectedShapes.add(shapes.get(snappedIndex));
+						}
+					}
+					if(selectedShapes.size() == 2)
+					{
+						if(selectedShapes.get(0) instanceof Point)
+						{
+							Line l = new Line((Point) selectedShapes.get(0), (Circle) selectedShapes.get(1), false);
+							addShape(l);
+							addCommand(new DrawCommand(l));
+						}
+						else
+						{
+							Line l = new Line((Point) selectedShapes.get(1), (Circle) selectedShapes.get(0), false);
 							addShape(l);
 							addCommand(new DrawCommand(l));
 						}

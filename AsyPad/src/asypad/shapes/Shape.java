@@ -307,6 +307,26 @@ public abstract class Shape
 				Point dependency2 = (Point) target.findShapeByName(d2Name);
 				s = new Line(dependency1, dependency2);
 			}
+			else if(args.substring(13, 25).equals("TANGENT_LINE"))
+			{
+				int d1 = 0, d2 = 0;
+				for(int i = 25; i < args.length(); i++)
+				{
+					if(args.charAt(i) == ':')
+					{
+						d1 = i;
+					}
+					if(args.charAt(i) == ',')
+					{
+						d2 = i;
+					}
+				}
+				String d1Name = args.substring(d1+2, d2);
+				String d2Name = args.substring(d2+2, args.length());
+				Point dependency1 = (Point) target.findShapeByName(d1Name);
+				Point dependency2 = (Point) target.findShapeByName(d2Name);
+				s = new Line(dependency1, dependency2);
+			}
 		}
 		else if(args.substring(0, 6).equals("CIRCLE"))
 		{

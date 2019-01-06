@@ -1,6 +1,7 @@
 package asypad.shapes;
 
 import javafx.scene.layout.Pane;
+import asypad.shapes.types.CIRCLE_TYPE;
 import asypad.shapes.types.LINE_TYPE;
 
 /**
@@ -33,6 +34,13 @@ public class Line extends Shape
 	 * y-coordinate of the end point of the line.
 	 */
 	private double y2;
+	
+	/**
+	 * Identifier to distinguish between the 2 possible intersections of a point and a circle, 
+	 * only used for {@code LINE_TYPE.TANGENT_LINE} that depend on a line and a circle.
+	 */
+	private boolean identifier; //used for tangent to a circle through a point.
+
 
 	/**
 	 * Constructs line through 2 points.
@@ -168,8 +176,18 @@ public class Line extends Shape
 		y1 = p.getY();
 		x2 = Utility.tangentX(x1, y1, c, identifier);
 		y2 = Utility.tangentY(x1, y1, c, identifier);
+		
+		double dx = x2-x1;
+		double dy = y2-y1;
+		double dirx = dx/Math.sqrt(dx*dx+dy*dy);
+		double diry = dy/Math.sqrt(dx*dx+dy*dy);
+		
+		x1 = x1+INF*diry;
+		y1 = y1-INF*dirx;
+		x2 = x2-INF*diry;
+		y2 = y2+INF*dirx;
 				
-		label.setText("pb"+p.getName()+SEPARATOR+c.getName());
+		label.setText("tl"+p.getName()+SEPARATOR+c.getName());
 		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
 		line.setStrokeWidth(StrokeWidth);
 	}
@@ -332,6 +350,15 @@ public class Line extends Shape
 			x2 = mx-INF*diry;
 			y2 = my+INF*dirx;
 		}
+		else if(type == LINE_TYPE.TANGENT_LINE)
+		{
+			Point p = (Point) dependencies.get(0);
+			Circle c = (Circle) dependencies.get(1);
+			x1 = p.getX();
+			y1 = p.getY();
+			x2 = Utility.tangentX(x1, y1, c, identifier);
+			y2 = Utility.tangentY(x1, y1, c, identifier);
+		}
 		//System.out.println(this);
 		line.setStartX(x1);
 		line.setStartY(y1);
@@ -372,6 +399,10 @@ public class Line extends Shape
 		{
 			label.setText("pb"+d1+SEPARATOR+d2);
 		}
+		else if(type == LINE_TYPE.TANGENT_LINE)
+		{
+			label.setText("tl"+d1+SEPARATOR+d2);
+		}
 		for(Shape s : children) s.refreshName();
 	}
 
@@ -385,7 +416,8 @@ public class Line extends Shape
 		String s = "";
 		if(type == LINE_TYPE.SEGMENT || type == LINE_TYPE.LINE 
 				|| type == LINE_TYPE.PARALLEL_LINE || type == LINE_TYPE.PERPENDICULAR_LINE
-				|| type == LINE_TYPE.PERPENDICULAR_BISECTOR)
+				|| type == LINE_TYPE.PERPENDICULAR_BISECTOR
+				|| type == LINE_TYPE.TANGENT_LINE)
 		{
 			s = "LINE: type = " + type + " dependencies: " + dependencies.get(0).getName()
 					+ ", " + dependencies.get(1).getName();
@@ -455,6 +487,36 @@ public class Line extends Shape
 			String p2 = dependencies.get(1).getName();
 			String p = "(" + p1 + "+" + p2 + ")/2";
 			String s = "path " + n + " = (" + p + "-" + INF/100 + "*unit(((" + p2 + "-" + p1 + ").y, -(" + p2 + "-" + p1 + ").x)))--(" + p + "+" + INF/100 + "*unit(((" + p2 + "-" + p1 + ").y, -(" + p2 + "-" + p1 + ").x))); ";
+			if(!hide) s+="draw(" + n + ");\n";
+			else s+="\n";
+			return s;
+		}
+		else if(type == LINE_TYPE.TANGENT_LINE)
+		{
+			String p = dependencies.get(0).getName();
+			String c = dependencies.get(1).getName();
+			
+			String center = "";
+			String rad = "";
+			
+			if(dependencies.get(1).type == CIRCLE_TYPE.CIRCLE)
+			{
+				center = dependencies.get(1).dependencies.get(0).getName();
+				String on = dependencies.get(1).dependencies.get(1).getName();
+				rad = "abs(" + center + "-" + on + ")";
+			}
+			else if(dependencies.get(1).type == CIRCLE_TYPE.CIRCUMCIRCLE)
+			{
+				center = "circumcenter(" + dependencies.get(1).dependencies.get(0).getName() + ", " + dependencies.get(1).dependencies.get(1).getName() + ", " + dependencies.get(1).dependencies.get(2).getName() + ")";
+				rad = "abs(" + center + "-" + dependencies.get(1).dependencies.get(0).getName() + ")";
+			}
+			else if(dependencies.get(1).type == CIRCLE_TYPE.INCIRCLE)
+			{
+				center = "incenter(" + dependencies.get(1).dependencies.get(0).getName() + ", " + dependencies.get(1).dependencies.get(1).getName() + ", " + dependencies.get(1).dependencies.get(2).getName() + ")";
+				rad = "inradius(" + dependencies.get(1).dependencies.get(0).getName() + ", " + dependencies.get(1).dependencies.get(1).getName() + ", " + dependencies.get(1).dependencies.get(2).getName() + ")";
+			}
+			
+			String s = "pair " + p + "_" + c + "_tangent = tangent( " + p + ", " + center + ", " + rad + ", + " + identifier + "); path " + n + " = (" + p + "-" + INF/100 + "*unit(" + p + "_" + c + "_tangent" + "-" + p + "))--(" + p + "_" + c + "_tangent" + "+" + INF/100 + "*unit(" + p + "_" + c + "_tangent" + "-" + p + ")); ";
 			if(!hide) s+="draw(" + n + ");\n";
 			else s+="\n";
 			return s;

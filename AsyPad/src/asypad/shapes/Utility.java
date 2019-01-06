@@ -304,7 +304,7 @@ public class Utility
 		double a = (c1.getRadius() * c1.getRadius() - c2.getRadius() * c2.getRadius() + d * d)/ (2 * d);
 		double h = Math.sqrt(c1.getRadius() * c1.getRadius() - a * a);
 		
-		double x2 = c1.getCenterX() + dx * a / d + h * (identifier ? 1 : -1) * (dy / d);
+		double x2 = c1.getCenterX() + dx * a / d + h * (dy / d);
 		
 		return x2;
 	}
@@ -335,7 +335,7 @@ public class Utility
 		double a = (c1.getRadius() * c1.getRadius() - c2.getRadius() * c2.getRadius() + d * d)/ (2 * d);
 		double h = Math.sqrt(c1.getRadius() * c1.getRadius() - a * a);
 		
-		double y2 = c1.getCenterY() + dy * a / d + h * (identifier ? -1 : 1) * (dx / d);
+		double y2 = c1.getCenterY() + dy * a / d - h * (dx / d);
 		
 		return y2;
 	}
@@ -636,6 +636,7 @@ public class Utility
 			}
 			 
 			double m = -translationX / translationY;
+			
 			
 			return y + m / (m * m + 1);
 		}
