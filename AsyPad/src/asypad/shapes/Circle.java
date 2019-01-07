@@ -104,7 +104,7 @@ public class Circle extends Shape
 		super(c1, c2, p);
 		x = Utility.tangentCircleX(c1, c2, p, identifier);
 		y = Utility.tangentCircleY(c1, c2, p, identifier);
-		radius = Utility.dist(x, y, c1.getCenterX(), c1.getCenterY()) - Utility.dist(x, y, p.getX(), p.getY());
+		radius = Utility.dist(x, y, p.getX(), p.getY());
 		type = CIRCLE_TYPE.TANGENT_CIRCLE;
 		circle = new javafx.scene.shape.Circle(x, y, radius);
 		circle.setFill(Color.TRANSPARENT);
@@ -181,7 +181,7 @@ public class Circle extends Shape
 
 			x = Utility.tangentCircleX(c1, c2, p, identifier);
 			y = Utility.tangentCircleY(c1, c2, p, identifier);
-			radius = Utility.dist(x, y, c1.getCenterX(), c1.getCenterY()) - Utility.dist(x, y, p.getX(), p.getY());
+			radius = Utility.dist(x, y, p.getX(), p.getY());
 		}
 		circle.setCenterX(x);
 		circle.setCenterY(y);

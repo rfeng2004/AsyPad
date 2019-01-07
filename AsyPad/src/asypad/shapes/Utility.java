@@ -687,10 +687,6 @@ public class Utility
 	 */
 	public static double tangentCircleX(Circle c1, Circle c2, Point p, boolean identifier)
 	{
-		if(equal(distToShape(c2.getCenterX(), c2.getCenterY(), p), c2.getRadius()))
-		{
-			return tangentCircleX(c2, c1, p, identifier);
-		}
 		double dx = c1.getCenterX() - p.getX();
 		double dy = c1.getCenterY() - p.getY();
 		Point F = new Point(p.getX() + (identifier ? -1 : 1) * c2.getRadius() * dx / Math.sqrt(dx * dx + dy * dy), p.getY() + (identifier ? -1 : 1) * c2.getRadius() * dy / Math.sqrt(dx * dx + dy * dy));
@@ -709,10 +705,6 @@ public class Utility
 	 */
 	public static double tangentCircleY(Circle c1, Circle c2, Point p, boolean identifier)
 	{
-		if(equal(distToShape(c2.getCenterX(), c2.getCenterY(), p), c2.getRadius()))
-		{
-			return tangentCircleY(c2, c1, p, identifier);
-		}
 		double dx = c1.getCenterX() - p.getX();
 		double dy = c1.getCenterY() - p.getY();
 		Point F = new Point(p.getX() + (identifier ? -1 : 1) * c2.getRadius() * dx / Math.sqrt(dx * dx + dy * dy), p.getY() + (identifier ? -1 : 1) * c2.getRadius() * dy / Math.sqrt(dx * dx + dy * dy));

@@ -769,9 +769,18 @@ public class AsyPadPane extends Pane
 						}
 						if(c1 != c2)
 						{
-							Circle c = new Circle(c1, c2, p, false);
-							addShape(c);
-							addCommand(new DrawCommand(c));
+							if(Utility.equal(Utility.distToShape(c1.getCenterX(), c1.getCenterY(), p), c1.getRadius()))
+							{
+								Circle c = new Circle(c1, c2, p, false);
+								addShape(c);
+								addCommand(new DrawCommand(c));
+							}
+							else if(Utility.equal(Utility.distToShape(c2.getCenterX(), c2.getCenterY(), p), c2.getRadius()))
+							{
+								Circle c = new Circle(c2, c1, p, false);
+								addShape(c);
+								addCommand(new DrawCommand(c));
+							}
 						}
 						resetSelectedShapes();
 						selectedShapes.clear();
