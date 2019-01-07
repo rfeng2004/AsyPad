@@ -19,7 +19,7 @@ public enum CIRCLE_TYPE implements SHAPE_TYPE
 	 */
 	INCIRCLE,
 	/**
-	 * Circle tangent to two other circles. Either both externally or both internally tangent.
+	 * Circle tangent to two other circles.
 	 */
 	TANGENT_CIRCLE;
 }

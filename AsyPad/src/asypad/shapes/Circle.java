@@ -97,8 +97,7 @@ public class Circle extends Shape
 	 * @param c1 first circle
 	 * @param c2 second circle
 	 * @param p point
-	 * @param identifier
-	 * @param isCircumcircle if the circle is a circumcircle
+	 * @param identifier if it is internally tangent to one and externally tangent to the other
 	 */
 	public Circle(Circle c1, Circle c2, Point p, boolean identifier)
 	{

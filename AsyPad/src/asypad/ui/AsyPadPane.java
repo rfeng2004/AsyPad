@@ -722,7 +722,28 @@ public class AsyPadPane extends Pane
 				}
 				else if(tool == CIRCLE_TYPE.TANGENT_CIRCLE)
 				{
-					/* if(snappedIndex != -1 && shapes.get(snappedIndex) instanceof Point) selectedShapes.add(shapes.get(snappedIndex));
+					if(snappedIndex != -1)
+					{
+						Shape selected = shapes.get(snappedIndex);
+						if(selected instanceof Point)
+						{
+							int numPoints = 0;
+							for(Shape s : selectedShapes)
+							{
+								if(s instanceof Point) numPoints++;
+							}
+							if(numPoints == 0) selectedShapes.add(selected);
+						}
+						else if(selected instanceof Circle)
+						{
+							int numCirc = 0;
+							for(Shape s : selectedShapes)
+							{
+								if(s instanceof Circle) numCirc++;
+							}
+							if(numCirc <= 1) selectedShapes.add(selected);
+						}
+					}
 					if(selectedShapes.size() == 3)
 					{
 						Circle c1 = new Circle(new Point(0, 0), new Point(0, 1)), c2 = new Circle(new Point(0, 0), new Point(0, 1));
@@ -755,7 +776,7 @@ public class AsyPadPane extends Pane
 						resetSelectedShapes();
 						selectedShapes.clear();
 						getChildren().remove(currentCircle);
-					}*/
+					}
 				}
 
 				setSelectedShapes();
