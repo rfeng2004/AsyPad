@@ -378,6 +378,7 @@ public class Line extends Shape
 		line.setEndX(x2);
 		line.setEndY(y2);
 		line.setStrokeWidth(StrokeWidth);
+		line.setStroke(color);
 		for(Shape s : children)
 		{
 			s.refresh();

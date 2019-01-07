@@ -136,7 +136,6 @@ public class Utility
 	 * @param l2 second line
 	 * @return y-coordinate of intersection point
 	 */
-
 	public static double intersectY(Line l1, Line l2)
 	{
 		double m1 = (l1.getEndY()-l1.getStartY())/(l1.getEndX()-l1.getStartX());
@@ -526,6 +525,30 @@ public class Utility
 		Line a1 = new Line(p1, new Point(footX(p1.getX(), p1.getY(), new Line(p2, p3)), footY(p1.getX(), p1.getY(), new Line(p2, p3))));
 		Line a2 = new Line(p2, new Point(footX(p2.getX(), p2.getY(), new Line(p1, p3)), footY(p2.getX(), p2.getY(), new Line(p1, p3))));
 		return intersectY(a1, a2);
+	}
+	
+	/**
+	 * Finds the x-coordinate of the centroid of 3 points.
+	 * @param p1 first point
+	 * @param p2 second point
+	 * @param p3 third point
+	 * @return x-coordinate of centroid
+	 */
+	public static double centroidX(Point p1, Point p2, Point p3)
+	{
+		return (p1.getX()+p2.getX()+p3.getX())/3;
+	}
+	
+	/**
+	 * Finds the y-coordinate of the centroid of 3 points.
+	 * @param p1 first point
+	 * @param p2 second point
+	 * @param p3 third point
+	 * @return y-coordinate of centroid
+	 */
+	public static double centroidY(Point p1, Point p2, Point p3)
+	{
+		return (p1.getY()+p2.getY()+p3.getY())/3;
 	}
 
 	/**

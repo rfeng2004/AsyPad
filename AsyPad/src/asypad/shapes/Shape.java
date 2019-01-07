@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import asypad.shapes.labels.DraggableLabel;
 import asypad.shapes.types.SHAPE_TYPE;
 import asypad.ui.AsyPadPane;
@@ -72,6 +73,11 @@ public abstract class Shape
 	 * The dependency level of this shape.
 	 */
 	protected int level;
+	
+	/**
+	 * The color of the shape.
+	 */
+	protected Color color;
 
 	/**
 	 * Builds a Shape from the arguments.
@@ -381,7 +387,7 @@ public abstract class Shape
 				Point dependency1 = (Point) target.findShapeByName(d1Name);
 				Point dependency2 = (Point) target.findShapeByName(d2Name);
 				Point dependency3 = (Point) target.findShapeByName(d3Name);
-				s = new Circle(dependency1, dependency2, dependency3, 1);
+				s = new Circle(dependency1, dependency2, dependency3, true);
 			}
 			else if(args.substring(15, 23).equals("INCIRCLE"))
 			{
@@ -404,7 +410,7 @@ public abstract class Shape
 				Point dependency1 = (Point) target.findShapeByName(d1Name);
 				Point dependency2 = (Point) target.findShapeByName(d2Name);
 				Point dependency3 = (Point) target.findShapeByName(d3Name);
-				s = new Circle(dependency1, dependency2, dependency3, 2);
+				s = new Circle(dependency1, dependency2, dependency3, false);
 			}
 		}
 		return s;
@@ -430,6 +436,7 @@ public abstract class Shape
 		remove = false;
 		hide = false;
 		inAsyCode = true;
+		color = Color.BLACK;
 	}
 
 	/**
@@ -537,6 +544,25 @@ public abstract class Shape
 	public void setName(String name)
 	{
 		label.setText(name);
+	}
+	
+	/**
+	 * Sets the color of the shape
+	 * @param c new color of shape
+	 */
+	public void setColor(Color c)
+	{
+		color = c;
+		refresh();
+	}
+	
+	/**
+	 * Returns the color of the shape.
+	 * @return color of shape
+	 */
+	public Color getColor()
+	{
+		return color;
 	}
 
 	/**

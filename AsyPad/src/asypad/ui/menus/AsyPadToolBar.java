@@ -81,7 +81,7 @@ public class AsyPadToolBar extends MenuBar
 		Tool perpendicularLine = new Tool(perpendicular, "Perpendicular Line", "Select a point and a line to create a perpendicular line.", LINE_TYPE.PERPENDICULAR_LINE, line, this, parent);
 		Tool angleBisector = new Tool(angleBisectorImage, "Angle Bisector", "Select 3 points to create an angle bisector. The second point will be the vertex of the angle.", LINE_TYPE.ANGLE_BISECTOR, line, this, parent);
 		Tool perpendicularBisector = new Tool(perpendicularBisectorImage, "Perpendicular Bisector", "Select 2 points to construct their perpendicular bisector", LINE_TYPE.PERPENDICULAR_BISECTOR, line, this, parent);
-		Tool tangentLine = new Tool(tangentLineImage, "Tangent Line", "Select a point and a circle to construct a line through the point tangent to the circle.", LINE_TYPE.TANGENT_LINE, line, this, parent);
+		Tool tangentLine = new Tool(tangentLineImage, "Tangent Line", "Select a point and a circle to construct a tangent line through the point.", LINE_TYPE.TANGENT_LINE, line, this, parent);
 		
 		line.getItems().addAll(defaultSegment, defaultLine, parallelLine, perpendicularLine, angleBisector, perpendicularBisector, tangentLine);
 		

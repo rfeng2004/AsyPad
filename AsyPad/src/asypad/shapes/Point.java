@@ -1,7 +1,6 @@
 package asypad.shapes;
 
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import asypad.shapes.types.POINT_TYPE;
 
 /**
@@ -104,7 +103,7 @@ public class Point extends Shape
 		relativeLocation = -1;
 		identifier = false;
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
-		dot.setStroke(Color.BLACK);
+		dot.setStroke(color);
 		dot.setStrokeWidth(StrokeWidth);
 		label.setText(name);
 		label.refresh();
@@ -138,7 +137,7 @@ public class Point extends Shape
 			if(x < c.getCenterX()) relativeLocation += Math.PI;
 		}
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
-		dot.setStroke(Color.BLACK);
+		dot.setStroke(color);
 		dot.setStrokeWidth(StrokeWidth);
 		label.setText(name);
 		label.refresh();
@@ -169,7 +168,7 @@ public class Point extends Shape
 			y = c.getCenterY()+c.getRadius()*Math.sin(relativeLocation);
 		}
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
-		dot.setStroke(Color.BLACK);
+		dot.setStroke(color);
 		dot.setStrokeWidth(StrokeWidth);
 		label.setText(name);
 		label.refresh();
@@ -190,7 +189,7 @@ public class Point extends Shape
 		relativeLocation = -1;
 		identifier = false;
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
-		dot.setStroke(Color.BLACK);
+		dot.setStroke(color);
 		dot.setStrokeWidth(StrokeWidth);
 		label.setText(name);
 		label.refresh();
@@ -213,7 +212,7 @@ public class Point extends Shape
 		this.x = Utility.intersectX(l, c, identifier);
 		this.y = Utility.intersectY(l, c, identifier);
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
-		dot.setStroke(Color.BLACK);
+		dot.setStroke(color);
 		dot.setStrokeWidth(StrokeWidth);
 		label.setText(name);
 		label.refresh();
@@ -236,7 +235,7 @@ public class Point extends Shape
 		this.x = Utility.intersectX(c1, c2, identifier);
 		this.y = Utility.intersectY(c1, c2, identifier);
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
-		dot.setStroke(Color.BLACK);
+		dot.setStroke(color);
 		dot.setStrokeWidth(StrokeWidth);
 		label.setText(name);
 		label.refresh();
@@ -256,7 +255,7 @@ public class Point extends Shape
 		type = POINT_TYPE.MIDPOINT;
 		relativeLocation = -1;
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
-		dot.setStroke(Color.BLACK);
+		dot.setStroke(color);
 		dot.setStrokeWidth(StrokeWidth);
 		label.setText(name);
 		label.refresh();
@@ -390,6 +389,8 @@ public class Point extends Shape
 		dot.setCenterY(y);
 		dot.setRadius(StrokeWidth);
 		dot.setStrokeWidth(StrokeWidth);
+		dot.setStroke(color);
+		dot.setFill(color);
 		label.refresh();
 		for(Shape s : children)
 		{

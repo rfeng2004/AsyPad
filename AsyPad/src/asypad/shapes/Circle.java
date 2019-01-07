@@ -45,7 +45,7 @@ public class Circle extends Shape
 		circle = new javafx.scene.shape.Circle(x, y, radius);
 		circle.setFill(Color.TRANSPARENT);
 		circle.setStrokeWidth(StrokeWidth);
-		circle.setStroke(Color.BLACK);
+		circle.setStroke(color);
 		label.setText("circ" + center.getName() + SEPARATOR + on.getName());
 	}
 
@@ -54,12 +54,12 @@ public class Circle extends Shape
 	 * @param p1 first point
 	 * @param p2 second point
 	 * @param p3 third point
-	 * @param circ which type of circle it is. (1 = circumcircle, 2 = incircle)
+	 * @param isCircumcircle if the circle is a circumcircle
 	 */
-	public Circle(Point p1, Point p2, Point p3, int circ)
+	public Circle(Point p1, Point p2, Point p3, boolean isCircumcircle)
 	{
 		super(p1, p2, p3);
-		if(circ == 1)
+		if(isCircumcircle)
 		{
 			x = Utility.circumcenterX(p1, p2, p3);
 			y = Utility.circumcenterY(p1, p2, p3);
@@ -68,10 +68,10 @@ public class Circle extends Shape
 			circle = new javafx.scene.shape.Circle(x, y, radius);
 			circle.setFill(Color.TRANSPARENT);
 			circle.setStrokeWidth(StrokeWidth);
-			circle.setStroke(Color.BLACK);
+			circle.setStroke(color);
 			label.setText("cc" + p1.getName() + SEPARATOR + p2.getName() + SEPARATOR + p3.getName());
 		}
-		else if(circ == 2)
+		else
 		{
 			x = Utility.incenterX(p1, p2, p3);
 			y = Utility.incenterY(p1, p2, p3);
@@ -80,7 +80,7 @@ public class Circle extends Shape
 			circle = new javafx.scene.shape.Circle(x, y, radius);
 			circle.setFill(Color.TRANSPARENT);
 			circle.setStrokeWidth(StrokeWidth);
-			circle.setStroke(Color.BLACK);
+			circle.setStroke(color);
 			label.setText("ic" + p1.getName() + SEPARATOR + p2.getName() + SEPARATOR + p3.getName());
 		}
 	}
@@ -117,7 +117,7 @@ public class Circle extends Shape
 		p.getChildren().add(circle);
 	}
 
-	public void refresh() 
+	public void refresh()
 	{
 		if(type == CIRCLE_TYPE.CIRCLE)
 		{
@@ -149,6 +149,7 @@ public class Circle extends Shape
 		circle.setCenterY(y);
 		circle.setRadius(radius);
 		circle.setStrokeWidth(StrokeWidth);
+		circle.setStroke(color);
 		for(Shape s : children)
 		{
 			s.refresh();
@@ -166,6 +167,10 @@ public class Circle extends Shape
 		else if(type == CIRCLE_TYPE.CIRCUMCIRCLE)
 		{
 			label.setText("cc"+d1+SEPARATOR+d2+SEPARATOR+dependencies.get(2).getName());
+		}
+		else if(type == CIRCLE_TYPE.INCIRCLE)
+		{
+			label.setText("ic"+d1+SEPARATOR+d2+SEPARATOR+dependencies.get(2).getName());
 		}
 		for(Shape s : children) s.refreshName();
 	}

@@ -1,6 +1,6 @@
 package asypad.ui;
 /*
- * TODO Add new tool: relative point, intersection point of 2 circles, conic sections.
+ * TODO Add new tool: relative point, conic sections.
  * TODO Implement grid show and hide.
  * TODO Add user manual in help menu.
  */
@@ -90,6 +90,11 @@ public class AsyPadPane extends Pane
 	private javafx.scene.shape.Circle currentCircle;
 
 	/**
+	 * Color of selected shapes.
+	 */
+	private Color selected;
+
+	/**
 	 * Creates an AsyPadPane layout.
 	 */
 	public AsyPadPane()
@@ -104,6 +109,7 @@ public class AsyPadPane extends Pane
 		currentCircle = new javafx.scene.shape.Circle();
 		currentCircle.setFill(Color.TRANSPARENT);
 		currentCircle.setStroke(Color.BLACK);
+		selected = Color.RED;
 
 		AsyPadMenuBar menus = new AsyPadMenuBar(this);
 		AsyPadToolBar tools = new AsyPadToolBar(this);
@@ -252,7 +258,7 @@ public class AsyPadPane extends Pane
 								y = (p1.getY()+p2.getY())/2;
 							}
 						}
-						Circle c = new Circle(new Point(x, y), p1, p2, 1);
+						Circle c = new Circle(new Point(x, y), p1, p2, true);
 						setCurrentCircle(c.getCenterX(), c.getCenterY(), c.getRadius());
 					}
 				}
@@ -275,7 +281,7 @@ public class AsyPadPane extends Pane
 								y = (p1.getY()+p2.getY())/2;
 							}
 						}
-						Circle c = new Circle(new Point(x, y), p1, p2, 2);
+						Circle c = new Circle(new Point(x, y), p1, p2, false);
 						setCurrentCircle(c.getCenterX(), c.getCenterY(), c.getRadius());
 					}
 				}
@@ -686,7 +692,7 @@ public class AsyPadPane extends Pane
 						Point p3 = (Point) selectedShapes.get(2);
 						if(p1 != p2 && p2 != p3 && p1 != p3)
 						{
-							Circle c = new Circle(p1, p2, p3, 1);
+							Circle c = new Circle(p1, p2, p3, true);
 							addShape(c);
 							addCommand(new DrawCommand(c));
 						}
@@ -705,7 +711,7 @@ public class AsyPadPane extends Pane
 						Point p3 = (Point) selectedShapes.get(2);
 						if(p1 != p2 && p2 != p3 && p1 != p3)
 						{
-							Circle c = new Circle(p1, p2, p3, 2);
+							Circle c = new Circle(p1, p2, p3, false);
 							addShape(c);
 							addCommand(new DrawCommand(c));
 						}
@@ -959,7 +965,7 @@ public class AsyPadPane extends Pane
 	{
 		Stage rename = new Stage();
 		FlowPane flowPane = new FlowPane();
-		Scene renameScene = new Scene(flowPane, 580, 50);
+		Scene renameScene = new Scene(flowPane, 580, 60);
 		flowPane.getChildren().add(new Label("Rename Point " + p.getLabel().getText() + ":"));
 		TextField name = new TextField();
 		name.setPromptText("Enter new name of point");
@@ -967,7 +973,9 @@ public class AsyPadPane extends Pane
 		Button cancel = new Button("Cancel");
 		Button delete = new Button("Delete Point");
 		Button hide = new Button("Hide Point");
-		flowPane.getChildren().addAll(name, submit, cancel, delete, hide);
+		Label chooseColor = new Label("Set Point Color: ");
+		ColorPicker colorPicker = new ColorPicker();
+		flowPane.getChildren().addAll(name, submit, cancel, delete, hide, chooseColor, colorPicker);
 		cancel.requestFocus();
 		submit.setOnAction(new EventHandler<ActionEvent>()
 		{
@@ -1010,6 +1018,16 @@ public class AsyPadPane extends Pane
 				rename.close();
 			}
 		});
+		colorPicker.setValue(p.getColor());
+		colorPicker.setOnAction(new EventHandler<ActionEvent>()
+		{
+			public void handle(ActionEvent e)
+			{
+				Color c = colorPicker.getValue();
+				p.setColor(c);
+				addCommand(new ColorCommand(p, c));
+			}
+		});
 		rename.setScene(renameScene);
 		rename.setAlwaysOnTop(true);
 		rename.initStyle(StageStyle.UTILITY);
@@ -1032,11 +1050,13 @@ public class AsyPadPane extends Pane
 		{
 			Stage configure = new Stage();
 			FlowPane flowPane = new FlowPane();
-			Scene renameScene = new Scene(flowPane, 250, 30);
+			Scene renameScene = new Scene(flowPane, 250, 60);
 			Button cancel = new Button("Cancel");
 			Button delete = new Button("Delete Shape");
 			Button hide = new Button("Hide Shape");
-			flowPane.getChildren().addAll(cancel, delete, hide);
+			Label chooseColor = new Label("Set Shape Color: ");
+			ColorPicker colorPicker = new ColorPicker();
+			flowPane.getChildren().addAll(cancel, delete, hide, chooseColor, colorPicker);
 			cancel.requestFocus();
 			cancel.setOnAction(new EventHandler<ActionEvent>()
 			{
@@ -1065,6 +1085,16 @@ public class AsyPadPane extends Pane
 					update();
 					snappedIndex = -1;
 					configure.close();
+				}
+			});
+			colorPicker.setValue(s.getColor());
+			colorPicker.setOnAction(new EventHandler<ActionEvent>()
+			{
+				public void handle(ActionEvent e)
+				{
+					Color c = colorPicker.getValue();
+					s.setColor(c);
+					addCommand(new ColorCommand(s, c));
 				}
 			});
 			configure.setScene(renameScene);
@@ -1152,25 +1182,25 @@ public class AsyPadPane extends Pane
 	{
 		for(Shape s : selectedShapes)
 		{
-			s.getObject().setStroke(Color.RED);
+			s.getObject().setStroke(selected);
 			if(s instanceof Point)
 			{
-				s.getObject().setFill(Color.RED);
+				s.getObject().setFill(selected);
 			}
 		}
 	}
 
 	/**
-	 * Resets the stroke color of all selected shapes to black.
+	 * Resets the stroke color of all selected shapes to their original color.
 	 */
 	private void resetSelectedShapes()
 	{
 		for(Shape s : selectedShapes)
 		{
-			s.getObject().setStroke(Color.BLACK);
+			s.getObject().setStroke(s.getColor());
 			if(s instanceof Point)
 			{
-				s.getObject().setFill(Color.BLACK);
+				s.getObject().setFill(s.getColor());
 			}
 		}
 	}
