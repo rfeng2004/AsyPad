@@ -94,12 +94,14 @@ public class AsyPadToolBar extends MenuBar
 		
 		Image cc = new Image("resources/circumcircle.png");
 		Image ic = new Image("resources/incircle.png");
-
+		Image tc = new Image("resources/tangentcircle.png");
+		
 		Tool defaultCircle = new Tool(c, "Circle", "Select the center, then a point on the circle.", CIRCLE_TYPE.CIRCLE, circle, this, parent);
 		Tool circumcircle = new Tool(cc, "Circumircle", "Select 3 points to create a circumcircle.", CIRCLE_TYPE.CIRCUMCIRCLE, circle, this, parent);
 		Tool incircle = new Tool(ic, "Incircle", "Select 3 points to create a incircle.", CIRCLE_TYPE.INCIRCLE, circle, this, parent);
+		Tool tangentcircle = new Tool(tc, "Tangent Circle", "Select 2 circles and a point on one of the circles to create a circle tangent to them at the point.", CIRCLE_TYPE.TANGENT_CIRCLE, circle, this, parent);
 
-		circle.getItems().addAll(defaultCircle, circumcircle, incircle);
+		circle.getItems().addAll(defaultCircle, circumcircle, incircle, tangentcircle);
 		
 		getMenus().addAll(mouse, point, line, circle);
 		setPrefSize(5000, 40);

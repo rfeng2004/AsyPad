@@ -17,5 +17,9 @@ public enum CIRCLE_TYPE implements SHAPE_TYPE
 	/**
 	 * Incircle of the triangle formed by three given points.
 	 */
-	INCIRCLE;
+	INCIRCLE,
+	/**
+	 * Circle tangent to two other circles. Either both externally or both internally tangent.
+	 */
+	TANGENT_CIRCLE;
 }

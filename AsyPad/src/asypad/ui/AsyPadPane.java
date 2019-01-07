@@ -720,6 +720,43 @@ public class AsyPadPane extends Pane
 						getChildren().remove(currentCircle);
 					}
 				}
+				else if(tool == CIRCLE_TYPE.TANGENT_CIRCLE)
+				{
+					/* if(snappedIndex != -1 && shapes.get(snappedIndex) instanceof Point) selectedShapes.add(shapes.get(snappedIndex));
+					if(selectedShapes.size() == 3)
+					{
+						Circle c1 = new Circle(new Point(0, 0), new Point(0, 1)), c2 = new Circle(new Point(0, 0), new Point(0, 1));
+						Point p = new Point(0, 0);
+
+						if(selectedShapes.get(0) instanceof Circle && selectedShapes.get(1) instanceof Circle && selectedShapes.get(2) instanceof Point)
+						{
+							c1 = (Circle) selectedShapes.get(0);
+							c2 = (Circle) selectedShapes.get(1);
+							p = (Point) selectedShapes.get(2);
+						}
+						else if(selectedShapes.get(0) instanceof Circle && selectedShapes.get(1) instanceof Point && selectedShapes.get(2) instanceof Circle)
+						{
+							c1 = (Circle) selectedShapes.get(0);
+							c2 = (Circle) selectedShapes.get(2);
+							p = (Point) selectedShapes.get(1);
+						}
+						else if(selectedShapes.get(0) instanceof Point && selectedShapes.get(1) instanceof Circle && selectedShapes.get(2) instanceof Circle)
+						{
+							c1 = (Circle) selectedShapes.get(1);
+							c2 = (Circle) selectedShapes.get(2);
+							p = (Point) selectedShapes.get(0);
+						}
+						if(c1 != c2)
+						{
+							Circle c = new Circle(c1, c2, p, false);
+							addShape(c);
+							addCommand(new DrawCommand(c));
+						}
+						resetSelectedShapes();
+						selectedShapes.clear();
+						getChildren().remove(currentCircle);
+					}*/
+				}
 
 				setSelectedShapes();
 			}
