@@ -3,6 +3,9 @@ package asypad.ui;
  * TODO Add new tool: relative point, conic sections.
  * TODO Implement grid show and hide.
  * TODO Add user manual in help menu.
+ * FIXME Tangent Circle Bugs
+ * - Clicking on intersection point of tangent circle and original circle causes bugs.
+ * - Add tangent circle asymptote and asypad conversions.
  */
 
 import java.io.*;

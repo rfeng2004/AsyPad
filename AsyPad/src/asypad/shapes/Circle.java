@@ -188,9 +188,9 @@ public class Circle extends Shape
 		circle.setRadius(radius);
 		circle.setStrokeWidth(StrokeWidth);
 		circle.setStroke(color);
-		for(Shape s : children)
+		for(int i = 0; i < children.size(); i++)
 		{
-			s.refresh();
+			children.get(i).refresh();
 		}
 	}
 

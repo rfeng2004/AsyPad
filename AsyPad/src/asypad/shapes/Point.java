@@ -217,7 +217,7 @@ public class Point extends Shape
 		label.setText(name);
 		label.refresh();
 	}
-	
+
 	/**
 	 * Constructs an intersection point between circles c1 and c2. Identifier = true represents
 	 * the intersection point that is more counterclockwise wrt the first circle.
@@ -392,9 +392,9 @@ public class Point extends Shape
 		dot.setStroke(color);
 		dot.setFill(color);
 		label.refresh();
-		for(Shape s : children)
+		for(int i = 0; i < children.size(); i++)
 		{
-			s.refresh();
+			children.get(i).refresh();
 		}
 	}
 
