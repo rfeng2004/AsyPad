@@ -792,6 +792,7 @@ public class AsyPadPane extends Pane
 				}
 
 				setSelectedShapes();
+				clearGarbage();
 			}
 		});
 		this.setOnMouseDragged(new EventHandler<MouseEvent>()
@@ -1024,6 +1025,24 @@ public class AsyPadPane extends Pane
 		for(Shape s : shapes)
 		{
 			s.refresh();
+		}
+	}
+	
+	/**
+	 * Clears out the garbage shapes that were used for calculation but are not needed anymore.
+	 */
+	private void clearGarbage()
+	{
+		for(Shape s : shapes)
+		{
+			for(int i = 0; i < s.getChildren().size(); i++)
+			{
+				if(!shapes.contains(s.getChildren().get(i)))
+				{
+					s.getChildren().remove(i);
+					i--;
+				}
+			}
 		}
 	}
 

@@ -8,6 +8,11 @@ package asypad.shapes;
 public class Utility
 {
 	/**
+	 * Used when comparing for 2 equal doubles.
+	 */
+	private static double EPSILON = 0.001;
+	
+	/**
 	 * Calculates the distance between 2 points.
 	 * @param x1 x-coordinate of first point
 	 * @param y1 y-coordinate of first point
@@ -100,12 +105,12 @@ public class Utility
 	 */
 	public static double intersectX(Line l1, Line l2)
 	{
-		double m1 = (l1.getEndY()-l1.getStartY())/(l1.getEndX()-l1.getStartX());
-		double b1 = l1.getStartY()-m1*l1.getStartX();
-		double m2 = (l2.getEndY()-l2.getStartY())/(l2.getEndX()-l2.getStartX());
-		double b2 = l2.getStartY()-m2*l2.getStartX();
 		if(l1.getEndX()-l1.getStartX()!=0 && l2.getEndX()-l2.getStartX()!=0)
 		{
+			double m1 = (l1.getEndY()-l1.getStartY())/(l1.getEndX()-l1.getStartX());
+			double b1 = l1.getStartY()-m1*l1.getStartX();
+			double m2 = (l2.getEndY()-l2.getStartY())/(l2.getEndX()-l2.getStartX());
+			double b2 = l2.getStartY()-m2*l2.getStartX();
 			double x = solveX(m1, b1, m2, b2);
 			if((l1.getStartX()-x)*(l1.getEndX()-x) < 0 && (l2.getStartX()-x)*(l2.getEndX()-x) < 0) return x;
 			else return Double.POSITIVE_INFINITY;
@@ -116,7 +121,7 @@ public class Utility
 			{
 				return Double.POSITIVE_INFINITY;
 			}
-			if(l1.getEndX()-l1.getStartX()==0)
+			else if(l1.getEndX()-l1.getStartX()==0)
 			{
 				if((l2.getStartX()-l1.getStartX())*(l2.getEndX()-l1.getStartX()) < 0) return l1.getStartX();
 				else return Double.POSITIVE_INFINITY;
@@ -139,14 +144,14 @@ public class Utility
 
 	public static double intersectY(Line l1, Line l2)
 	{
-		double m1 = (l1.getEndY()-l1.getStartY())/(l1.getEndX()-l1.getStartX());
-		double b1 = l1.getStartY()-m1*l1.getStartX();
-		double m2 = (l2.getEndY()-l2.getStartY())/(l2.getEndX()-l2.getStartX());
-		double b2 = l2.getStartY()-m2*l2.getStartX();
 		if(l1.getEndX()-l1.getStartX()!=0 && l2.getEndX()-l2.getStartX()!=0)
 		{
+			double m1 = (l1.getEndY()-l1.getStartY())/(l1.getEndX()-l1.getStartX());
+			double b1 = l1.getStartY()-m1*l1.getStartX();
+			double m2 = (l2.getEndY()-l2.getStartY())/(l2.getEndX()-l2.getStartX());
+			double b2 = l2.getStartY()-m2*l2.getStartX();
 			double y = solveY(m1, b1, m2, b2);
-			if((l1.getStartY()-y)*(l1.getEndY()-y) < 0 && (l2.getStartY()-y)*(l2.getEndY()-y) < 0) return y;
+			if((l1.getStartY()-y)*(l1.getEndY()-y) <= 0 && (l2.getStartY()-y)*(l2.getEndY()-y) <= 0) return y;
 			else return Double.POSITIVE_INFINITY;
 		}
 		else
@@ -155,13 +160,17 @@ public class Utility
 			{
 				return Double.POSITIVE_INFINITY;
 			}
-			if(l1.getEndX()-l1.getStartX()==0)
+			else if(l1.getEndX()-l1.getStartX()==0)
 			{
+				double m2 = (l2.getEndY()-l2.getStartY())/(l2.getEndX()-l2.getStartX());
+				double b2 = l2.getStartY()-m2*l2.getStartX();
 				if((l2.getStartX()-l1.getStartX())*(l2.getEndX()-l1.getStartX()) < 0) return m2*l1.getStartX()+b2;
 				else return Double.POSITIVE_INFINITY;
 			}
 			else
 			{
+				double m1 = (l1.getEndY()-l1.getStartY())/(l1.getEndX()-l1.getStartX());
+				double b1 = l1.getStartY()-m1*l1.getStartX();
 				if((l1.getStartX()-l2.getStartX())*(l1.getEndX()-l2.getStartX()) < 0) return m1*l2.getStartX()+b1;
 				else return Double.POSITIVE_INFINITY;
 			}
@@ -189,8 +198,8 @@ public class Utility
 		double D = x1*y2-x2*y1;
 		double r = c.getRadius();
 		double discriminant = r*r*dr*dr-D*D;
-		if(discriminant < -0.001) return Double.POSITIVE_INFINITY;
-		else if(discriminant < 0.001)
+		if(discriminant < -EPSILON) return Double.POSITIVE_INFINITY;
+		else if(discriminant < EPSILON)
 		{
 			return D*dy/(dr*dr)+c.getCenterX();
 		}
@@ -244,8 +253,8 @@ public class Utility
 		double D = x1*y2-x2*y1;
 		double r = c.getRadius();
 		double discriminant = r*r*dr*dr-D*D;
-		if(discriminant < -0.001) return Double.POSITIVE_INFINITY;
-		else if(discriminant < 0.001)
+		if(discriminant < -EPSILON) return Double.POSITIVE_INFINITY;
+		else if(discriminant < EPSILON)
 		{
 			return -D*dx/(dr*dr)+c.getCenterY();
 		}
@@ -294,7 +303,13 @@ public class Utility
 		double d = dist(c1.getCenterX(), c1.getCenterY(), c2.getCenterX(), c2.getCenterY());
 		if(equal(d, c1.getRadius() + c2.getRadius()))
 		{
-			return c1.getRadius() + dx * c1.getRadius() / d;
+			//externally tangent
+			return c1.getCenterX() + dx * c1.getRadius() / d;
+		}
+		else if(equal(d, Math.abs(c1.getRadius()-c2.getRadius())))
+		{
+			//internally tangent
+			return c1.getCenterX() - dx * c1.getRadius() / d;
 		}
 		else if(d > c1.getRadius() + c2.getRadius())
 		{
@@ -325,7 +340,13 @@ public class Utility
 		double d = dist(c1.getCenterX(), c1.getCenterY(), c2.getCenterX(), c2.getCenterY());
 		if(equal(d, c1.getRadius() + c2.getRadius()))
 		{
-			return c1.getRadius() + dx * c1.getRadius() / d;
+			//externally tangent
+			return c1.getCenterY() + dy * c1.getRadius() / d;
+		}
+		else if(equal(d, Math.abs(c1.getRadius()-c2.getRadius())))
+		{
+			//internally tangent
+			return c1.getCenterY() - dy * c1.getRadius() / d;
 		}
 		else if(d > c1.getRadius() + c2.getRadius())
 		{
@@ -689,8 +710,13 @@ public class Utility
 	{
 		double dx = c1.getCenterX() - p.getX();
 		double dy = c1.getCenterY() - p.getY();
-		Point F = new Point(p.getX() + (identifier ? -1 : 1) * c2.getRadius() * dx / Math.sqrt(dx * dx + dy * dy), p.getY() + (identifier ? -1 : 1) * c2.getRadius() * dy / Math.sqrt(dx * dx + dy * dy));
-		return intersectX(new Line(new Point(c1.getCenterX(), c1.getCenterY()), p, false), new Line(new Point(c2.getCenterX(), c2.getCenterY()), F));
+		double d = Math.sqrt(dx*dx+dy*dy);
+		Point F = new Point(p.getX()+(identifier ? -1 : 1)*c2.getRadius()*dx/d, p.getY()+(identifier ? -1 : 1)*c2.getRadius()*dy/d);
+		Line l1 = new Line(new Point(c1.getCenterX(), c1.getCenterY()), p, false);
+		Line l2 = new Line(new Point(c2.getCenterX(), c2.getCenterY()), F);
+		//sometimes circle disappears because of the check for if a point
+		//is actually between the end points of the 2 lines.
+		return intersectX(l1, l2);
 	}
 	
 	/**
@@ -707,8 +733,11 @@ public class Utility
 	{
 		double dx = c1.getCenterX() - p.getX();
 		double dy = c1.getCenterY() - p.getY();
-		Point F = new Point(p.getX() + (identifier ? -1 : 1) * c2.getRadius() * dx / Math.sqrt(dx * dx + dy * dy), p.getY() + (identifier ? -1 : 1) * c2.getRadius() * dy / Math.sqrt(dx * dx + dy * dy));
-		return intersectY(new Line(new Point(c1.getCenterX(), c1.getCenterY()), p, false), new Line(new Point(c2.getCenterX(), c2.getCenterY()), F));
+		double d = Math.sqrt(dx*dx+dy*dy);
+		Point F = new Point(p.getX()+(identifier ? -1 : 1)*c2.getRadius()*dx/d, p.getY()+(identifier ? -1 : 1)*c2.getRadius()*dy/d);
+		Line l1 = new Line(new Point(c1.getCenterX(), c1.getCenterY()), p, false);
+		Line l2 = new Line(new Point(c2.getCenterX(), c2.getCenterY()), F);
+		return intersectY(l1, l2);
 	}
 	
 	/**
@@ -758,7 +787,6 @@ public class Utility
 	 */
 	public static boolean equal(double d1, double d2)
 	{
-		double epsilon = 0.001;
-		return Math.abs(d1 - d2) < epsilon;
+		return Math.abs(d1 - d2) < EPSILON;
 	}	
 }

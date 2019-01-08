@@ -375,7 +375,6 @@ public class Point extends Shape
 				Circle c2 = (Circle) dependencies.get(1);
 				x = Utility.intersectX(c1, c2, identifier);
 				y = Utility.intersectY(c1, c2, identifier);
-
 			}
 		}
 		else if(type == POINT_TYPE.MIDPOINT)
