@@ -1,18 +1,21 @@
 # AsyPad
 A simple drawing tool that can convert diagrams into Asymptote code.
 
-# Shapes (as of v1.1)
+# Shapes (as of v1.2)
 Points: Free point, Point locked onto another shape, Intersection Point, Midpoint
 
-Lines: Segment, Line, Parallel Line, Perpendicular Line, Angle Bisector, Perpendicular Bisector
+Lines: Segment, Line, Parallel Line, Perpendicular Line, Angle Bisector, Perpendicular Bisector, Tangent Line
 
-Circles: Center and Point on circle, Circumcircle
+Circles: Center and Point on circle, Circumcircle, Incircle, Tangent Circle
 
 # Valid Point Names
 Rename a point by double clicking on it.
 The following are valid point names:
 - The name is made only of capital letters and numbers, and starts with a capital letter.
 - The name is a capital letter, followed by an underscore, followed by a number or lowercase letter.
+
+# Coloring
+Color a shape by double clicking on it or right clicking it and selecting a color in the dropdown menu or create your own custom color.
 
 # Keyboard Shortcuts
 Press Esc when you want to cancel drawing a shape.
