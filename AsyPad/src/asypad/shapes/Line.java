@@ -1,7 +1,6 @@
 package asypad.shapes;
 
 import javafx.scene.layout.Pane;
-import asypad.shapes.types.CIRCLE_TYPE;
 import asypad.shapes.types.LINE_TYPE;
 
 /**
@@ -514,25 +513,9 @@ public class Line extends Shape
 			String p = dependencies.get(0).getName();
 			String c = dependencies.get(1).getName();
 			
-			String center = "";
-			String rad = "";
+			String center = c + "center";
+			String rad = c + "rad";
 			
-			if(dependencies.get(1).type == CIRCLE_TYPE.CIRCLE)
-			{
-				center = dependencies.get(1).dependencies.get(0).getName();
-				String on = dependencies.get(1).dependencies.get(1).getName();
-				rad = "abs(" + center + "-" + on + ")";
-			}
-			else if(dependencies.get(1).type == CIRCLE_TYPE.CIRCUMCIRCLE)
-			{
-				center = "circumcenter(" + dependencies.get(1).dependencies.get(0).getName() + ", " + dependencies.get(1).dependencies.get(1).getName() + ", " + dependencies.get(1).dependencies.get(2).getName() + ")";
-				rad = "abs(" + center + "-" + dependencies.get(1).dependencies.get(0).getName() + ")";
-			}
-			else if(dependencies.get(1).type == CIRCLE_TYPE.INCIRCLE)
-			{
-				center = "incenter(" + dependencies.get(1).dependencies.get(0).getName() + ", " + dependencies.get(1).dependencies.get(1).getName() + ", " + dependencies.get(1).dependencies.get(2).getName() + ")";
-				rad = "inradius(" + dependencies.get(1).dependencies.get(0).getName() + ", " + dependencies.get(1).dependencies.get(1).getName() + ", " + dependencies.get(1).dependencies.get(2).getName() + ")";
-			}
 			int id = (identifier ? 2 : 1);
 			String s = "pair " + p + "_" + c + "_tangent" + id + " = tangent(" + p + ", " + center + ", " + rad + ", " + id + ");\npath " + n + " = (" + p + "-" + INF/100 + "*unit(" + p + "_" + c + "_tangent" + id + "-" + p + "))--(" + p + "_" + c + "_tangent" + id + "+" + INF/100 + "*unit(" + p + "_" + c + "_tangent" + id + "-" + p + ")); ";
 			if(!hide) s+="draw(" + n + ");\n";
