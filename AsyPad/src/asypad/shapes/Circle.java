@@ -248,12 +248,13 @@ public class Circle extends Shape
 	{
 		if(!inAsyCode) return "";
 		String n = getName();
+		String hex = "c"+Utility.hex(color);
 		if(type == CIRCLE_TYPE.CIRCLE)
 		{
 			String p1 = dependencies.get(0).getName();
 			String p2 = dependencies.get(1).getName();
-			String s = "path " + n + " = Circle(" + p1 + ", abs(" + p1 + "-" + p2 + ")); \npair " + n + "center = " + p1 + "; real " + n + "rad = abs(" + p1 + " - " + p2 + ");";
-			if(!hide) s+="draw(" + n + ");\n";
+			String s = "path " + n + " = Circle(" + p1 + ", abs(" + p1 + "-" + p2 + "));\npair " + n + "center = " + p1 + "; real " + n + "rad = abs(" + p1 + " - " + p2 + "); ";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
 			else s+="\n";
 			return s;
 		}
@@ -262,8 +263,8 @@ public class Circle extends Shape
 			String p1 = dependencies.get(0).getName();
 			String p2 = dependencies.get(1).getName();
 			String p3 = dependencies.get(2).getName();
-			String s = "path " + n + " = circumcircle(" + p1 + ", " + p2 + ", " + p3 + "); \npair " + n + "center = circumcenter(" + p1 + ", " + p2 + ", " + p3 + "); real " + n + "rad = circumradius(" + p1 + ", " + p2 + ", " + p3 + ");";
-			if(!hide) s+="draw(" + n + ");\n";
+			String s = "path " + n + " = circumcircle(" + p1 + ", " + p2 + ", " + p3 + ");\npair " + n + "center = circumcenter(" + p1 + ", " + p2 + ", " + p3 + "); real " + n + "rad = circumradius(" + p1 + ", " + p2 + ", " + p3 + "); ";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
 			else s+="\n";
 			return s;
 		}
@@ -272,8 +273,8 @@ public class Circle extends Shape
 			String p1 = dependencies.get(0).getName();
 			String p2 = dependencies.get(1).getName();
 			String p3 = dependencies.get(2).getName();
-			String s = "path " + n + " = incircle(" + p1 + ", " + p2 + ", " + p3 + "); \npair " + n + "center = incenter(" + p1 + ", " + p2 + ", " + p3 + "); real " + n + "rad = inradius(" + p1 + ", " + p2 + ", " + p3 + ");";
-			if(!hide) s+="draw(" + n + ");\n";
+			String s = "path " + n + " = incircle(" + p1 + ", " + p2 + ", " + p3 + ");\npair " + n + "center = incenter(" + p1 + ", " + p2 + ", " + p3 + "); real " + n + "rad = inradius(" + p1 + ", " + p2 + ", " + p3 + "); ";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
 			else s+="\n";
 			return s;
 		}
@@ -288,10 +289,10 @@ public class Circle extends Shape
 			String ce1 = c1 + "center", ce2 = c2 + "center";
 			String r1 = c1 + "rad", r2 = c2 + "rad";
 			
-			String s = "pair " + p + "_" + c1 + "_" + c2 + "_auxPt" + (id+1) + " = " + p + " + " + id + " * " + r2 + " / " + r1 + " * (" + ce1 + " - " + p +"); pair " + p + "_" + c1 + "_" + c2 + "_mid = ((" +ce2 + " + " + p + "_" + c1 + "_" + c2 + "_auxPt" + (id+1) + ")/2);" + "\n";
-			s += "pair " + p + "_" + c1 + "_" + c2 + "_tccenter = extension(unit(rotate(90," + p + "_" + c1 + "_" + c2 + "_mid)*" + ce2 + "-" + p + "_" + c1 + "_" + c2 + "_mid)" + " + " + p + "_" + c1 + "_" + c2 + "_mid" + ", unit(rotate(270," + p + "_" + c1 + "_" + c2 + "_mid)*" + ce2 + "-" + p + "_" + c1 + "_" + c2 + "_mid)" + " + " + p + "_" + c1 + "_" + c2 + "_mid" + ", " + ce1 + ", " + p + "); \n";
-			s += "path " + n + " = circle(" + p + "_" + c1 + "_" + c2 + "_tccenter, abs(" + p + "_" + c1 + "_" + c2 + "_tccenter - " + p + "));";
-			if(!hide) s+="draw(" + n + ");\n";
+			String s = "pair " + p + "_" + c1 + "_" + c2 + "_auxPt" + (id+1) + " = " + p + " + " + id + " * " + r2 + " / " + r1 + " * (" + ce1 + " - " + p +"); pair " + p + "_" + c1 + "_" + c2 + "_mid = ((" +ce2 + " + " + p + "_" + c1 + "_" + c2 + "_auxPt" + (id+1) + ")/2);\n";
+			s += "pair " + p + "_" + c1 + "_" + c2 + "_tccenter = extension(unit(rotate(90," + p + "_" + c1 + "_" + c2 + "_mid)*" + ce2 + "-" + p + "_" + c1 + "_" + c2 + "_mid)" + " + " + p + "_" + c1 + "_" + c2 + "_mid" + ", unit(rotate(270," + p + "_" + c1 + "_" + c2 + "_mid)*" + ce2 + "-" + p + "_" + c1 + "_" + c2 + "_mid)" + " + " + p + "_" + c1 + "_" + c2 + "_mid" + ", " + ce1 + ", " + p + ");\n";
+			s += "path " + n + " = circle(" + p + "_" + c1 + "_" + c2 + "_tccenter, abs(" + p + "_" + c1 + "_" + c2 + "_tccenter - " + p + ")); ";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
 			else s+="\n";
 			return s;
 		}

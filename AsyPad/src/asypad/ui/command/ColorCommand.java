@@ -1,6 +1,6 @@
 package asypad.ui.command;
 
-import asypad.shapes.Shape;
+import asypad.shapes.*;
 import asypad.ui.AsyPadPane;
 import javafx.scene.paint.Color;
 
@@ -38,10 +38,7 @@ public class ColorCommand extends Command
 
 	public String toString()
 	{
-		String rgb = String.format("%02X%02X%02X",
-	            (int)(newColor.getRed()*255),
-	            (int)(newColor.getGreen()*255),
-	            (int)(newColor.getBlue()*255));
+		String rgb = Utility.hex(newColor);
 		String s = "color(" + shape.getName() + ", " 
 				+ rgb + ")\n";
 		return s;

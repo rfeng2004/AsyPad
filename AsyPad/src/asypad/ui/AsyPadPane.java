@@ -1449,6 +1449,25 @@ public class AsyPadPane extends Pane
 		asy+="import olympiad;\nimport markers;\nimport math;\nimport graph;\n";
 		asy+="//change the unit size to fit your needs\n";
 		asy+="unitsize(1cm);\n";
+		
+		ArrayList<String> colors = new ArrayList<String>();
+		for(Shape s : shapes)
+		{
+			if(s.isInAsyCode())
+			{
+				String c = Utility.hex(s.getColor());
+				if(!colors.contains(c))
+				{
+					colors.add(c);
+				}
+			}
+		}
+		asy+="//colored pens\n";
+		for(String color : colors)
+		{
+			asy+="pen c" + color + " = rgb(\"" + color + "\");\n";
+		}
+		
 		int MAXLVL = 0;
 		for(Shape s : shapes)
 		{

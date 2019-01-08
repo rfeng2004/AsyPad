@@ -1,5 +1,7 @@
 package asypad.shapes;
 
+import javafx.scene.paint.Color;
+
 /**
  * Utility that contains useful functions.
  * @author Raymond Feng
@@ -788,5 +790,18 @@ public class Utility
 	public static boolean equal(double d1, double d2)
 	{
 		return Math.abs(d1 - d2) < EPSILON;
-	}	
+	}
+	
+	/**
+	 * Hexes a Color into string format.
+	 * @param color the Color to be hexed
+	 * @return String rgb representation of the Color.
+	 */
+	public static String hex(Color color)
+	{
+		return String.format("%02X%02X%02X",
+	            (int)(color.getRed()*255),
+	            (int)(color.getGreen()*255),
+	            (int)(color.getBlue()*255));
+	}
 }

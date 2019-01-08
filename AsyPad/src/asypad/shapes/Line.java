@@ -451,12 +451,13 @@ public class Line extends Shape
 	{
 		if(!inAsyCode) return "";
 		String n = getName();
+		String hex = "c"+Utility.hex(color);
 		if(type == LINE_TYPE.SEGMENT)
 		{
 			String p1 = dependencies.get(0).getName();
 			String p2 = dependencies.get(1).getName();
 			String s = "path " + n + " = " + p1 + "--" + p2 + "; ";
-			if(!hide) s+="draw(" + n + ");\n";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
 			else s+="\n";
 			return s;
 		}
@@ -465,7 +466,7 @@ public class Line extends Shape
 			String p1 = dependencies.get(0).getName();
 			String p2 = dependencies.get(1).getName();
 			String s = "path " + n + " = (" + p1 + "-" + INF/100 + "*unit(" + p2 + "-" + p1 + "))--(" + p2 + "+" + INF/100 + "*unit(" + p2 + "-" + p1 + ")); ";
-			if(!hide) s+="draw(" + n + ");\n";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
 			else s+="\n";
 			return s;
 		}
@@ -474,7 +475,7 @@ public class Line extends Shape
 			String p = dependencies.get(0).getName();
 			String l = dependencies.get(1).getName();
 			String s = "path " + n + " = (" + p + "-" + INF/100 + "*dir(" + l + "))--(" + p + "+" + INF/100 + "*dir(" + l + ")); ";
-			if(!hide) s+="draw(" + n + ");\n";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
 			else s+="\n";
 			return s;
 		}
@@ -483,7 +484,7 @@ public class Line extends Shape
 			String p = dependencies.get(0).getName();
 			String l = dependencies.get(1).getName();
 			String s = "path " + n + " = (" + p + "-" + INF/100 + "*(dir(" + l + ").y, -dir(" + l + ").x))--(" + p + "+" + INF/100 + "*(dir(" + l + ").y, -dir(" + l + ").x)); ";
-			if(!hide) s+="draw(" + n + ");\n";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
 			else s+="\n";
 			return s;
 		}
@@ -494,7 +495,7 @@ public class Line extends Shape
 			String p3 = dependencies.get(2).getName();
 			String bisectorpoint = "(bisectorpoint(" + p1 + ", " + p2 + ", " + p3 + ")-" + p2 + ")";
 			String s = "path " + n + " = (" + p2 + "-" + INF/100 + "*" + bisectorpoint + ")--(" + p2 + "+" + INF/100 + "*" + bisectorpoint + "); ";
-			if(!hide) s+="draw(" + n + ");\n";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
 			else s+="\n";
 			return s;
 		}
@@ -504,7 +505,7 @@ public class Line extends Shape
 			String p2 = dependencies.get(1).getName();
 			String p = "(" + p1 + "+" + p2 + ")/2";
 			String s = "path " + n + " = (" + p + "-" + INF/100 + "*unit(((" + p2 + "-" + p1 + ").y, -(" + p2 + "-" + p1 + ").x)))--(" + p + "+" + INF/100 + "*unit(((" + p2 + "-" + p1 + ").y, -(" + p2 + "-" + p1 + ").x))); ";
-			if(!hide) s+="draw(" + n + ");\n";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
 			else s+="\n";
 			return s;
 		}
@@ -518,7 +519,7 @@ public class Line extends Shape
 			
 			int id = (identifier ? 2 : 1);
 			String s = "pair " + p + "_" + c + "_tangent" + id + " = tangent(" + p + ", " + center + ", " + rad + ", " + id + ");\npath " + n + " = (" + p + "-" + INF/100 + "*unit(" + p + "_" + c + "_tangent" + id + "-" + p + "))--(" + p + "_" + c + "_tangent" + id + "+" + INF/100 + "*unit(" + p + "_" + c + "_tangent" + id + "-" + p + ")); ";
-			if(!hide) s+="draw(" + n + ");\n";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
 			else s+="\n";
 			return s;
 		}
