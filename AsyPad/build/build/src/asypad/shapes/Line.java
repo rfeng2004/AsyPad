@@ -33,6 +33,13 @@ public class Line extends Shape
 	 * y-coordinate of the end point of the line.
 	 */
 	private double y2;
+	
+	/**
+	 * Identifier to distinguish between the 2 possible intersections of a point and a circle, 
+	 * only used for {@code LINE_TYPE.TANGENT_LINE} that depend on a point and a circle.
+	 */
+	private boolean identifier; //used for tangent to a circle through a point.
+
 
 	/**
 	 * Constructs line through 2 points.
@@ -149,6 +156,39 @@ public class Line extends Shape
 		x2 = mx-INF*diry;
 		y2 = my+INF*dirx;
 		label.setText("pb"+p1.getName()+SEPARATOR+p2.getName());
+		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
+		line.setStrokeWidth(StrokeWidth);
+	}
+	
+	/**
+	 * Constructs the line tangent line to a circle that goes through a point
+	 * @param p point
+	 * @param c circle
+	 */
+	public Line(Point p, Circle c, boolean identifier)
+	{
+		super(p, c);
+		
+		type = LINE_TYPE.TANGENT_LINE;
+		
+		x1 = p.getX();
+		y1 = p.getY();
+		x2 = Utility.tangentX(x1, y1, c, identifier);
+		y2 = Utility.tangentY(x1, y1, c, identifier);
+						
+		double dx = x2-p.getX();
+		double dy = y2-p.getY();
+		double dirx = dx/Math.sqrt(dx*dx+dy*dy);
+		double diry = dy/Math.sqrt(dx*dx+dy*dy);
+		
+		x1 = p.getX()-INF*dirx;
+		y1 = p.getY()-INF*diry;
+		x2 = x2+INF*dirx;
+		y2 = y2+INF*diry;
+		
+		this.identifier = identifier;
+		
+		label.setText("tl"+(identifier ? 2 : 1)+p.getName()+SEPARATOR+c.getName());
 		line = new javafx.scene.shape.Line(x1, y1, x2, y2);
 		line.setStrokeWidth(StrokeWidth);
 	}
@@ -311,15 +351,36 @@ public class Line extends Shape
 			x2 = mx-INF*diry;
 			y2 = my+INF*dirx;
 		}
+		else if(type == LINE_TYPE.TANGENT_LINE)
+		{
+			Point p = (Point) dependencies.get(0);
+			Circle c = (Circle) dependencies.get(1);
+			
+			x1 = p.getX();
+			y1 = p.getY();
+			x2 = Utility.tangentX(x1, y1, c, identifier);
+			y2 = Utility.tangentY(x1, y1, c, identifier);
+			
+			double dx = x2-p.getX();
+			double dy = y2-p.getY();
+			double dirx = dx/Math.sqrt(dx*dx+dy*dy);
+			double diry = dy/Math.sqrt(dx*dx+dy*dy);
+			
+			x1 = p.getX()-INF*dirx;
+			y1 = p.getY()-INF*diry;
+			x2 = x2+INF*dirx;
+			y2 = y2+INF*diry;
+		}
 		//System.out.println(this);
 		line.setStartX(x1);
 		line.setStartY(y1);
 		line.setEndX(x2);
 		line.setEndY(y2);
 		line.setStrokeWidth(StrokeWidth);
-		for(Shape s : children)
+		line.setStroke(color);
+		for(int i = 0; i < children.size(); i++)
 		{
-			s.refresh();
+			children.get(i).refresh();
 		}
 	}
 
@@ -351,6 +412,10 @@ public class Line extends Shape
 		{
 			label.setText("pb"+d1+SEPARATOR+d2);
 		}
+		else if(type == LINE_TYPE.TANGENT_LINE)
+		{
+			label.setText("tl"+(identifier ? 2 : 1)+d1+SEPARATOR+d2);
+		}
 		for(Shape s : children) s.refreshName();
 	}
 
@@ -374,6 +439,11 @@ public class Line extends Shape
 			s = "LINE: type = " + type + " dependencies: " + dependencies.get(0).getName()
 					+ ", " + dependencies.get(1).getName() + ", " + dependencies.get(2).getName();
 		}
+		else if(type == LINE_TYPE.TANGENT_LINE)
+		{
+			s = "LINE: type = " + type + " dependencies: " + dependencies.get(0).getName()
+					+ ", " + dependencies.get(1).getName() + " identifier = " + identifier;
+		}
 		return s;
 	}
 
@@ -381,12 +451,13 @@ public class Line extends Shape
 	{
 		if(!inAsyCode) return "";
 		String n = getName();
+		String hex = "c"+Utility.hex(color);
 		if(type == LINE_TYPE.SEGMENT)
 		{
 			String p1 = dependencies.get(0).getName();
 			String p2 = dependencies.get(1).getName();
 			String s = "path " + n + " = " + p1 + "--" + p2 + "; ";
-			if(!hide) s+="draw(" + n + ");\n";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
 			else s+="\n";
 			return s;
 		}
@@ -395,7 +466,7 @@ public class Line extends Shape
 			String p1 = dependencies.get(0).getName();
 			String p2 = dependencies.get(1).getName();
 			String s = "path " + n + " = (" + p1 + "-" + INF/100 + "*unit(" + p2 + "-" + p1 + "))--(" + p2 + "+" + INF/100 + "*unit(" + p2 + "-" + p1 + ")); ";
-			if(!hide) s+="draw(" + n + ");\n";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
 			else s+="\n";
 			return s;
 		}
@@ -404,7 +475,7 @@ public class Line extends Shape
 			String p = dependencies.get(0).getName();
 			String l = dependencies.get(1).getName();
 			String s = "path " + n + " = (" + p + "-" + INF/100 + "*dir(" + l + "))--(" + p + "+" + INF/100 + "*dir(" + l + ")); ";
-			if(!hide) s+="draw(" + n + ");\n";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
 			else s+="\n";
 			return s;
 		}
@@ -413,7 +484,7 @@ public class Line extends Shape
 			String p = dependencies.get(0).getName();
 			String l = dependencies.get(1).getName();
 			String s = "path " + n + " = (" + p + "-" + INF/100 + "*(dir(" + l + ").y, -dir(" + l + ").x))--(" + p + "+" + INF/100 + "*(dir(" + l + ").y, -dir(" + l + ").x)); ";
-			if(!hide) s+="draw(" + n + ");\n";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
 			else s+="\n";
 			return s;
 		}
@@ -424,7 +495,7 @@ public class Line extends Shape
 			String p3 = dependencies.get(2).getName();
 			String bisectorpoint = "(bisectorpoint(" + p1 + ", " + p2 + ", " + p3 + ")-" + p2 + ")";
 			String s = "path " + n + " = (" + p2 + "-" + INF/100 + "*" + bisectorpoint + ")--(" + p2 + "+" + INF/100 + "*" + bisectorpoint + "); ";
-			if(!hide) s+="draw(" + n + ");\n";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
 			else s+="\n";
 			return s;
 		}
@@ -434,7 +505,21 @@ public class Line extends Shape
 			String p2 = dependencies.get(1).getName();
 			String p = "(" + p1 + "+" + p2 + ")/2";
 			String s = "path " + n + " = (" + p + "-" + INF/100 + "*unit(((" + p2 + "-" + p1 + ").y, -(" + p2 + "-" + p1 + ").x)))--(" + p + "+" + INF/100 + "*unit(((" + p2 + "-" + p1 + ").y, -(" + p2 + "-" + p1 + ").x))); ";
-			if(!hide) s+="draw(" + n + ");\n";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
+			else s+="\n";
+			return s;
+		}
+		else if(type == LINE_TYPE.TANGENT_LINE)
+		{
+			String p = dependencies.get(0).getName();
+			String c = dependencies.get(1).getName();
+			
+			String center = c + "center";
+			String rad = c + "rad";
+			
+			int id = (identifier ? 2 : 1);
+			String s = "pair " + p + "_" + c + "_tangent" + id + " = tangent(" + p + ", " + center + ", " + rad + ", " + id + ");\npath " + n + " = (" + p + "-" + INF/100 + "*unit(" + p + "_" + c + "_tangent" + id + "-" + p + "))--(" + p + "_" + c + "_tangent" + id + "+" + INF/100 + "*unit(" + p + "_" + c + "_tangent" + id + "-" + p + ")); ";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
 			else s+="\n";
 			return s;
 		}

@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import asypad.shapes.labels.DraggableLabel;
 import asypad.shapes.types.SHAPE_TYPE;
 import asypad.ui.AsyPadPane;
@@ -17,62 +18,67 @@ public abstract class Shape
 	 * Stroke width of shapes.
 	 */
 	public static double StrokeWidth = 3;
-	
+
 	/**
 	 * Infinite that is used for drawing lines that should extend to infinity.
 	 */
 	public static final double INF = 2000;
-	
+
 	/**
 	 * The formatter used to round to 2 decimal places for file i/o.
 	 */
 	public static final DecimalFormat FORMATTER = new DecimalFormat("#0.00");
-	
+
 	/**
 	 * String used to separate dependencies in a shape's name;
 	 */
 	protected static final String SEPARATOR = "_";
-	
+
 	/**
 	 * The shapes that this shape depends on.
 	 */
 	protected ArrayList<Shape> dependencies;
-	
+
 	/**
 	 * The shapes that depend on this shape.
 	 */
 	protected ArrayList<Shape> children;
-	
+
 	/**
 	 * If this shape should be removed.
 	 */
 	protected boolean remove;
-	
+
 	/**
 	 * If this shape should be hidden.
 	 */
 	protected boolean hide;
-	
+
 	/**
 	 * If this shape's code should be added to the generated Asymptote file.
 	 */
 	protected boolean inAsyCode;
-	
+
 	/**
 	 * The shape's label.
 	 */
 	protected DraggableLabel label;
-	
+
 	/**
 	 * The type of this shape.
 	 */
 	protected SHAPE_TYPE type;
-	
+
 	/**
 	 * The dependency level of this shape.
 	 */
 	protected int level;
 	
+	/**
+	 * The color of the shape.
+	 */
+	protected Color color;
+
 	/**
 	 * Builds a Shape from the arguments.
 	 * @param args arguments specifying the shape
@@ -148,16 +154,21 @@ public abstract class Shape
 					d2Name = args.substring(d2+2, id-12);
 				}
 				else d2Name = args.substring(d2+2, args.length());
-				Line dependency1 = (Line) target.findShapeByName(d1Name);
+				Shape dependency1 = target.findShapeByName(d1Name);
 				Shape dependency2 = target.findShapeByName(d2Name);
-				if(dependency2 instanceof Line)
+				if(dependency1 instanceof Line && dependency2 instanceof Line)
 				{
-					s = new Point(dependency1, (Line) dependency2, name);
+					s = new Point((Line) dependency1, (Line) dependency2, name);
 				}
-				else
+				else if(dependency1 instanceof Line && dependency2 instanceof Circle)
 				{
 					boolean identifier = Boolean.parseBoolean(args.substring(id+2, args.length()));
-					s = new Point(dependency1, (Circle) dependency2, identifier, name);
+					s = new Point((Line) dependency1, (Circle) dependency2, identifier, name);
+				}
+				else if(dependency1 instanceof Circle && dependency2 instanceof Circle)
+				{
+					boolean identifier = Boolean.parseBoolean(args.substring(id+2, args.length()));
+					s = new Point((Circle) dependency1, (Circle) dependency2, identifier, name);
 				}
 			}
 			else if(args.substring(14, 22).equals("MIDPOINT"))
@@ -307,6 +318,31 @@ public abstract class Shape
 				Point dependency2 = (Point) target.findShapeByName(d2Name);
 				s = new Line(dependency1, dependency2);
 			}
+			else if(args.substring(13, 25).equals("TANGENT_LINE"))
+			{
+				int d1 = 0, d2 = 0, id = 0;
+				for(int i = 25; i < args.length(); i++)
+				{
+					if(args.charAt(i) == ':')
+					{
+						d1 = i;
+					}
+					if(args.charAt(i) == ',')
+					{
+						d2 = i;
+					}
+					if(args.charAt(i) == '=')
+					{
+						id = i;
+					}
+				}
+				String d1Name = args.substring(d1+2, d2);
+				String d2Name = args.substring(d2+2, id-12);
+				boolean identifier = Boolean.parseBoolean(args.substring(id+2, args.length()));
+				Point dependency1 = (Point) target.findShapeByName(d1Name);
+				Circle dependency2 = (Circle) target.findShapeByName(d2Name);
+				s = new Line(dependency1, dependency2, identifier);
+			}
 		}
 		else if(args.substring(0, 6).equals("CIRCLE"))
 		{
@@ -351,12 +387,63 @@ public abstract class Shape
 				Point dependency1 = (Point) target.findShapeByName(d1Name);
 				Point dependency2 = (Point) target.findShapeByName(d2Name);
 				Point dependency3 = (Point) target.findShapeByName(d3Name);
-				s = new Circle(dependency1, dependency2, dependency3);
+				s = new Circle(dependency1, dependency2, dependency3, true);
+			}
+			else if(args.substring(15, 23).equals("INCIRCLE"))
+			{
+				int d1 = 0, d2 = 0, d3 = 0;
+				for(int i = 23; i < args.length(); i++)
+				{
+					if(args.charAt(i) == ':')
+					{
+						d1 = i;
+					}
+					if(args.charAt(i) == ',')
+					{
+						if(d2 == 0) d2 = i;
+						else d3 = i;
+					}
+				}
+				String d1Name = args.substring(d1+2, d2);
+				String d2Name = args.substring(d2+2, d3);
+				String d3Name = args.substring(d3+2, args.length());
+				Point dependency1 = (Point) target.findShapeByName(d1Name);
+				Point dependency2 = (Point) target.findShapeByName(d2Name);
+				Point dependency3 = (Point) target.findShapeByName(d3Name);
+				s = new Circle(dependency1, dependency2, dependency3, false);
+			}
+			else if(args.substring(15, 29).equals("TANGENT_CIRCLE"))
+			{
+				int d1 = 0, d2 = 0, d3 = 0, id = 0;
+				for(int i = 29; i < args.length(); i++)
+				{
+					if(args.charAt(i) == ':')
+					{
+						d1 = i;
+					}
+					if(args.charAt(i) == ',')
+					{
+						if(d2 == 0) d2 = i;
+						else d3 = i;
+					}
+					if(args.charAt(i) == '=')
+					{
+						id = i;
+					}
+				}
+				String d1Name = args.substring(d1 + 2, d2);
+				String d2Name = args.substring(d2 + 2, d3);
+				String d3Name = args.substring(d3 + 2, id - 12);
+				boolean identifier = Boolean.parseBoolean(args.substring(id + 2, args.length()));
+				Circle dependency1 = (Circle) target.findShapeByName(d1Name);
+				Circle dependency2 = (Circle) target.findShapeByName(d2Name);
+				Point dependency3 = (Point) target.findShapeByName(d3Name);
+				s = new Circle(dependency1, dependency2, dependency3, identifier);
 			}
 		}
 		return s;
 	}
-	
+
 	/**
 	 * Default superclass constructor called by all shapes, initializes dependencies, children, and level.
 	 * @param shapes dependencies
@@ -377,8 +464,9 @@ public abstract class Shape
 		remove = false;
 		hide = false;
 		inAsyCode = true;
+		color = Color.BLACK;
 	}
-	
+
 	/**
 	 * Dependencies of this shape.
 	 * @return dependencies
@@ -407,7 +495,7 @@ public abstract class Shape
 			s.delete();
 		}
 	}
-	
+
 	/**
 	 * Sets the value of remove for this shape.
 	 * @param remove new value of remove
@@ -416,7 +504,7 @@ public abstract class Shape
 	{
 		this.remove = remove;
 	}
-	
+
 	/**
 	 * Adds this shape and all children to Asymptote code.
 	 */
@@ -428,7 +516,7 @@ public abstract class Shape
 			s.addToAsy();
 		}
 	}
-	
+
 	/**
 	 * Removes this shape and all children from Asymptote code.
 	 */
@@ -440,7 +528,7 @@ public abstract class Shape
 			s.removeFromAsy();
 		}
 	}
-	
+
 	/**
 	 * Sets whether the shape should be hidden.
 	 * @param hidden if the shape should be hidden
@@ -449,7 +537,7 @@ public abstract class Shape
 	{
 		hide = hidden;
 	}
-	
+
 	/**
 	 * If this shape should be removed.
 	 * @return remove
@@ -458,7 +546,7 @@ public abstract class Shape
 	{
 		return remove;
 	}
-	
+
 	/**
 	 * If this shape should be hidden.
 	 * @return hide
@@ -467,7 +555,7 @@ public abstract class Shape
 	{
 		return hide;
 	}
-	
+
 	/**
 	 * If this shape is in the Asymptote code.
 	 * @return inAsyCode
@@ -476,7 +564,7 @@ public abstract class Shape
 	{
 		return inAsyCode;
 	}
-	
+
 	/**
 	 * Renames the shape.
 	 * @param name new name
@@ -487,6 +575,25 @@ public abstract class Shape
 	}
 	
 	/**
+	 * Sets the color of the shape
+	 * @param c new color of shape
+	 */
+	public void setColor(Color c)
+	{
+		color = c;
+		refresh();
+	}
+	
+	/**
+	 * Returns the color of the shape.
+	 * @return color of shape
+	 */
+	public Color getColor()
+	{
+		return color;
+	}
+
+	/**
 	 * Returns the name of the shape.
 	 * @return the name of the shape
 	 */
@@ -494,7 +601,7 @@ public abstract class Shape
 	{
 		return label.getText();
 	}
-	
+
 	/**
 	 * Returns the shapes's label.
 	 * @return the shape label
@@ -503,7 +610,7 @@ public abstract class Shape
 	{
 		return label;
 	}
-	
+
 	/**
 	 * Returns this shape's type.
 	 * @return type
@@ -512,7 +619,7 @@ public abstract class Shape
 	{
 		return type;
 	}
-	
+
 	/**
 	 * Returns this shape's level of dependency.
 	 * @return level of dependency
@@ -527,29 +634,29 @@ public abstract class Shape
 	 * @param p pane that shape is to be drawn on
 	 */
 	public abstract void draw(Pane p);
-	
+
 	/**
 	 * Refreshes shape and all of its children.
 	 */
 	public abstract void refresh();
-	
+
 	/**
 	 * Refreshes the name of this shape and all of its children.
 	 */
 	public abstract void refreshName();
-	
+
 	/**
 	 * Returns the underlying shape that is drawn onto the screen.
 	 * @return the underlying shape
 	 */
 	public abstract javafx.scene.shape.Shape getObject();
-	
+
 	/**
-	 * String representation of the shape. Should only be used for debugging purposes.
+	 * String representation of the shape. Is used in .apad file i/o.
 	 * @return string representation
 	 */
 	public abstract String toString();
-	
+
 	/**
 	 * Converts this shape into Asymptote code.
 	 * @return Asymptote representation.

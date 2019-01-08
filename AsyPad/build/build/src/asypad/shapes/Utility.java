@@ -1,12 +1,19 @@
 package asypad.shapes;
 
+import javafx.scene.paint.Color;
+
 /**
  * Utility that contains useful functions.
- * @author Raymond Feng
+ * @author Raymond Feng, Anthony Wang
  */
 
 public class Utility
 {
+	/**
+	 * Used when comparing for 2 equal doubles.
+	 */
+	private static double EPSILON = 0.001;
+	
 	/**
 	 * Calculates the distance between 2 points.
 	 * @param x1 x-coordinate of first point
@@ -100,12 +107,12 @@ public class Utility
 	 */
 	public static double intersectX(Line l1, Line l2)
 	{
-		double m1 = (l1.getEndY()-l1.getStartY())/(l1.getEndX()-l1.getStartX());
-		double b1 = l1.getStartY()-m1*l1.getStartX();
-		double m2 = (l2.getEndY()-l2.getStartY())/(l2.getEndX()-l2.getStartX());
-		double b2 = l2.getStartY()-m2*l2.getStartX();
 		if(l1.getEndX()-l1.getStartX()!=0 && l2.getEndX()-l2.getStartX()!=0)
 		{
+			double m1 = (l1.getEndY()-l1.getStartY())/(l1.getEndX()-l1.getStartX());
+			double b1 = l1.getStartY()-m1*l1.getStartX();
+			double m2 = (l2.getEndY()-l2.getStartY())/(l2.getEndX()-l2.getStartX());
+			double b2 = l2.getStartY()-m2*l2.getStartX();
 			double x = solveX(m1, b1, m2, b2);
 			if((l1.getStartX()-x)*(l1.getEndX()-x) < 0 && (l2.getStartX()-x)*(l2.getEndX()-x) < 0) return x;
 			else return Double.POSITIVE_INFINITY;
@@ -116,7 +123,7 @@ public class Utility
 			{
 				return Double.POSITIVE_INFINITY;
 			}
-			if(l1.getEndX()-l1.getStartX()==0)
+			else if(l1.getEndX()-l1.getStartX()==0)
 			{
 				if((l2.getStartX()-l1.getStartX())*(l2.getEndX()-l1.getStartX()) < 0) return l1.getStartX();
 				else return Double.POSITIVE_INFINITY;
@@ -139,14 +146,14 @@ public class Utility
 
 	public static double intersectY(Line l1, Line l2)
 	{
-		double m1 = (l1.getEndY()-l1.getStartY())/(l1.getEndX()-l1.getStartX());
-		double b1 = l1.getStartY()-m1*l1.getStartX();
-		double m2 = (l2.getEndY()-l2.getStartY())/(l2.getEndX()-l2.getStartX());
-		double b2 = l2.getStartY()-m2*l2.getStartX();
 		if(l1.getEndX()-l1.getStartX()!=0 && l2.getEndX()-l2.getStartX()!=0)
 		{
+			double m1 = (l1.getEndY()-l1.getStartY())/(l1.getEndX()-l1.getStartX());
+			double b1 = l1.getStartY()-m1*l1.getStartX();
+			double m2 = (l2.getEndY()-l2.getStartY())/(l2.getEndX()-l2.getStartX());
+			double b2 = l2.getStartY()-m2*l2.getStartX();
 			double y = solveY(m1, b1, m2, b2);
-			if((l1.getStartY()-y)*(l1.getEndY()-y) < 0 && (l2.getStartY()-y)*(l2.getEndY()-y) < 0) return y;
+			if((l1.getStartY()-y)*(l1.getEndY()-y) <= 0 && (l2.getStartY()-y)*(l2.getEndY()-y) <= 0) return y;
 			else return Double.POSITIVE_INFINITY;
 		}
 		else
@@ -155,13 +162,17 @@ public class Utility
 			{
 				return Double.POSITIVE_INFINITY;
 			}
-			if(l1.getEndX()-l1.getStartX()==0)
+			else if(l1.getEndX()-l1.getStartX()==0)
 			{
+				double m2 = (l2.getEndY()-l2.getStartY())/(l2.getEndX()-l2.getStartX());
+				double b2 = l2.getStartY()-m2*l2.getStartX();
 				if((l2.getStartX()-l1.getStartX())*(l2.getEndX()-l1.getStartX()) < 0) return m2*l1.getStartX()+b2;
 				else return Double.POSITIVE_INFINITY;
 			}
 			else
 			{
+				double m1 = (l1.getEndY()-l1.getStartY())/(l1.getEndX()-l1.getStartX());
+				double b1 = l1.getStartY()-m1*l1.getStartX();
 				if((l1.getStartX()-l2.getStartX())*(l1.getEndX()-l2.getStartX()) < 0) return m1*l2.getStartX()+b1;
 				else return Double.POSITIVE_INFINITY;
 			}
@@ -189,8 +200,8 @@ public class Utility
 		double D = x1*y2-x2*y1;
 		double r = c.getRadius();
 		double discriminant = r*r*dr*dr-D*D;
-		if(discriminant < 0) return Double.POSITIVE_INFINITY;
-		else if(discriminant == 0)
+		if(discriminant < -EPSILON) return Double.POSITIVE_INFINITY;
+		else if(discriminant < EPSILON)
 		{
 			return D*dy/(dr*dr)+c.getCenterX();
 		}
@@ -244,8 +255,8 @@ public class Utility
 		double D = x1*y2-x2*y1;
 		double r = c.getRadius();
 		double discriminant = r*r*dr*dr-D*D;
-		if(discriminant < 0) return Double.POSITIVE_INFINITY;
-		else if(discriminant == 0)
+		if(discriminant < -EPSILON) return Double.POSITIVE_INFINITY;
+		else if(discriminant < EPSILON)
 		{
 			return -D*dx/(dr*dr)+c.getCenterY();
 		}
@@ -276,6 +287,80 @@ public class Utility
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Calculates an intersection point between the two circles. If there is more than one intersection point,
+	 * identifier = true means to return the x-coordinate of the intersection that is more counterclockwise wrt the first circle.
+	 * If such an intersection point is non-existent returns Double.POSITIVE_INFINTY.
+	 * @param c1 circle 1
+	 * @param c2 circle 2
+	 * @param identifier distinguishes between the possibly 2 different intersection points
+	 * @return x-coordinate of the appropriate intersection
+	 */
+	public static double intersectX(Circle c1, Circle c2, boolean identifier)
+	{
+		double dx = c2.getCenterX() - c1.getCenterX();
+		double dy = c2.getCenterY() - c1.getCenterY();
+		double d = dist(c1.getCenterX(), c1.getCenterY(), c2.getCenterX(), c2.getCenterY());
+		if(equal(d, c1.getRadius() + c2.getRadius()))
+		{
+			//externally tangent
+			return c1.getCenterX() + dx * c1.getRadius() / d;
+		}
+		else if(equal(d, Math.abs(c1.getRadius()-c2.getRadius())))
+		{
+			//internally tangent
+			return c1.getCenterX() - dx * c1.getRadius() / d;
+		}
+		else if(d > c1.getRadius() + c2.getRadius())
+		{
+			return Double.POSITIVE_INFINITY;
+		}
+		
+		double a = (c1.getRadius() * c1.getRadius() - c2.getRadius() * c2.getRadius() + d * d)/ (2 * d);
+		double h = Math.sqrt(c1.getRadius() * c1.getRadius() - a * a);
+				
+		double x2 = c1.getCenterX() + dx * a / d + h * (identifier ? 1 : -1) * (dy / d);
+		
+		return x2;
+	}
+	
+	/**
+	 * Calculates an intersection point between the two circles. If there is more than one intersection point,
+	 * identifier = true means to return the y-coordinate of the intersection that is more counterclockwise wrt the first circle.
+	 * If such an intersection point is non-existent returns Double.POSITIVE_INFINTY.
+	 * @param c1 circle 1
+	 * @param c2 circle 2
+	 * @param identifier distinguishes between the possibly 2 different intersection points
+	 * @return y-coordinate of the appropriate intersection
+	 */
+	public static double intersectY(Circle c1, Circle c2, boolean identifier)
+	{
+		double dx = c2.getCenterX() - c1.getCenterX();
+		double dy = c2.getCenterY() - c1.getCenterY();
+		double d = dist(c1.getCenterX(), c1.getCenterY(), c2.getCenterX(), c2.getCenterY());
+		if(equal(d, c1.getRadius() + c2.getRadius()))
+		{
+			//externally tangent
+			return c1.getCenterY() + dy * c1.getRadius() / d;
+		}
+		else if(equal(d, Math.abs(c1.getRadius()-c2.getRadius())))
+		{
+			//internally tangent
+			return c1.getCenterY() - dy * c1.getRadius() / d;
+		}
+		else if(d > c1.getRadius() + c2.getRadius())
+		{
+			return Double.POSITIVE_INFINITY;
+		}
+		
+		double a = (c1.getRadius() * c1.getRadius() - c2.getRadius() * c2.getRadius() + d * d)/ (2 * d);
+		double h = Math.sqrt(c1.getRadius() * c1.getRadius() - a * a);
+		
+		double y2 = c1.getCenterY() + dy * a / d - h * (identifier ? 1 : -1) * (dx / d);
+		
+		return y2;
 	}
 
 	/**
@@ -409,6 +494,86 @@ public class Utility
 			}
 		}
 	}
+	
+	/**
+	 * Finds the x-coordinate of the incenter of 3 points.
+	 * @param p1 first point
+	 * @param p2 second point
+	 * @param p3 third point
+	 * @return x-coordinate of incenter
+	 */
+	public static double incenterX(Point p1, Point p2, Point p3)
+	{
+		double a = dist(p2, p3), b = dist(p1, p3), c = dist(p1, p2);
+		
+		return (a * p1.getX() + b * p2.getX() + c * p3.getX()) / (a+b+c);
+	}
+	
+	/**
+	 * Finds the y-coordinate of the incenter of 3 points.
+	 * @param p1 first point
+	 * @param p2 second point
+	 * @param p3 third point
+	 * @return y-coordinate of incenter
+	 */
+	public static double incenterY(Point p1, Point p2, Point p3)
+	{
+		double a = dist(p2, p3), b = dist(p1, p3), c = dist(p1, p2);
+		
+		return (a * p1.getY() + b * p2.getY() + c * p3.getY()) / (a+b+c);
+	}
+	
+	/**
+	 * Finds the x-coordinate of the orthocenter of 3 points.
+	 * @param p1 first point
+	 * @param p2 second point
+	 * @param p3 third point
+	 * @return x-coordinate of orthocenter
+	 */
+	public static double orthocenterX(Point p1, Point p2, Point p3)
+	{
+		Line a1 = new Line(p1, new Point(footX(p1.getX(), p1.getY(), new Line(p2, p3)), footY(p1.getX(), p1.getY(), new Line(p2, p3))));
+		Line a2 = new Line(p2, new Point(footX(p2.getX(), p2.getY(), new Line(p1, p3)), footY(p2.getX(), p2.getY(), new Line(p1, p3))));
+		return intersectX(a1, a2);
+	}
+	
+	/**
+	 * Finds the y-coordinate of the orthocenter of 3 points.
+	 * @param p1 first point
+	 * @param p2 second point
+	 * @param p3 third point
+	 * @return y-coordinate of orthocenter
+	 */
+	public static double orthocenterY(Point p1, Point p2, Point p3)
+	{
+		Line a1 = new Line(p1, new Point(footX(p1.getX(), p1.getY(), new Line(p2, p3, false)), footY(p1.getX(), p1.getY(), new Line(p2, p3, false))), false);
+		Line a2 = new Line(p2, new Point(footX(p2.getX(), p2.getY(), new Line(p1, p3, false)), footY(p2.getX(), p2.getY(), new Line(p1, p3, false))), false);
+		return intersectY(a1, a2);
+	}
+	
+	/**
+	 * Finds the x-coordinate of the centroid of 3 points.
+	 * @param p1 first point
+	 * @param p2 second point
+	 * @param p3 third point
+	 * @return x-coordinate of centroid
+	 */
+	public static double centroidX(Point p1, Point p2, Point p3)
+	{
+		return (p1.getX()+p2.getX()+p3.getX())/3;
+	}
+	
+	/**
+	 * Finds the y-coordinate of the centroid of 3 points.
+	 * @param p1 first point
+	 * @param p2 second point
+	 * @param p3 third point
+	 * @return y-coordinate of centroid
+	 */
+	public static double centroidY(Point p1, Point p2, Point p3)
+	{
+		return (p1.getY()+p2.getY()+p3.getY())/3;
+	}
 
 	/**
 	 * Calculates the x-coordinate of the point that lies on the angle bisector of angle p1p2p3,
@@ -455,7 +620,128 @@ public class Utility
 		y2 = (d2-1)/d2*p2.getY()+1/d2*y2;
 		return y2;
 	}
-
+	
+	/**
+	 * Finds the x-coordinate of the point such that the line formed by the point and the given point
+	 * is tangent to the circle. identifier is used to find which point (true = point more counterclockwise wrt the first circle).
+	 * If it is on the circle, finds the point 1 unit away and in the positive x direction from the given point.
+	 * If it is inside the circle, returns Double.POSITIVE_INFINITY.
+	 * @param x x-coordinate
+	 * @param y y-coordinate
+	 * @param c circle
+	 * @param identifier distinguishes between the possibly 2 different points
+	 * @return x coordinate of the point described above
+	 */
+	public static double tangentX(double x, double y, Circle c, boolean identifier)
+	{
+		if(equal(dist(c.getCenterX(), c.getCenterY(), x, y), c.getRadius()))
+		{
+			// translate the circle to be centered at the origin
+			double translationX = x - c.getCenterX(), translationY = - y + c.getCenterY();
+			
+			// if it is a vertical line
+			if(translationY == 0)
+			{
+				return x;
+			}
+			 
+			double m = -translationX / translationY;
+			
+			return x + 1 / (m * m + 1);
+		}
+		else if(dist(c.getCenterX(), c.getCenterY(), x, y) < c.getRadius())
+		{
+			return Double.POSITIVE_INFINITY;
+		}
+		
+		Circle dCirc = new Circle(new Point((x + c.getCenterX()) / 2, (y + c.getCenterY()) / 2), new Point(x, y));
+		
+		return intersectX(dCirc, c, identifier);
+	}
+	
+	/**
+	 * Finds the y-coordinate of the point such that the line formed by the point and the given point
+	 * is tangent to the circle. identifier is used to find which point (true = point more counterclockwise wrt the first circle).
+	 * If it is on the circle, finds the point 1 unit away and in the positive y direction from the given point.
+	 * If it is a vertical line, returns 1 unit down.
+	 * If it is inside the circle, returns Double.POSITIVE_INFINITY.
+	 * @param x x-coordinate
+	 * @param y y-coordinate
+	 * @param c circle
+	 * @param identifier distinguishes between the possibly 2 different points
+	 * @return x coordinate of the point described above
+	 */
+	public static double tangentY(double x, double y, Circle c, boolean identifier)
+	{
+		if(equal(dist(c.getCenterX(), c.getCenterY(), x, y), c.getRadius()))
+		{
+			// translate the circle to be centered at the origin
+			double translationX = x - c.getCenterX(), translationY = - y + c.getCenterY();
+			
+			// if it is a vertical line
+			if(translationY == 0)
+			{
+				return y - 1;
+			}
+			 
+			double m = -translationX / translationY;
+			
+			return y - m / (m * m + 1);
+		}
+		else if(dist(c.getCenterX(), c.getCenterY(), x, y) < c.getRadius())
+		{
+			return Double.POSITIVE_INFINITY;
+		}
+		
+		Circle dCirc = new Circle(new Point((x + c.getCenterX()) / 2, (y + c.getCenterY()) / 2), new Point(x, y));
+		
+		return intersectY(dCirc, c, identifier);
+	}
+	
+	/**
+	 * Finds the x-coordinate of the center of the circle tangent to the two given non-intersecting circles going through the given point.
+	 * identifier = true means it is internally tangent to one of the circles and externally tangent to another.
+	 * If such a circle doesn't exist, returns Double.POSITIVE_INFINITY
+	 * @param c1 first circle
+	 * @param c2 second circle
+	 * @param p point
+	 * @param identifier distinguishes between the possibly 2 different circles
+	 * @return x-coordinate of the described circle.
+	 */
+	public static double tangentCircleX(Circle c1, Circle c2, Point p, boolean identifier)
+	{
+		double dx = c1.getCenterX() - p.getX();
+		double dy = c1.getCenterY() - p.getY();
+		double d = Math.sqrt(dx*dx+dy*dy);
+		Point F = new Point(p.getX()+(identifier ? -1 : 1)*c2.getRadius()*dx/d, p.getY()+(identifier ? -1 : 1)*c2.getRadius()*dy/d);
+		Line l1 = new Line(new Point(c1.getCenterX(), c1.getCenterY()), p, false);
+		Line l2 = new Line(new Point(c2.getCenterX(), c2.getCenterY()), F);
+		//sometimes circle disappears because of the check for if a point
+		//is actually between the end points of the 2 lines.
+		return intersectX(l1, l2);
+	}
+	
+	/**
+	 * Finds the y-coordinate of the center of the circle tangent to the two given non-intersecting circles going through the given point.
+	 * identifier = true means it is internally tangent to one of the circles and externally tangent to another.
+	 * If such a circle doesn't exist, returns Double.POSITIVE_INFINITY
+	 * @param c1 first circle
+	 * @param c2 second circle
+	 * @param p point
+	 * @param identifier distinguishes between the possibly 2 different circles
+	 * @return y-coordinate of the described circle.
+	 */
+	public static double tangentCircleY(Circle c1, Circle c2, Point p, boolean identifier)
+	{
+		double dx = c1.getCenterX() - p.getX();
+		double dy = c1.getCenterY() - p.getY();
+		double d = Math.sqrt(dx*dx+dy*dy);
+		Point F = new Point(p.getX()+(identifier ? -1 : 1)*c2.getRadius()*dx/d, p.getY()+(identifier ? -1 : 1)*c2.getRadius()*dy/d);
+		Line l1 = new Line(new Point(c1.getCenterX(), c1.getCenterY()), p, false);
+		Line l2 = new Line(new Point(c2.getCenterX(), c2.getCenterY()), F);
+		return intersectY(l1, l2);
+	}
+	
 	/**
 	 * Finds distance from (x, y) to shape s.
 	 * @param x x-coordinate
@@ -493,5 +779,29 @@ public class Utility
 	{
 		if(d < 0) return -1;
 		return 1;
+	}
+	
+	/**
+	 * Whether the two doubles are equal (since rounding errors exist)
+	 * @param d1 first double
+	 * @param d2 second double
+	 * @return whether |d1-d2| < 0.0001 = epsilon
+	 */
+	public static boolean equal(double d1, double d2)
+	{
+		return Math.abs(d1 - d2) < EPSILON;
+	}
+	
+	/**
+	 * Hexes a Color into string format.
+	 * @param color the Color to be hexed
+	 * @return String rgb representation of the Color.
+	 */
+	public static String hex(Color color)
+	{
+		return String.format("%02X%02X%02X",
+	            (int)(color.getRed()*255),
+	            (int)(color.getGreen()*255),
+	            (int)(color.getBlue()*255));
 	}
 }

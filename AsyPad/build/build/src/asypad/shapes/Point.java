@@ -1,7 +1,6 @@
 package asypad.shapes;
 
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import asypad.shapes.types.POINT_TYPE;
 
 /**
@@ -104,7 +103,7 @@ public class Point extends Shape
 		relativeLocation = -1;
 		identifier = false;
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
-		dot.setStroke(Color.BLACK);
+		dot.setStroke(color);
 		dot.setStrokeWidth(StrokeWidth);
 		label.setText(name);
 		label.refresh();
@@ -138,7 +137,7 @@ public class Point extends Shape
 			if(x < c.getCenterX()) relativeLocation += Math.PI;
 		}
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
-		dot.setStroke(Color.BLACK);
+		dot.setStroke(color);
 		dot.setStrokeWidth(StrokeWidth);
 		label.setText(name);
 		label.refresh();
@@ -169,7 +168,7 @@ public class Point extends Shape
 			y = c.getCenterY()+c.getRadius()*Math.sin(relativeLocation);
 		}
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
-		dot.setStroke(Color.BLACK);
+		dot.setStroke(color);
 		dot.setStrokeWidth(StrokeWidth);
 		label.setText(name);
 		label.refresh();
@@ -190,7 +189,7 @@ public class Point extends Shape
 		relativeLocation = -1;
 		identifier = false;
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
-		dot.setStroke(Color.BLACK);
+		dot.setStroke(color);
 		dot.setStrokeWidth(StrokeWidth);
 		label.setText(name);
 		label.refresh();
@@ -213,7 +212,30 @@ public class Point extends Shape
 		this.x = Utility.intersectX(l, c, identifier);
 		this.y = Utility.intersectY(l, c, identifier);
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
-		dot.setStroke(Color.BLACK);
+		dot.setStroke(color);
+		dot.setStrokeWidth(StrokeWidth);
+		label.setText(name);
+		label.refresh();
+	}
+
+	/**
+	 * Constructs an intersection point between circles c1 and c2. Identifier = true represents
+	 * the intersection point that is more counterclockwise wrt the first circle.
+	 * @param l line
+	 * @param c circle
+	 * @param identifier which intersection point this will be
+	 * @param name
+	 */
+	public Point(Circle c1, Circle c2, boolean identifier, String name)
+	{
+		super(c1, c2);
+		type = POINT_TYPE.INTERSECTION_POINT;
+		relativeLocation = -1;
+		this.identifier = identifier;
+		this.x = Utility.intersectX(c1, c2, identifier);
+		this.y = Utility.intersectY(c1, c2, identifier);
+		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
+		dot.setStroke(color);
 		dot.setStrokeWidth(StrokeWidth);
 		label.setText(name);
 		label.refresh();
@@ -233,7 +255,7 @@ public class Point extends Shape
 		type = POINT_TYPE.MIDPOINT;
 		relativeLocation = -1;
 		dot = new javafx.scene.shape.Circle(x, y, StrokeWidth);
-		dot.setStroke(Color.BLACK);
+		dot.setStroke(color);
 		dot.setStrokeWidth(StrokeWidth);
 		label.setText(name);
 		label.refresh();
@@ -347,6 +369,13 @@ public class Point extends Shape
 				y = Utility.intersectY(l, c, identifier);
 
 			}
+			else if(dependencies.get(0) instanceof Circle && dependencies.get(1) instanceof Circle)
+			{
+				Circle c1 = (Circle) dependencies.get(0);
+				Circle c2 = (Circle) dependencies.get(1);
+				x = Utility.intersectX(c1, c2, identifier);
+				y = Utility.intersectY(c1, c2, identifier);
+			}
 		}
 		else if(type == POINT_TYPE.MIDPOINT)
 		{
@@ -359,10 +388,12 @@ public class Point extends Shape
 		dot.setCenterY(y);
 		dot.setRadius(StrokeWidth);
 		dot.setStrokeWidth(StrokeWidth);
+		dot.setStroke(color);
+		dot.setFill(color);
 		label.refresh();
-		for(Shape s : children)
+		for(int i = 0; i < children.size(); i++)
 		{
-			s.refresh();
+			children.get(i).refresh();
 		}
 	}
 
@@ -408,11 +439,12 @@ public class Point extends Shape
 	{
 		if(!inAsyCode) return "";
 		String n = getName();
+		String hex = "c"+Utility.hex(color);
 		double dir = (getLabel().getDirection()*180/Math.PI+360)%360;
 		if(type == POINT_TYPE.POINT)
 		{
 			String s = "pair " + n + " = (" + FORMATTER.format(x/100) + ", " + FORMATTER.format((INF-y)/100) + "); ";
-			if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
+			if(!hide) s += "dot(" + n + ", " + hex + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
 			else s+="\n";
 			return s;
 		}
@@ -423,18 +455,29 @@ public class Point extends Shape
 				String l1 = dependencies.get(0).getName();
 				String l2 = dependencies.get(1).getName();
 				String s = "pair " + n + " = intersectionpoint(" + l1 + ", " + l2 + "); ";
-				if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
+				if(!hide) s += "dot(" + n + ", " + hex + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
 				else s+="\n";
 				return s;
 			}
-			else if(dependencies.get(1) instanceof Circle)
+			else if(dependencies.get(0) instanceof Line && dependencies.get(1) instanceof Circle)
 			{
 				String l = dependencies.get(0).getName();
 				String c = dependencies.get(1).getName();
 				int a = 1;
 				if(identifier) a = 0;
 				String s = "pair " + n + " = intersectionpoints(" + l + ", " + c + ")[" + a + "]; ";
-				if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
+				if(!hide) s += "dot(" + n + ", " + hex + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
+				else s+="\n";
+				return s;
+			}
+			else if(dependencies.get(0) instanceof Circle)
+			{
+				String c1 = dependencies.get(0).getName();
+				String c2 = dependencies.get(1).getName();
+				int a = 1;
+				if(identifier) a = 0;
+				String s = "pair " + n + " = intersectionpoints(" + c1 + ", " + c2 + ")[" + a + "]; ";
+				if(!hide) s += "dot(" + n + ", " + hex + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
 				else s+="\n";
 				return s;
 			}
@@ -445,7 +488,7 @@ public class Point extends Shape
 			{
 				String l = dependencies.get(0).getName();
 				String s = "pair " + n + " = relpoint(" + l + ", " + relativeLocation + "); ";
-				if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
+				if(!hide) s += "dot(" + n + ", " + hex + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
 				else s+="\n";
 				return s;
 			}
@@ -453,7 +496,7 @@ public class Point extends Shape
 			{
 				String c = dependencies.get(0).getName();
 				String s = "pair " + n + " = relpoint(" + c + ", " + -relativeLocation/(2*Math.PI) + "); ";
-				if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
+				if(!hide) s += "dot(" + n + ", " + hex + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
 				else s+="\n";
 				return s;
 			}
@@ -463,7 +506,7 @@ public class Point extends Shape
 			String p1 = dependencies.get(0).getName();
 			String p2 = dependencies.get(1).getName();
 			String s = "pair " + n + " = (" + p1 + " + " + p2 + ")/2; ";
-			if(!hide) s += "dot(" + n + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
+			if(!hide) s += "dot(" + n + ", " + hex + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
 			else s+="\n";
 			return s;
 		}

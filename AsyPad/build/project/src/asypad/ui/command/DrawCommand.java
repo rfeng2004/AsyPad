@@ -3,6 +3,7 @@ package asypad.ui.command;
 import asypad.shapes.*;
 import asypad.shapes.types.POINT_TYPE;
 import asypad.ui.AsyPadPane;
+import javafx.scene.paint.Color;
 
 /**
  * This class represents a command where the user draws a shape onto the screen.
@@ -51,6 +52,7 @@ public class DrawCommand extends Command
 		{
 			shape.setRemove(false);
 			shape.setHidden(false);
+			shape.setColor(Color.BLACK);
 			target.addShape(shape);
 		}
 		else
@@ -66,6 +68,7 @@ public class DrawCommand extends Command
 			p.setName(defaultName);
 			p.setRemove(false);
 			p.setHidden(false);
+			p.setColor(Color.BLACK);
 			p.getLabel().setDirection(-Math.PI/4);
 			target.addShape(p);
 		}

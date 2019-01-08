@@ -960,6 +960,11 @@ public class AsyPadPane extends Pane
 	 */
 	public void undo()
 	{
+		resetSelectedShapes();
+		selectedShapes.clear();
+		getChildren().remove(currentLine);
+		getChildren().remove(currentCircle);
+		
 		if(currentCommandIndex > -1) currentCommandIndex--;
 		clear();
 		for(int i = 0; i <= currentCommandIndex; i++)
@@ -974,6 +979,11 @@ public class AsyPadPane extends Pane
 	 */
 	public void redo()
 	{
+		resetSelectedShapes();
+		selectedShapes.clear();
+		getChildren().remove(currentLine);
+		getChildren().remove(currentCircle);
+		
 		if(currentCommandIndex < commands.size()-1)
 		{
 			currentCommandIndex++;

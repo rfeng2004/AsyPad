@@ -3,6 +3,7 @@ package asypad.ui.command;
 import asypad.shapes.Point;
 import asypad.shapes.Shape;
 import asypad.ui.AsyPadPane;
+import javafx.scene.paint.Color;
 
 /**
  * This class stores a user command.
@@ -19,7 +20,22 @@ public abstract class Command
 	public static void loadCommand(String command, AsyPadPane target)
 	{
 		Command load = null;
-		if(command.substring(0, 4).equals("draw"))
+		if(command.substring(0, 5).equals("color"))
+		{
+			int comma = 0;
+			for(int i = 5; i < command.length(); i++)
+			{
+				if(command.charAt(i) == ',')
+				{
+					comma = i;
+				}
+			}
+			String name = command.substring(6, comma);
+			String color = command.substring(comma+2, command.length()-1);
+			Color c = Color.web(color);
+			load = new ColorCommand(target.findShapeByName(name), c);
+		}
+		else if(command.substring(0, 4).equals("draw"))
 		{
 			String args = command.substring(5, command.length()-1);
 			Shape s = Shape.buildShape(args, target);

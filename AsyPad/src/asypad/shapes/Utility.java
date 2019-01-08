@@ -4,7 +4,7 @@ import javafx.scene.paint.Color;
 
 /**
  * Utility that contains useful functions.
- * @author Raymond Feng
+ * @author Raymond Feng, Anthony Wang
  */
 
 public class Utility

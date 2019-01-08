@@ -29,6 +29,12 @@ public class Circle extends Shape
 	 * Radius of the circle.
 	 */
 	private double radius;
+	
+	/**
+	 * Identifier to distinguish between the 2 possible circles tangent to 2 circles and tangent to the first at a point, 
+	 * only used for {@code LINE_TYPE.TANGENT_CIRCLE} that depend on 2 circles and a point.
+	 */
+	private boolean identifier;
 
 	/**
 	 * Constructs new Circle with center and a point on the circle.
@@ -45,28 +51,66 @@ public class Circle extends Shape
 		circle = new javafx.scene.shape.Circle(x, y, radius);
 		circle.setFill(Color.TRANSPARENT);
 		circle.setStrokeWidth(StrokeWidth);
-		circle.setStroke(Color.BLACK);
+		circle.setStroke(color);
 		label.setText("circ" + center.getName() + SEPARATOR + on.getName());
 	}
 
 	/**
-	 * Constructs the circumcircle of 3 points.
+	 * Constructs a circle based on 3 points.
 	 * @param p1 first point
 	 * @param p2 second point
 	 * @param p3 third point
+	 * @param isCircumcircle if the circle is a circumcircle
 	 */
-	public Circle(Point p1, Point p2, Point p3)
+	public Circle(Point p1, Point p2, Point p3, boolean isCircumcircle)
 	{
 		super(p1, p2, p3);
-		x = Utility.circumcenterX(p1, p2, p3);
-		y = Utility.circumcenterY(p1, p2, p3);
-		radius = Utility.dist(x, y, p1.getX(), p1.getY());
-		type = CIRCLE_TYPE.CIRCUMCIRCLE;
+		if(isCircumcircle)
+		{
+			x = Utility.circumcenterX(p1, p2, p3);
+			y = Utility.circumcenterY(p1, p2, p3);
+			radius = Utility.dist(x, y, p1.getX(), p1.getY());
+			type = CIRCLE_TYPE.CIRCUMCIRCLE;
+			circle = new javafx.scene.shape.Circle(x, y, radius);
+			circle.setFill(Color.TRANSPARENT);
+			circle.setStrokeWidth(StrokeWidth);
+			circle.setStroke(color);
+			label.setText("cc" + p1.getName() + SEPARATOR + p2.getName() + SEPARATOR + p3.getName());
+		}
+		else
+		{
+			x = Utility.incenterX(p1, p2, p3);
+			y = Utility.incenterY(p1, p2, p3);
+			radius = Utility.distToL(p1.getX(), p1.getY(), p2.getX(), p2.getY(), x, y);
+			type = CIRCLE_TYPE.INCIRCLE;
+			circle = new javafx.scene.shape.Circle(x, y, radius);
+			circle.setFill(Color.TRANSPARENT);
+			circle.setStrokeWidth(StrokeWidth);
+			circle.setStroke(color);
+			label.setText("ic" + p1.getName() + SEPARATOR + p2.getName() + SEPARATOR + p3.getName());
+		}
+	}
+	
+	/**
+	 * Constructs a circle tangent to two circles, tangent to the first circle at a given point. 
+	 * identifier = true means it is internally tangent to one of the circles and externally tangent to another.
+	 * @param c1 first circle
+	 * @param c2 second circle
+	 * @param p point
+	 * @param identifier if it is internally tangent to one and externally tangent to the other
+	 */
+	public Circle(Circle c1, Circle c2, Point p, boolean identifier)
+	{
+		super(c1, c2, p);
+		x = Utility.tangentCircleX(c1, c2, p, identifier);
+		y = Utility.tangentCircleY(c1, c2, p, identifier);
+		radius = Utility.dist(x, y, p.getX(), p.getY());
+		type = CIRCLE_TYPE.TANGENT_CIRCLE;
 		circle = new javafx.scene.shape.Circle(x, y, radius);
 		circle.setFill(Color.TRANSPARENT);
 		circle.setStrokeWidth(StrokeWidth);
-		circle.setStroke(Color.BLACK);
-		label.setText("cc" + p1.getName() + SEPARATOR + p2.getName() + SEPARATOR + p3.getName());
+		circle.setStroke(color);
+		label.setText("tc" + c1.getName() + SEPARATOR + c2.getName() + SEPARATOR + p.getName());
 	}
 
 	/**
@@ -101,7 +145,7 @@ public class Circle extends Shape
 		p.getChildren().add(circle);
 	}
 
-	public void refresh() 
+	public void refresh()
 	{
 		if(type == CIRCLE_TYPE.CIRCLE)
 		{
@@ -120,13 +164,33 @@ public class Circle extends Shape
 			y = Utility.circumcenterY(p1, p2, p3);
 			radius = Utility.dist(x, y, p1.getX(), p1.getY());
 		}
+		else if(type == CIRCLE_TYPE.INCIRCLE)
+		{
+			Point p1 = (Point) dependencies.get(0);
+			Point p2 = (Point) dependencies.get(1);
+			Point p3 = (Point) dependencies.get(2);
+			x = Utility.incenterX(p1, p2, p3);
+			y = Utility.incenterY(p1, p2, p3);
+			radius = Utility.distToL(p1.getX(), p1.getY(), p2.getX(), p2.getY(), x, y);
+		}
+		else if(type == CIRCLE_TYPE.TANGENT_CIRCLE)
+		{
+			Circle c1 = (Circle) dependencies.get(0);
+			Circle c2 = (Circle) dependencies.get(1);
+			Point p = (Point) dependencies.get(2);
+
+			x = Utility.tangentCircleX(c1, c2, p, identifier);
+			y = Utility.tangentCircleY(c1, c2, p, identifier);
+			radius = Utility.dist(x, y, p.getX(), p.getY());
+		}
 		circle.setCenterX(x);
 		circle.setCenterY(y);
 		circle.setRadius(radius);
 		circle.setStrokeWidth(StrokeWidth);
-		for(Shape s : children)
+		circle.setStroke(color);
+		for(int i = 0; i < children.size(); i++)
 		{
-			s.refresh();
+			children.get(i).refresh();
 		}
 	}
 
@@ -141,6 +205,14 @@ public class Circle extends Shape
 		else if(type == CIRCLE_TYPE.CIRCUMCIRCLE)
 		{
 			label.setText("cc"+d1+SEPARATOR+d2+SEPARATOR+dependencies.get(2).getName());
+		}
+		else if(type == CIRCLE_TYPE.INCIRCLE)
+		{
+			label.setText("ic"+d1+SEPARATOR+d2+SEPARATOR+dependencies.get(2).getName());
+		}
+		else if(type == CIRCLE_TYPE.TANGENT_CIRCLE)
+		{
+			label.setText("tc"+d1+SEPARATOR+d2+SEPARATOR+dependencies.get(2).getName());
 		}
 		for(Shape s : children) s.refreshName();
 	}
@@ -158,10 +230,16 @@ public class Circle extends Shape
 			s = "CIRCLE: type = " + type + " dependencies: " + dependencies.get(0).getName()
 					+ ", " + dependencies.get(1).getName();
 		}
-		else if(type == CIRCLE_TYPE.CIRCUMCIRCLE)
+		else if(type == CIRCLE_TYPE.CIRCUMCIRCLE || type == CIRCLE_TYPE.INCIRCLE)
 		{
 			s = "CIRCLE: type = " + type + " dependencies: " + dependencies.get(0).getName()
 					+ ", " + dependencies.get(1).getName() + ", " + dependencies.get(2).getName();
+		}
+		else if(type == CIRCLE_TYPE.TANGENT_CIRCLE)
+		{
+			s = "CIRCLE: type = " + type + " dependencies: " + dependencies.get(0).getName()
+					+ ", " + dependencies.get(1).getName() + ", " + dependencies.get(2).getName()
+					+ " identifier = " + identifier;
 		}
 		return s;
 	}
@@ -170,12 +248,13 @@ public class Circle extends Shape
 	{
 		if(!inAsyCode) return "";
 		String n = getName();
+		String hex = "c"+Utility.hex(color);
 		if(type == CIRCLE_TYPE.CIRCLE)
 		{
 			String p1 = dependencies.get(0).getName();
 			String p2 = dependencies.get(1).getName();
-			String s = "path " + n + " = Circle(" + p1 + ", abs(" + p1 + "-" + p2 + ")); ";
-			if(!hide) s+="draw(" + n + ");\n";
+			String s = "path " + n + " = Circle(" + p1 + ", abs(" + p1 + "-" + p2 + "));\npair " + n + "center = " + p1 + "; real " + n + "rad = abs(" + p1 + " - " + p2 + "); ";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
 			else s+="\n";
 			return s;
 		}
@@ -184,11 +263,40 @@ public class Circle extends Shape
 			String p1 = dependencies.get(0).getName();
 			String p2 = dependencies.get(1).getName();
 			String p3 = dependencies.get(2).getName();
-			String s = "path " + n + " = circumcircle(" + p1 + ", " + p2 + ", " + p3 + "); ";
-			if(!hide) s+="draw(" + n + ");\n";
+			String s = "path " + n + " = circumcircle(" + p1 + ", " + p2 + ", " + p3 + ");\npair " + n + "center = circumcenter(" + p1 + ", " + p2 + ", " + p3 + "); real " + n + "rad = circumradius(" + p1 + ", " + p2 + ", " + p3 + "); ";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
 			else s+="\n";
 			return s;
 		}
+		else if(type == CIRCLE_TYPE.INCIRCLE)
+		{
+			String p1 = dependencies.get(0).getName();
+			String p2 = dependencies.get(1).getName();
+			String p3 = dependencies.get(2).getName();
+			String s = "path " + n + " = incircle(" + p1 + ", " + p2 + ", " + p3 + ");\npair " + n + "center = incenter(" + p1 + ", " + p2 + ", " + p3 + "); real " + n + "rad = inradius(" + p1 + ", " + p2 + ", " + p3 + "); ";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
+			else s+="\n";
+			return s;
+		}
+		else if(type == CIRCLE_TYPE.TANGENT_CIRCLE)
+		{
+			String c1 = dependencies.get(0).getName();
+			String c2 = dependencies.get(1).getName();
+			String p = dependencies.get(2).getName();
+			
+			int id = (identifier ? -1 : 1);
+			
+			String ce1 = c1 + "center", ce2 = c2 + "center";
+			String r1 = c1 + "rad", r2 = c2 + "rad";
+			
+			String s = "pair " + p + "_" + c1 + "_" + c2 + "_auxPt" + (id+1) + " = " + p + " + " + id + " * " + r2 + " / " + r1 + " * (" + ce1 + " - " + p +"); pair " + p + "_" + c1 + "_" + c2 + "_mid = ((" +ce2 + " + " + p + "_" + c1 + "_" + c2 + "_auxPt" + (id+1) + ")/2);\n";
+			s += "pair " + p + "_" + c1 + "_" + c2 + "_tccenter = extension(unit(rotate(90," + p + "_" + c1 + "_" + c2 + "_mid)*" + ce2 + "-" + p + "_" + c1 + "_" + c2 + "_mid)" + " + " + p + "_" + c1 + "_" + c2 + "_mid" + ", unit(rotate(270," + p + "_" + c1 + "_" + c2 + "_mid)*" + ce2 + "-" + p + "_" + c1 + "_" + c2 + "_mid)" + " + " + p + "_" + c1 + "_" + c2 + "_mid" + ", " + ce1 + ", " + p + ");\n";
+			s += "path " + n + " = circle(" + p + "_" + c1 + "_" + c2 + "_tccenter, abs(" + p + "_" + c1 + "_" + c2 + "_tccenter - " + p + ")); ";
+			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
+			else s+="\n";
+			return s;
+		}
+
 		return null;
 	}
 

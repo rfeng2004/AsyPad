@@ -73,6 +73,7 @@ public class AsyPadToolBar extends MenuBar
 		Image perpendicular = new Image("resources/perpendicular.png");
 		Image angleBisectorImage = new Image("resources/anglebisector.png");
 		Image perpendicularBisectorImage = new Image("resources/perpendicularbisector.png");
+		Image tangentLineImage = new Image("resources/tangentline.png");
 		
 		Tool defaultSegment = new Tool(segment, "Segment", "Select 2 points to create a segment.", LINE_TYPE.SEGMENT, line, this, parent);
 		Tool defaultLine = new Tool(lineImage, "Line", "Select 2 points to create a line.", LINE_TYPE.LINE, line, this, parent);
@@ -80,8 +81,9 @@ public class AsyPadToolBar extends MenuBar
 		Tool perpendicularLine = new Tool(perpendicular, "Perpendicular Line", "Select a point and a line to create a perpendicular line.", LINE_TYPE.PERPENDICULAR_LINE, line, this, parent);
 		Tool angleBisector = new Tool(angleBisectorImage, "Angle Bisector", "Select 3 points to create an angle bisector. The second point will be the vertex of the angle.", LINE_TYPE.ANGLE_BISECTOR, line, this, parent);
 		Tool perpendicularBisector = new Tool(perpendicularBisectorImage, "Perpendicular Bisector", "Select 2 points to construct their perpendicular bisector", LINE_TYPE.PERPENDICULAR_BISECTOR, line, this, parent);
+		Tool tangentLine = new Tool(tangentLineImage, "Tangent Line", "Select a point and a circle to construct a tangent line through the point.", LINE_TYPE.TANGENT_LINE, line, this, parent);
 		
-		line.getItems().addAll(defaultSegment, defaultLine, parallelLine, perpendicularLine, angleBisector, perpendicularBisector);
+		line.getItems().addAll(defaultSegment, defaultLine, parallelLine, perpendicularLine, angleBisector, perpendicularBisector, tangentLine);
 		
 		Menu circle = new Menu();
 		Image c = new Image("resources/circle.png");
@@ -91,11 +93,15 @@ public class AsyPadToolBar extends MenuBar
 		circle.setGraphic(circleGraphic);
 		
 		Image cc = new Image("resources/circumcircle.png");
+		Image ic = new Image("resources/incircle.png");
+		Image tc = new Image("resources/tangentcircle.png");
 		
 		Tool defaultCircle = new Tool(c, "Circle", "Select the center, then a point on the circle.", CIRCLE_TYPE.CIRCLE, circle, this, parent);
 		Tool circumcircle = new Tool(cc, "Circumircle", "Select 3 points to create a circumcircle.", CIRCLE_TYPE.CIRCUMCIRCLE, circle, this, parent);
-		
-		circle.getItems().addAll(defaultCircle, circumcircle);
+		Tool incircle = new Tool(ic, "Incircle", "Select 3 points to create a incircle.", CIRCLE_TYPE.INCIRCLE, circle, this, parent);
+		Tool tangentcircle = new Tool(tc, "Tangent Circle", "Select 2 circles and a point on one of the circles to create a circle tangent to them at the point.", CIRCLE_TYPE.TANGENT_CIRCLE, circle, this, parent);
+
+		circle.getItems().addAll(defaultCircle, circumcircle, incircle, tangentcircle);
 		
 		getMenus().addAll(mouse, point, line, circle);
 		setPrefSize(5000, 40);
