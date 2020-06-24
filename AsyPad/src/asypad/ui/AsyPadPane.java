@@ -43,9 +43,9 @@ public class AsyPadPane extends Pane
 	private int snappedIndex;
 
 	/**
-	 * Whether the mouse has been dragged.
+	 * Whether the mouse has been dragging a shape.
 	 */
-	private boolean dragged;
+	private boolean shapeDragged;
 
 	/**
 	 * ArrayList of user selected shapes.
@@ -186,7 +186,11 @@ public class AsyPadPane extends Pane
 				}
 				if(snappedIndex == -1)
 				{
-					setCursor(Cursor.DEFAULT);
+					if(tools.getSelectedTool() == MOUSE.MOUSE)
+					{
+						setCursor(Cursor.OPEN_HAND);
+					}
+					else setCursor(Cursor.DEFAULT);
 				}
 
 				SHAPE_TYPE tool = tools.getSelectedTool();
@@ -311,6 +315,10 @@ public class AsyPadPane extends Pane
 				SHAPE_TYPE tool = tools.getSelectedTool();
 				if(tool == MOUSE.MOUSE || tool instanceof POINT_TYPE)
 				{
+					if(snappedIndex == -1 && tool == MOUSE.MOUSE)
+					{
+						setCursor(Cursor.CLOSED_HAND);
+					}
 					if(snappedIndex != -1 && (event.getClickCount() == 2 || event.isSecondaryButtonDown()))
 					{
 						showConfigureShape(shapes.get(snappedIndex));
@@ -824,18 +832,19 @@ public class AsyPadPane extends Pane
 						Shape s = shapes.get(snappedIndex);
 						if(s.getType() == POINT_TYPE.POINT)
 						{
-							dragged = true;
+							shapeDragged = true;
 							((Point) s).setX(Math.max(0, event.getSceneX()));
 							((Point) s).setY(Math.max(0, event.getSceneY()));
 						}
 						else if(s.getType() == POINT_TYPE.POINT_ON_SHAPE)
 						{
-							dragged = true;
+							shapeDragged = true;
 							((Point) s).setRelativeLocation(event.getSceneX(), event.getSceneY());
 						}
 					}
 					else if(tool == MOUSE.MOUSE)
 					{
+						//setCursor(Cursor.CLOSED_HAND);
 						double dx = event.getSceneX()-pmouseX;
 						double dy = event.getSceneY()-pmouseY;
 						translate(dx, dy);
@@ -845,7 +854,7 @@ public class AsyPadPane extends Pane
 				{
 					if(snappedIndex != -1 && shapes.get(snappedIndex) instanceof Point)
 					{
-						dragged = true;
+						shapeDragged = true;
 						Point p = (Point) shapes.get(snappedIndex);
 						double cx = event.getSceneX();
 						double cy = event.getSceneY();
@@ -867,7 +876,7 @@ public class AsyPadPane extends Pane
 			public void handle(MouseEvent event)
 			{
 				SHAPE_TYPE tool = tools.getSelectedTool();
-				if(dragged)
+				if(shapeDragged)
 				{
 					if(tool == MOUSE.MOUSE)
 					{
@@ -900,7 +909,11 @@ public class AsyPadPane extends Pane
 						addCommand(new DragCommand(p, -direction));
 					}
 				}
-				dragged = false;
+				if(getCursor() == Cursor.CLOSED_HAND)
+				{
+					setCursor(Cursor.OPEN_HAND);
+				}
+				shapeDragged = false;
 			}
 		});
 	}
@@ -1235,6 +1248,7 @@ public class AsyPadPane extends Pane
 	public void updateTool(String tool)
 	{
 		currentTool.setText("Tool: " + tool);
+		currentTool.requestFocus(); //needed for key listener to be valid on the pane.
 		resetSelectedShapes();
 		selectedShapes.clear();
 		if(getChildren().contains(currentLine))
