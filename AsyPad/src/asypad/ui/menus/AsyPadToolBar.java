@@ -19,6 +19,7 @@ public class AsyPadToolBar extends MenuBar
 
 	/**
 	 * Creates a new AsyPad toolbar with specified parent.
+	 * @param parent the AsyPadPane that contains this AsyPadToolBar
 	 */
 	public AsyPadToolBar(AsyPadPane parent)
 	{
@@ -111,6 +112,7 @@ public class AsyPadToolBar extends MenuBar
 	
 	/**
 	 * Sets the selected tool.
+	 * @param tool the new selected tool
 	 */
 	public void setSelectedTool(SHAPE_TYPE tool)
 	{

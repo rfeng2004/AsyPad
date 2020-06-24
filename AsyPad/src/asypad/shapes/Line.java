@@ -164,6 +164,7 @@ public class Line extends Shape
 	 * Constructs the line tangent line to a circle that goes through a point
 	 * @param p point
 	 * @param c circle
+	 * @param identifier specifies which 1 of the 2 tangents is created
 	 */
 	public Line(Point p, Circle c, boolean identifier)
 	{

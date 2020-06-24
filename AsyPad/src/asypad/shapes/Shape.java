@@ -92,15 +92,7 @@ public abstract class Shape
 		{
 			if(args.substring(14, 19).equals("POINT") && args.charAt(19) != '_')
 			{
-				int xi = 0, yi = 0;
-				for(int i = 26; i < args.length(); i++)
-				{
-					if(args.charAt(i) == '=')
-					{
-						if(xi == 0) xi = i;
-						else yi = i;
-					}
-				}
+				int xi = args.indexOf('=', 26), yi = args.indexOf('=', xi+1);
 				String name = args.substring(26, xi-3);
 				String xs = args.substring(xi+2, yi-3);
 				String ys = args.substring(yi+2, args.length());
@@ -110,18 +102,7 @@ public abstract class Shape
 			}
 			else if(args.substring(14, 28).equals("POINT_ON_SHAPE"))
 			{
-				int d = 0, rl = 0;
-				for(int i = 35; i < args.length(); i++)
-				{
-					if(args.charAt(i) == ':')
-					{
-						d = i;
-					}
-					if(args.charAt(i) == '=')
-					{
-						rl = i;
-					}
-				}
+				int d = args.lastIndexOf(':'), rl = args.lastIndexOf('=');
 				String name = args.substring(35, d-11);
 				String dependencyName = args.substring(d+2, rl-18);
 				String rls = args.substring(rl+2, args.length());
@@ -130,26 +111,11 @@ public abstract class Shape
 			}
 			else if(args.substring(14, 32).equals("INTERSECTION_POINT"))
 			{
-				int d1 = 0, d2 = 0, id = 0;
-				for(int i = 39; i < args.length(); i++)
-				{
-					if(args.charAt(i) == ':')
-					{
-						d1 = i;
-					}
-					if(args.charAt(i) == ',')
-					{
-						d2 = i;
-					}
-					if(args.charAt(i) == '=')
-					{
-						id = i;
-					}
-				}
+				int d1 = args.lastIndexOf(':'), d2 = args.lastIndexOf(','), id = args.indexOf('=', d2+1);
 				String name = args.substring(39, d1-13);
 				String d1Name = args.substring(d1+2, d2);
 				String d2Name;
-				if(id != 0)
+				if(id != -1)
 				{
 					d2Name = args.substring(d2+2, id-12);
 				}
@@ -173,18 +139,7 @@ public abstract class Shape
 			}
 			else if(args.substring(14, 22).equals("MIDPOINT"))
 			{
-				int d1 = 0, d2 = 0;
-				for(int i = 39; i < args.length(); i++)
-				{
-					if(args.charAt(i) == ':')
-					{
-						d1 = i;
-					}
-					if(args.charAt(i) == ',')
-					{
-						d2 = i;
-					}
-				}
+				int d1 = args.lastIndexOf(':'), d2 = args.lastIndexOf(',');
 				String name = args.substring(29, d1-13);
 				String d1Name = args.substring(d1+2, d2);
 				String d2Name = args.substring(d2+2, args.length());
@@ -197,18 +152,7 @@ public abstract class Shape
 		{
 			if(args.substring(13, 20).equals("SEGMENT"))
 			{
-				int d1 = 0, d2 = 0;
-				for(int i = 20; i < args.length(); i++)
-				{
-					if(args.charAt(i) == ':')
-					{
-						d1 = i;
-					}
-					if(args.charAt(i) == ',')
-					{
-						d2 = i;
-					}
-				}
+				int d1 = args.lastIndexOf(':'), d2 = args.lastIndexOf(',');
 				String d1Name = args.substring(d1+2, d2);
 				String d2Name = args.substring(d2+2, args.length());
 				Point dependency1 = (Point) target.findShapeByName(d1Name);
@@ -217,18 +161,7 @@ public abstract class Shape
 			}
 			else if(args.substring(13, 17).equals("LINE"))
 			{
-				int d1 = 0, d2 = 0;
-				for(int i = 17; i < args.length(); i++)
-				{
-					if(args.charAt(i) == ':')
-					{
-						d1 = i;
-					}
-					if(args.charAt(i) == ',')
-					{
-						d2 = i;
-					}
-				}
+				int d1 = args.lastIndexOf(':'), d2 = args.lastIndexOf(',');
 				String d1Name = args.substring(d1+2, d2);
 				String d2Name = args.substring(d2+2, args.length());
 				Point dependency1 = (Point) target.findShapeByName(d1Name);
@@ -237,18 +170,7 @@ public abstract class Shape
 			}
 			else if(args.substring(13, 26).equals("PARALLEL_LINE"))
 			{
-				int d1 = 0, d2 = 0;
-				for(int i = 26; i < args.length(); i++)
-				{
-					if(args.charAt(i) == ':')
-					{
-						d1 = i;
-					}
-					if(args.charAt(i) == ',')
-					{
-						d2 = i;
-					}
-				}
+				int d1 = args.lastIndexOf(':'), d2 = args.lastIndexOf(',');
 				String d1Name = args.substring(d1+2, d2);
 				String d2Name = args.substring(d2+2, args.length());
 				Point dependency1 = (Point) target.findShapeByName(d1Name);
@@ -257,18 +179,7 @@ public abstract class Shape
 			}
 			else if(args.substring(13, 31).equals("PERPENDICULAR_LINE"))
 			{
-				int d1 = 0, d2 = 0;
-				for(int i = 31; i < args.length(); i++)
-				{
-					if(args.charAt(i) == ':')
-					{
-						d1 = i;
-					}
-					if(args.charAt(i) == ',')
-					{
-						d2 = i;
-					}
-				}
+				int d1 = args.lastIndexOf(':'), d2 = args.lastIndexOf(',');
 				String d1Name = args.substring(d1+2, d2);
 				String d2Name = args.substring(d2+2, args.length());
 				Point dependency1 = (Point) target.findShapeByName(d1Name);
@@ -277,19 +188,7 @@ public abstract class Shape
 			}
 			else if(args.substring(13, 27).equals("ANGLE_BISECTOR"))
 			{
-				int d1 = 0, d2 = 0, d3 = 0;
-				for(int i = 20; i < args.length(); i++)
-				{
-					if(args.charAt(i) == ':')
-					{
-						d1 = i;
-					}
-					if(args.charAt(i) == ',')
-					{
-						if(d2 == 0) d2 = i;
-						else d3 = i;
-					}
-				}
+				int d1 = args.lastIndexOf(':'), d2 = args.indexOf(',', d1+1), d3 = args.indexOf(',', d2+1);
 				String d1Name = args.substring(d1+2, d2);
 				String d2Name = args.substring(d2+2, d3);
 				String d3Name = args.substring(d3+2, args.length());
@@ -300,18 +199,7 @@ public abstract class Shape
 			}
 			else if(args.substring(13, 35).equals("PERPENDICULAR_BISECTOR"))
 			{
-				int d1 = 0, d2 = 0;
-				for(int i = 35; i < args.length(); i++)
-				{
-					if(args.charAt(i) == ':')
-					{
-						d1 = i;
-					}
-					if(args.charAt(i) == ',')
-					{
-						d2 = i;
-					}
-				}
+				int d1 = args.lastIndexOf(':'), d2 = args.lastIndexOf(',');
 				String d1Name = args.substring(d1+2, d2);
 				String d2Name = args.substring(d2+2, args.length());
 				Point dependency1 = (Point) target.findShapeByName(d1Name);
@@ -320,22 +208,7 @@ public abstract class Shape
 			}
 			else if(args.substring(13, 25).equals("TANGENT_LINE"))
 			{
-				int d1 = 0, d2 = 0, id = 0;
-				for(int i = 25; i < args.length(); i++)
-				{
-					if(args.charAt(i) == ':')
-					{
-						d1 = i;
-					}
-					if(args.charAt(i) == ',')
-					{
-						d2 = i;
-					}
-					if(args.charAt(i) == '=')
-					{
-						id = i;
-					}
-				}
+				int d1 = args.lastIndexOf(':'), d2 = args.lastIndexOf(','), id = args.lastIndexOf('=');
 				String d1Name = args.substring(d1+2, d2);
 				String d2Name = args.substring(d2+2, id-12);
 				boolean identifier = Boolean.parseBoolean(args.substring(id+2, args.length()));
@@ -348,18 +221,7 @@ public abstract class Shape
 		{
 			if(args.substring(15, 21).equals("CIRCLE"))
 			{
-				int d1 = 0, d2 = 0;
-				for(int i = 21; i < args.length(); i++)
-				{
-					if(args.charAt(i) == ':')
-					{
-						d1 = i;
-					}
-					if(args.charAt(i) == ',')
-					{
-						d2 = i;
-					}
-				}
+				int d1 = args.lastIndexOf(':'), d2 = args.lastIndexOf(',');
 				String d1Name = args.substring(d1+2, d2);
 				String d2Name = args.substring(d2+2, args.length());
 				Point dependency1 = (Point) target.findShapeByName(d1Name);
@@ -368,19 +230,7 @@ public abstract class Shape
 			}
 			else if(args.substring(15, 27).equals("CIRCUMCIRCLE"))
 			{
-				int d1 = 0, d2 = 0, d3 = 0;
-				for(int i = 27; i < args.length(); i++)
-				{
-					if(args.charAt(i) == ':')
-					{
-						d1 = i;
-					}
-					if(args.charAt(i) == ',')
-					{
-						if(d2 == 0) d2 = i;
-						else d3 = i;
-					}
-				}
+				int d1 = args.lastIndexOf(':'), d2 = args.indexOf(',', d1+1), d3 = args.indexOf(',', d2+1);
 				String d1Name = args.substring(d1+2, d2);
 				String d2Name = args.substring(d2+2, d3);
 				String d3Name = args.substring(d3+2, args.length());
@@ -391,19 +241,7 @@ public abstract class Shape
 			}
 			else if(args.substring(15, 23).equals("INCIRCLE"))
 			{
-				int d1 = 0, d2 = 0, d3 = 0;
-				for(int i = 23; i < args.length(); i++)
-				{
-					if(args.charAt(i) == ':')
-					{
-						d1 = i;
-					}
-					if(args.charAt(i) == ',')
-					{
-						if(d2 == 0) d2 = i;
-						else d3 = i;
-					}
-				}
+				int d1 = args.lastIndexOf(':'), d2 = args.indexOf(',', d1+1), d3 = args.indexOf(',', d2+1);
 				String d1Name = args.substring(d1+2, d2);
 				String d2Name = args.substring(d2+2, d3);
 				String d3Name = args.substring(d3+2, args.length());
@@ -414,23 +252,7 @@ public abstract class Shape
 			}
 			else if(args.substring(15, 29).equals("TANGENT_CIRCLE"))
 			{
-				int d1 = 0, d2 = 0, d3 = 0, id = 0;
-				for(int i = 29; i < args.length(); i++)
-				{
-					if(args.charAt(i) == ':')
-					{
-						d1 = i;
-					}
-					if(args.charAt(i) == ',')
-					{
-						if(d2 == 0) d2 = i;
-						else d3 = i;
-					}
-					if(args.charAt(i) == '=')
-					{
-						id = i;
-					}
-				}
+				int d1 = args.lastIndexOf(':'), d2 = args.indexOf(',', d1+1), d3 = args.indexOf(',', d2+1), id = args.lastIndexOf('=');
 				String d1Name = args.substring(d1 + 2, d2);
 				String d2Name = args.substring(d2 + 2, d3);
 				String d3Name = args.substring(d3 + 2, id - 12);

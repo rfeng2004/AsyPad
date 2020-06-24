@@ -22,14 +22,7 @@ public abstract class Command
 		Command load = null;
 		if(command.substring(0, 5).equals("color"))
 		{
-			int comma = 0;
-			for(int i = 5; i < command.length(); i++)
-			{
-				if(command.charAt(i) == ',')
-				{
-					comma = i;
-				}
-			}
+			int comma = command.indexOf(',');
 			String name = command.substring(6, comma);
 			String color = command.substring(comma+2, command.length()-1);
 			Color c = Color.web(color);
@@ -56,15 +49,7 @@ public abstract class Command
 		}
 		else if(command.substring(0, 4).equals("drag"))
 		{
-			int comma = 0;
-			for(int i = 5; i < command.length(); i++)
-			{
-				if(command.charAt(i) == ',')
-				{
-					comma = i;
-					break;
-				}
-			}
+			int comma = command.indexOf(',');
 			String name = command.substring(5, comma);
 			double dir = Double.parseDouble(command.substring(comma+2, command.length()-1));
 			load = new DragCommand((Point) target.findShapeByName(name), dir);
@@ -83,19 +68,7 @@ public abstract class Command
 		}
 		else if(command.substring(0, 4).equals("move"))
 		{
-			int comma1 = 0, comma2 = 0;
-			for(int i = 5; i < command.length(); i++)
-			{
-				if(command.charAt(i) == ',')
-				{
-					if(comma1 == 0) comma1 = i;
-					else
-					{
-						comma2 = i;
-						break;
-					}
-				}
-			}
+			int comma1 = command.indexOf(','), comma2 = command.indexOf(',', comma1+1);
 			String name = command.substring(5, comma1);
 			String movex = command.substring(comma1+2, comma2);
 			String movey = command.substring(comma2+2, command.length()-1);
@@ -105,15 +78,7 @@ public abstract class Command
 		}
 		else if(command.substring(0, 6).equals("rename"))
 		{
-			int comma = 0;
-			for(int i = 7; i < command.length(); i++)
-			{
-				if(command.charAt(i) == ',')
-				{
-					comma = i;
-					break;
-				}
-			}
+			int comma = command.indexOf(',');
 			String name = command.substring(7, comma);
 			String newName = command.substring(comma+2, command.length()-1);
 			load = new RenameCommand((Point) target.findShapeByName(name), newName);

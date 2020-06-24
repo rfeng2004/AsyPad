@@ -15,6 +15,14 @@ public class Utility
 	private static double EPSILON = 0.001;
 	
 	/**
+	 * This prevents any Utility objects from being created.
+	 */
+	private Utility()
+	{
+		
+	}
+	
+	/**
 	 * Calculates the distance between 2 points.
 	 * @param x1 x-coordinate of first point
 	 * @param y1 y-coordinate of first point
@@ -771,7 +779,7 @@ public class Utility
 	}
 	
 	/**
-	 * This is the equivalent of the sgn* function. Returns -1 if d < 0, 1 otherwise. (In particular, signumstar(0)=1)
+	 * This is the equivalent of the sgn* function. Returns -1 if d &lt; 0, 1 otherwise. (In particular, signumstar(0)=1)
 	 * @param d double to take sgn* of
 	 * @return sgn*(d)
 	 */
@@ -785,7 +793,7 @@ public class Utility
 	 * Whether the two doubles are equal (since rounding errors exist)
 	 * @param d1 first double
 	 * @param d2 second double
-	 * @return whether |d1-d2| < 0.0001 = epsilon
+	 * @return whether |d1-d2| &lt; 0.0001 = epsilon
 	 */
 	public static boolean equal(double d1, double d2)
 	{

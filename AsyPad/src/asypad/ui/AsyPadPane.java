@@ -96,6 +96,11 @@ public class AsyPadPane extends Pane
 	 * Color of selected shapes.
 	 */
 	private Color selected;
+	
+	/**
+	 * ColorPicker option which saves custom colors during the session.
+	 */
+	private ColorPicker colorPicker;
 
 	/**
 	 * Creates an AsyPadPane layout.
@@ -113,6 +118,7 @@ public class AsyPadPane extends Pane
 		currentCircle.setFill(Color.TRANSPARENT);
 		currentCircle.setStroke(Color.BLACK);
 		selected = Color.RED;
+		colorPicker = new ColorPicker();
 
 		AsyPadMenuBar menus = new AsyPadMenuBar(this);
 		AsyPadToolBar tools = new AsyPadToolBar(this);
@@ -1073,7 +1079,6 @@ public class AsyPadPane extends Pane
 		Button delete = new Button("Delete Point");
 		Button hide = new Button("Hide Point");
 		Label chooseColor = new Label("Set Point Color: ");
-		ColorPicker colorPicker = new ColorPicker();
 		flowPane.getChildren().addAll(name, submit, cancel, delete, hide, chooseColor, colorPicker);
 		cancel.requestFocus();
 		submit.setOnAction(new EventHandler<ActionEvent>()
@@ -1154,7 +1159,6 @@ public class AsyPadPane extends Pane
 			Button delete = new Button("Delete Shape");
 			Button hide = new Button("Hide Shape");
 			Label chooseColor = new Label("Set Shape Color: ");
-			ColorPicker colorPicker = new ColorPicker();
 			flowPane.getChildren().addAll(cancel, delete, hide, chooseColor, colorPicker);
 			cancel.requestFocus();
 			cancel.setOnAction(new EventHandler<ActionEvent>()

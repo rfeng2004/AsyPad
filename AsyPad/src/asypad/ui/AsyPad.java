@@ -28,7 +28,7 @@ import java.io.File;
 /**
  * AsyPad: A simple drawing tool that can convert diagrams into Asymptote code.
  * @author Raymond Feng
- * @version 1.0
+ * @version 1.2
  */
 public class AsyPad extends Application
 {

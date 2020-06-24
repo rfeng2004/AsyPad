@@ -201,7 +201,7 @@ public class Point extends Shape
 	 * @param l line
 	 * @param c circle
 	 * @param identifier which intersection point this will be
-	 * @param name
+	 * @param name name of point
 	 */
 	public Point(Line l, Circle c, boolean identifier, String name)
 	{
@@ -221,10 +221,10 @@ public class Point extends Shape
 	/**
 	 * Constructs an intersection point between circles c1 and c2. Identifier = true represents
 	 * the intersection point that is more counterclockwise wrt the first circle.
-	 * @param l line
-	 * @param c circle
+	 * @param c1 first circle
+	 * @param c2 second circle
 	 * @param identifier which intersection point this will be
-	 * @param name
+	 * @param name name of point
 	 */
 	public Point(Circle c1, Circle c2, boolean identifier, String name)
 	{
@@ -440,11 +440,11 @@ public class Point extends Shape
 		if(!inAsyCode) return "";
 		String n = getName();
 		String asyVarN = n;
-		System.out.println(asyVarN);
+		//System.out.println(asyVarN);
 		if(asyVarN.length() == 2 && asyVarN.charAt(1) == '\'')
 		{
 			asyVarN = "" + asyVarN.charAt(0) + 'p';
-			System.out.println(asyVarN);
+			//System.out.println(asyVarN);
 		}
 		String hex = "c" + Utility.hex(color);
 		double dir = (getLabel().getDirection() * 180 / Math.PI + 360) % 360;
