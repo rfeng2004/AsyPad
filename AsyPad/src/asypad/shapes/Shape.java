@@ -250,7 +250,7 @@ public abstract class Shape
 				Point dependency3 = (Point) target.findShapeByName(d3Name);
 				s = new Circle(dependency1, dependency2, dependency3, false);
 			}
-			else if(args.substring(15, 29).equals("TANGENT_CIRCLE"))
+			/*else if(args.substring(15, 29).equals("TANGENT_CIRCLE"))
 			{
 				int d1 = args.lastIndexOf(':'), d2 = args.indexOf(',', d1+1), d3 = args.indexOf(',', d2+1), id = args.lastIndexOf('=');
 				String d1Name = args.substring(d1 + 2, d2);
@@ -261,7 +261,7 @@ public abstract class Shape
 				Circle dependency2 = (Circle) target.findShapeByName(d2Name);
 				Point dependency3 = (Point) target.findShapeByName(d3Name);
 				s = new Circle(dependency1, dependency2, dependency3, identifier);
-			}
+			}*/
 		}
 		return s;
 	}

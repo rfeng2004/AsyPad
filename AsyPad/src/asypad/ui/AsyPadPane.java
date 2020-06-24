@@ -729,7 +729,7 @@ public class AsyPadPane extends Pane
 						getChildren().remove(currentCircle);
 					}
 				}
-				else if(tool == CIRCLE_TYPE.TANGENT_CIRCLE)
+				/*else if(tool == CIRCLE_TYPE.TANGENT_CIRCLE)
 				{
 					if(snappedIndex != -1)
 					{
@@ -795,7 +795,7 @@ public class AsyPadPane extends Pane
 						selectedShapes.clear();
 						getChildren().remove(currentCircle);
 					}
-				}
+				}*/
 
 				setSelectedShapes();
 				clearGarbage();
@@ -1368,7 +1368,7 @@ public class AsyPadPane extends Pane
 		else if(pname.length() == 3) //subscript names
 		{
 			if(pname.charAt(1) != '_') return false;
-			if((pname.charAt(2) < '0' || pname.charAt(2) > '9') && (pname.charAt(2) < 'a' || pname.charAt(2) > 'z')) return false;
+			if((pname.charAt(2) < '0' || pname.charAt(2) > '9') && (pname.charAt(2) < 'a' || pname.charAt(2) > 'z') && (pname.charAt(2) < 'A' || pname.charAt(2) > 'Z')) return false;
 			else return true;
 		}
 		else return false;
