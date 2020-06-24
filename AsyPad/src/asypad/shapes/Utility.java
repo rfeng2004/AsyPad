@@ -632,7 +632,7 @@ public class Utility
 	/**
 	 * Finds the x-coordinate of the point such that the line formed by the point and the given point
 	 * is tangent to the circle. identifier is used to find which point (true = point more counterclockwise wrt the first circle).
-	 * If it is on the circle, finds the point 1 unit away and in the positive x direction from the given point.
+	 * If it is on the circle, finds the point 1 unit away and counterclockwise from the given point.
 	 * If it is inside the circle, returns Double.POSITIVE_INFINITY.
 	 * @param x x-coordinate
 	 * @param y y-coordinate
@@ -645,17 +645,9 @@ public class Utility
 		if(equal(dist(c.getCenterX(), c.getCenterY(), x, y), c.getRadius()))
 		{
 			// translate the circle to be centered at the origin
-			double translationX = x - c.getCenterX(), translationY = - y + c.getCenterY();
+			double translationX = x - c.getCenterX(), translationY = y - c.getCenterY();
 			
-			// if it is a vertical line
-			if(translationY == 0)
-			{
-				return x;
-			}
-			 
-			double m = -translationX / translationY;
-			
-			return x + 1 / (m * m + 1);
+			return x + translationY / Math.sqrt(translationX*translationX + translationY*translationY);
 		}
 		else if(dist(c.getCenterX(), c.getCenterY(), x, y) < c.getRadius())
 		{
@@ -670,8 +662,7 @@ public class Utility
 	/**
 	 * Finds the y-coordinate of the point such that the line formed by the point and the given point
 	 * is tangent to the circle. identifier is used to find which point (true = point more counterclockwise wrt the first circle).
-	 * If it is on the circle, finds the point 1 unit away and in the positive y direction from the given point.
-	 * If it is a vertical line, returns 1 unit down.
+	 * If it is on the circle, finds the point 1 unit away and counterclockwise from the given point.
 	 * If it is inside the circle, returns Double.POSITIVE_INFINITY.
 	 * @param x x-coordinate
 	 * @param y y-coordinate
@@ -684,17 +675,9 @@ public class Utility
 		if(equal(dist(c.getCenterX(), c.getCenterY(), x, y), c.getRadius()))
 		{
 			// translate the circle to be centered at the origin
-			double translationX = x - c.getCenterX(), translationY = - y + c.getCenterY();
+			double translationX = x - c.getCenterX(), translationY = y - c.getCenterY();
 			
-			// if it is a vertical line
-			if(translationY == 0)
-			{
-				return y - 1;
-			}
-			 
-			double m = -translationX / translationY;
-			
-			return y - m / (m * m + 1);
+			return y - translationX / Math.sqrt(translationX*translationX + translationY*translationY);
 		}
 		else if(dist(c.getCenterX(), c.getCenterY(), x, y) < c.getRadius())
 		{

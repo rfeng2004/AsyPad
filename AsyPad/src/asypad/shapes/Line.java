@@ -519,7 +519,18 @@ public class Line extends Shape
 			String rad = c + "rad";
 			
 			int id = (identifier ? 2 : 1);
-			String s = "pair " + p + "_" + c + "_tangent" + id + " = tangent(" + p + ", " + center + ", " + rad + ", " + id + ");\npath " + n + " = (" + p + "-" + INF/100 + "*unit(" + p + "_" + c + "_tangent" + id + "-" + p + "))--(" + p + "_" + c + "_tangent" + id + "+" + INF/100 + "*unit(" + p + "_" + c + "_tangent" + id + "-" + p + ")); ";
+			
+			String s = "";
+			
+			Point pDep = (Point) dependencies.get(0);
+			Circle cDep = (Circle) dependencies.get(1);
+			//check if point is on circle for asy conversion (need special case handling)
+			if(Utility.equal(Utility.dist(pDep, new Point(cDep.getCenterX(), cDep.getCenterY())), cDep.getRadius()))
+			{
+				s+="pair " + p + "_" + c + "_tangent" + id + " = (" + p + ".x+(" + p + ".y-" + center + ".y)/sqrt((" + p + ".x-" + center + ".x)^2+(" + p + ".y-" + center + ".y)^2), " + p + ".y-(" + p + ".x-" + center + ".x)/sqrt((" + p + ".x-" + center + ".x)^2+(" + p + ".y-" + center + ".y)^2));\n";
+			}
+			else s+="pair " + p + "_" + c + "_tangent" + id + " = tangent(" + p + ", " + center + ", " + rad + ", " + id + ");\n";
+			s+="path " + n + " = (" + p + "-" + INF/100 + "*unit(" + p + "_" + c + "_tangent" + id + "-" + p + "))--(" + p + "_" + c + "_tangent" + id + "+" + INF/100 + "*unit(" + p + "_" + c + "_tangent" + id + "-" + p + ")); ";
 			if(!hide) s+="draw(" + n + ", " + hex + ");\n";
 			else s+="\n";
 			return s;

@@ -642,53 +642,45 @@ public class AsyPadPane extends Pane
 					}
 					if(selectedShapes.size() == 2)
 					{
+						Point p;
+						Circle c;
 						if(selectedShapes.get(0) instanceof Point)
 						{
-							Point p = (Point) selectedShapes.get(0);
-							Circle c = (Circle) selectedShapes.get(1);
-							if(Utility.dist(p.getX(), p.getY(), c.getCenterX(), c.getCenterY()) > c.getRadius())
-							{
-								Point p1 = new Point(Utility.tangentX(p.getX(), p.getY(), c, false), Utility.tangentY(p.getX(), p.getY(), c, false));
-								Point p2 = new Point(Utility.tangentX(p.getX(), p.getY(), c, true), Utility.tangentY(p.getX(), p.getY(), c, true));
-								double mx = event.getSceneX();
-								double my = event.getSceneY();
-								if(Utility.dist(mx, my, p1.getX(), p1.getY()) < Utility.dist(mx, my, p2.getX(), p2.getY()))
-								{
-									Line l = new Line((Point) selectedShapes.get(0), (Circle) selectedShapes.get(1), false);
-									addShape(l);
-									addCommand(new DrawCommand(l));
-								}
-								else
-								{
-									Line l = new Line((Point) selectedShapes.get(0), (Circle) selectedShapes.get(1), true);
-									addShape(l);
-									addCommand(new DrawCommand(l));
-								}
-							}
-
+							p = (Point) selectedShapes.get(0);
+							c = (Circle) selectedShapes.get(1);
 						}
 						else
 						{
-							Point p = (Point) selectedShapes.get(1);
-							Circle c = (Circle) selectedShapes.get(0);
-							if(Utility.dist(p.getX(), p.getY(), c.getCenterX(), c.getCenterY()) > c.getRadius())
+							p = (Point) selectedShapes.get(1);
+							c = (Circle) selectedShapes.get(0);
+						}
+						double dist = Utility.dist(p.getX(), p.getY(), c.getCenterX(), c.getCenterY());
+						if(Utility.equal(dist, c.getRadius()))
+						{
+							Line l = new Line(p, c, false);
+							addShape(l);
+							addCommand(new DrawCommand(l));
+						}
+						else if(dist > c.getRadius())
+						{
+							Point p1 = new Point(Utility.tangentX(p.getX(), p.getY(), c, false), Utility.tangentY(p.getX(), p.getY(), c, false));
+							Point p2 = new Point(Utility.tangentX(p.getX(), p.getY(), c, true), Utility.tangentY(p.getX(), p.getY(), c, true));
+							double mx = event.getSceneX();
+							double my = event.getSceneY();
+							if(Utility.dist(mx, my, p1.getX(), p1.getY()) < Utility.dist(mx, my, p2.getX(), p2.getY()))
 							{
-								Point p1 = new Point(Utility.tangentX(p.getX(), p.getY(), c, false), Utility.tangentY(p.getX(), p.getY(), c, false));
-								Point p2 = new Point(Utility.tangentX(p.getX(), p.getY(), c, true), Utility.tangentY(p.getX(), p.getY(), c, true));
-								if(Utility.distToShape(event.getSceneX(), event.getSceneY(), p1) < Utility.distToShape(event.getSceneX(), event.getSceneY(), p2))
-								{
-									Line l = new Line((Point) selectedShapes.get(1), (Circle) selectedShapes.get(0), false);
-									addShape(l);
-									addCommand(new DrawCommand(l));
-								}
-								else
-								{
-									Line l = new Line((Point) selectedShapes.get(1), (Circle) selectedShapes.get(0), true);
-									addShape(l);
-									addCommand(new DrawCommand(l));
-								}
+								Line l = new Line(p, c, false);
+								addShape(l);
+								addCommand(new DrawCommand(l));
+							}
+							else
+							{
+								Line l = new Line(p, c, true);
+								addShape(l);
+								addCommand(new DrawCommand(l));
 							}
 						}
+
 						resetSelectedShapes();
 						selectedShapes.clear();
 					}
@@ -1551,7 +1543,8 @@ public class AsyPadPane extends Pane
 			{
 				Point p = (Point) s.getDependencies().get(0);
 				Circle c = (Circle) s.getDependencies().get(1);
-				if(Utility.dist(p.getX(), p.getY(), c.getCenterX(), c.getCenterY()) < c.getRadius())
+				double dist = Utility.dist(p.getX(), p.getY(), c.getCenterX(), c.getCenterY());
+				if(!Utility.equal(dist, c.getRadius()) && dist < c.getRadius())
 				{
 					//remove non-existent tangent lines
 					s.removeFromAsy();
