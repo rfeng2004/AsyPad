@@ -101,6 +101,11 @@ public class AsyPadPane extends Pane
 	 * ColorPicker option which saves custom colors during the session.
 	 */
 	private ColorPicker colorPicker;
+	
+	/**
+	 * Previous mouse location (tracked for dragging).
+	 */
+	private double pmouseX, pmouseY;
 
 	/**
 	 * Creates an AsyPadPane layout.
@@ -119,6 +124,8 @@ public class AsyPadPane extends Pane
 		currentCircle.setStroke(Color.BLACK);
 		selected = Color.RED;
 		colorPicker = new ColorPicker();
+		pmouseX = 0;
+		pmouseY = 0;
 
 		AsyPadMenuBar menus = new AsyPadMenuBar(this);
 		AsyPadToolBar tools = new AsyPadToolBar(this);
@@ -150,6 +157,7 @@ public class AsyPadPane extends Pane
 						getChildren().remove(currentCircle);
 					}
 				}
+				//add hotkeys?
 			}
 		});
 		this.setOnMouseMoved(new EventHandler<MouseEvent>()
@@ -797,6 +805,9 @@ public class AsyPadPane extends Pane
 					}
 				}*/
 
+				pmouseX = event.getSceneX();
+				pmouseY = event.getSceneY();
+
 				setSelectedShapes();
 				clearGarbage();
 			}
@@ -823,6 +834,12 @@ public class AsyPadPane extends Pane
 							((Point) s).setRelativeLocation(event.getSceneX(), event.getSceneY());
 						}
 					}
+					else if(tool == MOUSE.MOUSE)
+					{
+						double dx = event.getSceneX()-pmouseX;
+						double dy = event.getSceneY()-pmouseY;
+						translate(dx, dy);
+					}
 				}
 				else if(tool == MOUSE.DRAG)
 				{
@@ -840,6 +857,9 @@ public class AsyPadPane extends Pane
 						p.getLabel().setDirection(-direction);
 					}
 				}
+				
+				pmouseX = event.getSceneX();
+				pmouseY = event.getSceneY();
 			}
 		});
 		this.setOnMouseReleased(new EventHandler<MouseEvent>()
@@ -1387,7 +1407,27 @@ public class AsyPadPane extends Pane
 		}
 		return false;
 	}
-
+	
+	/**
+	 * Translates the entire figure by the given amount.
+	 * @param dx translation in x direction
+	 * @param dy translation in y direction
+	 */
+	private void translate(double dx, double dy)
+	{
+		for(Shape s : shapes)
+		{
+			//move all dependency level 0 shapes by dx and dy, all children will follow
+			if(s.getLevel() == 0)
+			{
+				Point p = (Point) s;
+				p.setX(p.getX()+dx);
+				p.setY(p.getY()+dy);
+			}
+		}
+		update();
+	}
+	
 	/**
 	 * Loads an AsyPad file into the AsyPad.
 	 * @param apad file to be loaded
