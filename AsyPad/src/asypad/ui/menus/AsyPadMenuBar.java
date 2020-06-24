@@ -9,7 +9,6 @@ import asypad.shapes.Shape;
 import asypad.ui.AsyPad;
 import asypad.ui.AsyPadPane;
 import asypad.ui.command.*;
-import javafx.animation.AnimationTimer;
 import javafx.event.*;
 import javafx.geometry.*;
 import javafx.scene.Scene;
@@ -225,42 +224,7 @@ public class AsyPadMenuBar extends MenuBar
 		{
 			public void handle(ActionEvent event)
 			{
-				Stage asyPanel = new Stage();
-				FlowPane p = new FlowPane();
-				Scene scene = new Scene(p, 500, 600);
-				
-				TextArea asymptote = new TextArea();
-				asymptote.setPrefSize(500, 600);
-				asymptote.setEditable(false);
-				asymptote.setText(parent.toAsymptote());
-
-				AnimationTimer update = new AnimationTimer()
-				{
-					private long lastUpdate = 0;
-					public void handle(long now)
-					{
-						if(now-lastUpdate > 1e9)
-						{
-							lastUpdate = now;
-							double vScroll = asymptote.getScrollTop();
-							double hScroll = asymptote.getScrollLeft();
-							if(!parent.toAsymptote().equals(asymptote.getText()))
-							{
-								asymptote.setText(parent.toAsymptote());
-							}
-							asymptote.setScrollTop(vScroll);
-							asymptote.setScrollLeft(hScroll);
-						}
-					}
-				};
-				update.start();
-
-				p.getChildren().add(asymptote);
-				asyPanel.setScene(scene);
-				asyPanel.setAlwaysOnTop(true);
-				asyPanel.setTitle("Live Updating Asymptote Panel");
-				asyPanel.setResizable(false);
-				asyPanel.show();
+				parent.showAsyPanel();
 			}
 		});
 		view.getItems().addAll(showHidden, showAsyPanel);

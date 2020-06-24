@@ -10,6 +10,8 @@ package asypad.ui;
 
 import java.io.*;
 import java.util.ArrayList;
+
+import javafx.animation.AnimationTimer;
 import javafx.event.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -1076,6 +1078,78 @@ public class AsyPadPane extends Pane
 			s.refresh();
 		}
 	}
+
+	/**
+	 * Updates the label that shows the current tool.
+	 * @param tool new current tool
+	 */
+	public void updateTool(String tool)
+	{
+		currentTool.setText("Tool: " + tool);
+		currentTool.requestFocus(); //needed for key listener to be valid on the pane.
+		resetSelectedShapes();
+		selectedShapes.clear();
+		if(getChildren().contains(currentLine))
+		{
+			getChildren().remove(currentLine);
+		}
+		if(getChildren().contains(currentCircle))
+		{
+			getChildren().remove(currentCircle);
+		}
+	}
+
+	/**
+	 * Sets the description of the current tool.
+	 * @param description description of tool.
+	 */
+	public void updateToolDescription(String description)
+	{
+		currentToolDescription.setText(description);
+	}
+	
+	/**
+	 * Shows a live updating Asymptote Panel.
+	 */
+	public void showAsyPanel()
+	{
+		Stage asyPanel = new Stage();
+		FlowPane p = new FlowPane();
+		Scene scene = new Scene(p, 500, 600);
+		
+		TextArea asymptote = new TextArea();
+		asymptote.setPrefSize(500, 600);
+		asymptote.setEditable(false);
+		asymptote.setText(toAsymptote());
+
+		AnimationTimer update = new AnimationTimer()
+		{
+			private long lastUpdate = 0;
+			public void handle(long now)
+			{
+				if(now-lastUpdate > 1e9)
+				{
+					lastUpdate = now;
+					double vScroll = asymptote.getScrollTop();
+					double hScroll = asymptote.getScrollLeft();
+					if(!toAsymptote().equals(asymptote.getText()))
+					{
+						asymptote.setText(toAsymptote());
+					}
+					asymptote.setScrollTop(vScroll);
+					asymptote.setScrollLeft(hScroll);
+				}
+			}
+		};
+		update.start();
+
+		p.getChildren().add(asymptote);
+		asyPanel.setScene(scene);
+		asyPanel.setAlwaysOnTop(true);
+		asyPanel.setTitle("Live Updating Asymptote Panel");
+		asyPanel.setResizable(false);
+		asyPanel.show();
+	}
 	
 	/**
 	 * Clears out the garbage shapes that were used for calculation but are not needed anymore.
@@ -1239,35 +1313,6 @@ public class AsyPadPane extends Pane
 			configure.setTitle("Shape Options");
 			configure.show();
 		}
-	}
-
-	/**
-	 * Updates the label that shows the current tool.
-	 * @param tool new current tool
-	 */
-	public void updateTool(String tool)
-	{
-		currentTool.setText("Tool: " + tool);
-		currentTool.requestFocus(); //needed for key listener to be valid on the pane.
-		resetSelectedShapes();
-		selectedShapes.clear();
-		if(getChildren().contains(currentLine))
-		{
-			getChildren().remove(currentLine);
-		}
-		if(getChildren().contains(currentCircle))
-		{
-			getChildren().remove(currentCircle);
-		}
-	}
-
-	/**
-	 * Sets the description of the current tool.
-	 * @param description description of tool.
-	 */
-	public void updateToolDescription(String description)
-	{
-		currentToolDescription.setText(description);
 	}
 
 	/**
