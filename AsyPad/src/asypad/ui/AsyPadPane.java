@@ -105,9 +105,19 @@ public class AsyPadPane extends Pane
 	private ColorPicker colorPicker;
 
 	/**
-	 * Previous mouse location (tracked for dragging).
+	 * Previous mouse location (tracked for dragging background).
 	 */
 	private double pmouseX, pmouseY;
+
+	/**
+	 * Total translated amount (accumulated over a single gesture).
+	 */
+	private double totalTranslateX, totalTranslateY;
+
+	/**
+	 * Total scrolled amount (accumulated over a single gesture).
+	 */
+	private double totalScroll;
 
 	/**
 	 * Creates an AsyPadPane layout.
@@ -128,6 +138,9 @@ public class AsyPadPane extends Pane
 		colorPicker = new ColorPicker();
 		pmouseX = 0;
 		pmouseY = 0;
+		totalTranslateX = 0;
+		totalTranslateY = 0;
+		totalScroll = 0;
 
 		AsyPadMenuBar menus = new AsyPadMenuBar(this);
 		AsyPadToolBar tools = new AsyPadToolBar(this);
@@ -841,6 +854,8 @@ public class AsyPadPane extends Pane
 						//setCursor(Cursor.CLOSED_HAND);
 						double dx = event.getSceneX()-pmouseX;
 						double dy = event.getSceneY()-pmouseY;
+						totalTranslateX += dx;
+						totalTranslateY += dy;
 						translate(dx, dy);
 					}
 				}
@@ -906,6 +921,9 @@ public class AsyPadPane extends Pane
 				if(getCursor() == Cursor.CLOSED_HAND)
 				{
 					setCursor(Cursor.OPEN_HAND);
+					addCommand(new TranslateCommand(totalTranslateX, totalTranslateY));
+					totalTranslateX = 0;
+					totalTranslateY = 0;
 				}
 				shapeDragged = false;
 			}
@@ -919,11 +937,39 @@ public class AsyPadPane extends Pane
 				zoom(event.getSceneX(), event.getSceneY(), event.getZoomFactor());
 			}
 		});
+		this.setOnZoomFinished(new EventHandler<ZoomEvent>()
+		{
+			public void handle(ZoomEvent event)
+			{
+				addCommand(new ZoomCommand(event.getSceneX(), event.getSceneY(), event.getTotalZoomFactor()));
+			}
+		});
 		this.setOnScroll(new EventHandler<ScrollEvent>()
 		{
+			private int framesMissed = 0;
 			public void handle(ScrollEvent event)
 			{
+				framesMissed = 0;
+				if(totalScroll == 0)
+				{
+					AnimationTimer update = new AnimationTimer()
+					{
+						public void handle(long now)
+						{
+							if(framesMissed >= 10) //missing greater than 10 frames means scroll is over
+							{
+								addCommand(new ZoomCommand(event.getSceneX(), event.getSceneY(), Math.pow(Math.E, totalScroll/1000)));
+								totalScroll = 0;
+								stop();
+							}
+							framesMissed++;
+						}
+					};
+					update.start();
+				}
 				double factor = Math.pow(Math.E, event.getDeltaY()/1000);
+				totalScroll += event.getDeltaY();
+				//System.out.println(totalScroll);
 				zoom(event.getSceneX(), event.getSceneY(), factor);
 			}
 		});
@@ -1158,6 +1204,47 @@ public class AsyPadPane extends Pane
 		asyPanel.setTitle("Live Updating Asymptote Panel");
 		asyPanel.setResizable(false);
 		asyPanel.show();
+	}
+
+	/**
+	 * Translates the entire figure by the given amount.
+	 * @param dx translation in x direction
+	 * @param dy translation in y direction
+	 */
+	public void translate(double dx, double dy)
+	{
+		for(Shape s : shapes)
+		{
+			//move all dependency level 0 shapes by dx and dy, all children will follow
+			if(s.getLevel() == 0)
+			{
+				Point p = (Point) s;
+				p.setX(p.getX()+dx);
+				p.setY(p.getY()+dy);
+			}
+		}
+		update();
+	}
+
+	/**
+	 * Zooms by the specified factor with respect to the specified location
+	 * @param zx x-coordinate of zoom
+	 * @param zy y-coordinate of zoom
+	 * @param factor zoom factor
+	 */
+	public void zoom(double zx, double zy, double factor)
+	{
+		for(Shape s : shapes)
+		{
+			//zoom all dependency level 0 shapes by dx and dy, all children will follow
+			if(s.getLevel() == 0)
+			{
+				Point p = (Point) s;
+				p.setX(zx+factor*(p.getX()-zx));
+				p.setY(zy+factor*(p.getY()-zy));
+			}
+		}
+		update();
 	}
 
 	/**
@@ -1474,47 +1561,6 @@ public class AsyPadPane extends Pane
 			if(s.getName().equals(name)) return true;
 		}
 		return false;
-	}
-
-	/**
-	 * Translates the entire figure by the given amount.
-	 * @param dx translation in x direction
-	 * @param dy translation in y direction
-	 */
-	private void translate(double dx, double dy)
-	{
-		for(Shape s : shapes)
-		{
-			//move all dependency level 0 shapes by dx and dy, all children will follow
-			if(s.getLevel() == 0)
-			{
-				Point p = (Point) s;
-				p.setX(p.getX()+dx);
-				p.setY(p.getY()+dy);
-			}
-		}
-		update();
-	}
-
-	/**
-	 * Zooms by the specified factor with respect to the specified location
-	 * @param zx x-coordinate of zoom
-	 * @param zy y-coordinate of zoom
-	 * @param factor zoom factor
-	 */
-	private void zoom(double zx, double zy, double factor)
-	{
-		for(Shape s : shapes)
-		{
-			//zoom all dependency level 0 shapes by dx and dy, all children will follow
-			if(s.getLevel() == 0)
-			{
-				Point p = (Point) s;
-				p.setX(zx+factor*(p.getX()-zx));
-				p.setY(zy+factor*(p.getY()-zy));
-			}
-		}
-		update();
 	}
 
 	/**
