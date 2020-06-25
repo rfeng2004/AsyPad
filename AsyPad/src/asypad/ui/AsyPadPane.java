@@ -98,12 +98,12 @@ public class AsyPadPane extends Pane
 	 * Color of selected shapes.
 	 */
 	private Color selected;
-	
+
 	/**
 	 * ColorPicker option which saves custom colors during the session.
 	 */
 	private ColorPicker colorPicker;
-	
+
 	/**
 	 * Previous mouse location (tracked for dragging).
 	 */
@@ -860,7 +860,7 @@ public class AsyPadPane extends Pane
 						p.getLabel().setDirection(-direction);
 					}
 				}
-				
+
 				pmouseX = event.getSceneX();
 				pmouseY = event.getSceneY();
 			}
@@ -872,7 +872,7 @@ public class AsyPadPane extends Pane
 				SHAPE_TYPE tool = tools.getSelectedTool();
 				if(shapeDragged)
 				{
-					if(tool == MOUSE.MOUSE)
+					if(tool == MOUSE.MOUSE || tool instanceof POINT_TYPE)
 					{
 						Shape s = shapes.get(snappedIndex);
 						if(s.getType() == POINT_TYPE.POINT)
@@ -908,6 +908,23 @@ public class AsyPadPane extends Pane
 					setCursor(Cursor.OPEN_HAND);
 				}
 				shapeDragged = false;
+			}
+		});
+
+		//handle zooming with zoom gesture or scrolling
+		this.setOnZoom(new EventHandler<ZoomEvent>()
+		{
+			public void handle(ZoomEvent event)
+			{
+				zoom(event.getSceneX(), event.getSceneY(), event.getZoomFactor());
+			}
+		});
+		this.setOnScroll(new EventHandler<ScrollEvent>()
+		{
+			public void handle(ScrollEvent event)
+			{
+				double factor = Math.pow(Math.E, event.getDeltaY()/1000);
+				zoom(event.getSceneX(), event.getSceneY(), factor);
 			}
 		});
 	}
@@ -997,7 +1014,7 @@ public class AsyPadPane extends Pane
 		selectedShapes.clear();
 		getChildren().remove(currentLine);
 		getChildren().remove(currentCircle);
-		
+
 		if(currentCommandIndex > -1) currentCommandIndex--;
 		clear();
 		for(int i = 0; i <= currentCommandIndex; i++)
@@ -1016,7 +1033,7 @@ public class AsyPadPane extends Pane
 		selectedShapes.clear();
 		getChildren().remove(currentLine);
 		getChildren().remove(currentCircle);
-		
+
 		if(currentCommandIndex < commands.size()-1)
 		{
 			currentCommandIndex++;
@@ -1099,7 +1116,7 @@ public class AsyPadPane extends Pane
 	{
 		currentToolDescription.setText(description);
 	}
-	
+
 	/**
 	 * Shows a live updating Asymptote Panel.
 	 */
@@ -1108,7 +1125,7 @@ public class AsyPadPane extends Pane
 		Stage asyPanel = new Stage();
 		FlowPane p = new FlowPane();
 		Scene scene = new Scene(p, 500, 600);
-		
+
 		TextArea asymptote = new TextArea();
 		asymptote.setPrefSize(500, 600);
 		asymptote.setEditable(false);
@@ -1142,7 +1159,7 @@ public class AsyPadPane extends Pane
 		asyPanel.setResizable(false);
 		asyPanel.show();
 	}
-	
+
 	/**
 	 * Clears out the garbage shapes that were used for calculation but are not needed anymore.
 	 */
@@ -1458,7 +1475,7 @@ public class AsyPadPane extends Pane
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Translates the entire figure by the given amount.
 	 * @param dx translation in x direction
@@ -1478,7 +1495,28 @@ public class AsyPadPane extends Pane
 		}
 		update();
 	}
-	
+
+	/**
+	 * Zooms by the specified factor with respect to the specified location
+	 * @param zx x-coordinate of zoom
+	 * @param zy y-coordinate of zoom
+	 * @param factor zoom factor
+	 */
+	private void zoom(double zx, double zy, double factor)
+	{
+		for(Shape s : shapes)
+		{
+			//zoom all dependency level 0 shapes by dx and dy, all children will follow
+			if(s.getLevel() == 0)
+			{
+				Point p = (Point) s;
+				p.setX(zx+factor*(p.getX()-zx));
+				p.setY(zy+factor*(p.getY()-zy));
+			}
+		}
+		update();
+	}
+
 	/**
 	 * Loads an AsyPad file into the AsyPad.
 	 * @param apad file to be loaded
@@ -1555,7 +1593,7 @@ public class AsyPadPane extends Pane
 		asy+="import olympiad;\nimport markers;\nimport math;\nimport graph;\n";
 		asy+="// change the unit size to fit your needs\n";
 		asy+="unitsize(1cm);\n";
-		
+
 		ArrayList<String> colors = new ArrayList<String>();
 		for(Shape s : shapes)
 		{
@@ -1573,7 +1611,7 @@ public class AsyPadPane extends Pane
 		{
 			asy+="pen c" + color + " = rgb(\"" + color + "\");\n";
 		}
-		
+
 		int MAXLVL = 0;
 		for(Shape s : shapes)
 		{
