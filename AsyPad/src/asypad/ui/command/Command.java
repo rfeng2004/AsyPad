@@ -20,6 +20,8 @@ public abstract class Command
 	public static void loadCommand(String command, AsyPadPane target)
 	{
 		Command load = null;
+		//other than color, draw, hide, and strokewidth,
+		//these are legacy command loads (deprecated as of v2)
 		if(command.startsWith("color"))
 		{
 			int comma = command.indexOf(',');

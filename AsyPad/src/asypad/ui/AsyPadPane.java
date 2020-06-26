@@ -1584,6 +1584,7 @@ public class AsyPadPane extends Pane
 		catch(IOException ioe)
 		{
 			ioe.printStackTrace();
+			updateToolDescription("Error while loading " + apad.getAbsolutePath());
 		}
 		update();
 		updateToolDescription("Loaded diagram from " + apad.getAbsolutePath());
@@ -1596,6 +1597,8 @@ public class AsyPadPane extends Pane
 	public String toApad()
 	{
 		String apad = "";
+		//following code is buggy and has been deprecated
+		/*
 		clear();
 		for(int i = 0; i <= currentCommandIndex; i++)
 		{
@@ -1606,6 +1609,52 @@ public class AsyPadPane extends Pane
 			if(commands.get(i) instanceof RenameCommand) commands.get(i).doAction(this);
 		}
 		update();
+		*/
+		
+		int MAXLVL = 0;
+		
+		if(Shape.StrokeWidth != 3)
+		{
+			//set stroke width if changed
+			apad += (new StrokeWidthCommand(Shape.StrokeWidth)).toString();
+		}
+		
+		for(Shape s : shapes)
+		{
+			if(s.getLevel() > MAXLVL && s.isInAsyCode()) MAXLVL = s.getLevel();
+		}
+		
+		for(int i = 0; i <= MAXLVL; i++)
+		{
+			for(Shape s : shapes)
+			{
+				if(s.getLevel() == i)
+				{
+					//draw command for the shape
+					DrawCommand draw;
+					if(s instanceof Point)
+					{
+						Point p = (Point) s;
+						draw = new DrawCommand(p, p.getX(), p.getY(), p.getName());
+					}
+					else
+					{
+						draw = new DrawCommand(s);
+					}
+					apad += draw.toString();
+					
+					//set hidden and color for the shape 
+					if(s.isHidden())
+					{
+						apad += (new HideCommand(s)).toString();
+					}
+					if(!s.getColor().equals(Color.BLACK))
+					{
+						apad += (new ColorCommand(s, s.getColor())).toString();
+					}
+				}
+			}
+		}
 		return apad;
 	}
 
