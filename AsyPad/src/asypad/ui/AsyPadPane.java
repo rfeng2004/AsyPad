@@ -10,6 +10,7 @@ package asypad.ui;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javafx.animation.AnimationTimer;
 import javafx.event.*;
@@ -1234,14 +1235,32 @@ public class AsyPadPane extends Pane
 	 */
 	public void zoom(double zx, double zy, double factor)
 	{
+		HashMap<String, Double> targetX = new HashMap<String, Double>();
+		HashMap<String, Double> targetY = new HashMap<String, Double>();
+		//get target locations for all points with degrees of freedom
 		for(Shape s : shapes)
 		{
-			//zoom all dependency level 0 shapes by dx and dy, all children will follow
+			if(s.getLevel() == 0 || s.getType() == POINT_TYPE.POINT_ON_SHAPE)
+			{
+				Point p = (Point) s;
+				targetX.put(p.getName(), zx+factor*(p.getX()-zx));
+				targetY.put(p.getName(), zy+factor*(p.getY()-zy));
+			}
+		}
+		for(Shape s : shapes)
+		{
+			//zoom all dependency level 0 shapes by factor about zx and zy, all children will follow
 			if(s.getLevel() == 0)
 			{
 				Point p = (Point) s;
-				p.setX(zx+factor*(p.getX()-zx));
-				p.setY(zy+factor*(p.getY()-zy));
+				p.setX(targetX.get(p.getName()));
+				p.setY(targetY.get(p.getName()));
+			}
+			//relative location of points on shape doesn't always zoom correctly, so manually fix
+			if(s.getType() == POINT_TYPE.POINT_ON_SHAPE)
+			{
+				Point p = (Point) s;
+				p.setRelativeLocation(targetX.get(p.getName()), targetY.get(p.getName()));
 			}
 		}
 		update();
@@ -1597,7 +1616,7 @@ public class AsyPadPane extends Pane
 	public String toApad()
 	{
 		String apad = "";
-		//following code is buggy and has been deprecated
+		//following code is terrible: both buggy and inefficient, so it has been deprecated
 		/*
 		clear();
 		for(int i = 0; i <= currentCommandIndex; i++)
@@ -1651,6 +1670,15 @@ public class AsyPadPane extends Pane
 					if(!s.getColor().equals(Color.BLACK))
 					{
 						apad += (new ColorCommand(s, s.getColor())).toString();
+					}
+					
+					//set label direction for points
+					if(s instanceof Point)
+					{
+						Point p = (Point) s;
+						double dir = p.getLabel().getDirection();
+						//only add the command if it has been changed from the default value
+						if(!Utility.equal(dir, -Math.PI/4)) apad += (new DragCommand(p, dir)).toString();
 					}
 				}
 			}
