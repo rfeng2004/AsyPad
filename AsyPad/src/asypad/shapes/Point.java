@@ -445,6 +445,11 @@ public class Point extends Shape
 		{
 			asyVarN = "" + asyVarN.charAt(0) + 'p';
 			//System.out.println(asyVarN);
+			
+			//temporarily set the point name to the asy-safe name so that the rest of the asy code generates properly
+			//this name is then immediately REVERTED in the AsyPadPane.toAsymptote()
+			setName(asyVarN);
+			refreshName();
 		}
 		String hex = "c" + Utility.hex(color);
 		double dir = (getLabel().getDirection() * 180 / Math.PI + 360) % 360;

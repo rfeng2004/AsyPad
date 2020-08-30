@@ -1556,8 +1556,7 @@ public class AsyPadPane extends Pane
 		if(isAllLettersOrNumbers) return true;
 		else if(pname.length() == 2) //check for a point prime
 		{
-			if(pname.charAt(1) != '\'') return false;
-			else return true;
+			return pname.charAt(1) == '\'';
 		}
 		else if(pname.length() == 3) //subscript names
 		{
@@ -1580,6 +1579,18 @@ public class AsyPadPane extends Pane
 			if(s.getName().equals(name)) return true;
 		}
 		return false;
+	}
+	
+	private void resetPointPrimeNames()
+	{
+		for(Shape s : shapes)
+		{
+			if(s instanceof Point && s.getName().length() == 2 && s.getName().charAt(1) == 'p')
+			{
+				s.setName(""+s.getName().charAt(0)+'\'');
+				s.refreshName();
+			}
+		}
 	}
 
 	/**
@@ -1761,6 +1772,7 @@ public class AsyPadPane extends Pane
 				}
 			}
 		}
+		resetPointPrimeNames();
 		double xmin = 0;
 		double xmax = getWidth()/100;
 		double ymin = (Shape.INF-getHeight())/100;
