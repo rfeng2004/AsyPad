@@ -369,7 +369,6 @@ public class AsyPadPane extends Pane
 					{
 						Point p = new Point(event.getSceneX(), event.getSceneY(), nextPointName(1));
 						addShape(p);
-						addCommand(new DrawCommand(p, p.getX(), p.getY(), p.getName()));
 						//snappedIndex = shapes.size()-1;
 						setCursor(Cursor.HAND);
 					}
@@ -382,7 +381,6 @@ public class AsyPadPane extends Pane
 					{
 						Point p = new Point(event.getSceneX(), event.getSceneY(), shapes.get(snappedIndex), nextPointName(1));
 						addShape(p);
-						addCommand(new DrawCommand(p, p.getX(), p.getY(), p.getName()));
 						//snappedIndex = shapes.size()-1;
 						setCursor(Cursor.HAND);
 					}
@@ -392,7 +390,6 @@ public class AsyPadPane extends Pane
 						{
 							Point p = new Point(lines.get(0), lines.get(1), nextPointName(1));
 							addShape(p);
-							addCommand(new DrawCommand(p, p.getX(), p.getY(), p.getName()));
 						}
 						else if(lines.size() == 1 && circles.size() >= 1)
 						{
@@ -401,12 +398,10 @@ public class AsyPadPane extends Pane
 							if(Utility.distToShape(event.getSceneX(), event.getSceneY(), p1) < Utility.distToShape(event.getSceneX(), event.getSceneY(), p2))
 							{
 								addShape(p1);
-								addCommand(new DrawCommand(p1, p1.getX(), p1.getY(), p1.getName()));
 							}
 							else
 							{
 								addShape(p2);
-								addCommand(new DrawCommand(p2, p2.getX(), p2.getY(), p2.getName()));
 							}
 						}
 						else if(circles.size() >= 2)
@@ -417,13 +412,11 @@ public class AsyPadPane extends Pane
 							{
 								addShape(p1);
 								//System.out.println(p1);
-								addCommand(new DrawCommand(p1, p1.getX(), p1.getY(), p1.getName()));
 							}
 							else 
 							{
 								addShape(p2);
 								//System.out.println(p2);
-								addCommand(new DrawCommand(p2, p2.getX(), p2.getY(), p2.getName()));
 							}
 						}
 					}
@@ -434,7 +427,6 @@ public class AsyPadPane extends Pane
 					{
 						Point p = new Point(event.getSceneX(), event.getSceneY(), shapes.get(snappedIndex), nextPointName(1));
 						addShape(p);
-						addCommand(new DrawCommand(p, p.getX(), p.getY(), p.getName()));
 						//snappedIndex = shapes.size()-1;
 						setCursor(Cursor.HAND);
 					}
@@ -459,7 +451,6 @@ public class AsyPadPane extends Pane
 					{
 						Point p = new Point(lines.get(0), lines.get(1), nextPointName(1));
 						addShape(p);
-						addCommand(new DrawCommand(p, p.getX(), p.getY(), p.getName()));
 					}
 					else if(lines.size() == 1 && circles.size() >= 1)
 					{
@@ -469,13 +460,11 @@ public class AsyPadPane extends Pane
 						{
 							addShape(p1);
 							//System.out.println(p1);
-							addCommand(new DrawCommand(p1, p1.getX(), p1.getY(), p1.getName()));
 						}
 						else 
 						{
 							addShape(p2);
 							//System.out.println(p2);
-							addCommand(new DrawCommand(p2, p2.getX(), p2.getY(), p2.getName()));
 						}
 					}
 					else if(circles.size() >= 2)
@@ -486,13 +475,11 @@ public class AsyPadPane extends Pane
 						{
 							addShape(p1);
 							//System.out.println(p1);
-							addCommand(new DrawCommand(p1, p1.getX(), p1.getY(), p1.getName()));
 						}
 						else 
 						{
 							addShape(p2);
 							//System.out.println(p2);
-							addCommand(new DrawCommand(p2, p2.getX(), p2.getY(), p2.getName()));
 						}
 					}
 				}
@@ -505,7 +492,6 @@ public class AsyPadPane extends Pane
 						{
 							Point p = new Point((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), nextPointName(1));
 							addShape(p);
-							addCommand(new DrawCommand(p, p.getX(), p.getY(), p.getName()));
 						}
 						resetSelectedShapes();
 						selectedShapes.clear();
@@ -522,13 +508,11 @@ public class AsyPadPane extends Pane
 							{
 								Line l = new Line((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), true);
 								addShape(l);
-								addCommand(new DrawCommand(l));
 							}
 							else 
 							{
 								Line l = new Line((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), false);
 								addShape(l);
-								addCommand(new DrawCommand(l));
 							}
 						}
 						resetSelectedShapes();
@@ -568,13 +552,11 @@ public class AsyPadPane extends Pane
 							{
 								Line l = new Line((Point) selectedShapes.get(0), (Line) selectedShapes.get(1), true);
 								addShape(l);
-								addCommand(new DrawCommand(l));
 							}
 							else 
 							{
 								Line l = new Line((Point) selectedShapes.get(0), (Line) selectedShapes.get(1), false);
 								addShape(l);
-								addCommand(new DrawCommand(l));
 							}
 						}
 						else 
@@ -583,13 +565,11 @@ public class AsyPadPane extends Pane
 							{
 								Line l = new Line((Point) selectedShapes.get(1), (Line) selectedShapes.get(0), true);
 								addShape(l);
-								addCommand(new DrawCommand(l));
 							}
 							else
 							{
 								Line l = new Line((Point) selectedShapes.get(1), (Line) selectedShapes.get(0), false);
 								addShape(l);
-								addCommand(new DrawCommand(l));
 							}
 						}
 						resetSelectedShapes();
@@ -609,7 +589,6 @@ public class AsyPadPane extends Pane
 						{
 							Line l = new Line(p1, p2, p3);
 							addShape(l);
-							addCommand(new DrawCommand(l));
 						}
 						resetSelectedShapes();
 						selectedShapes.clear();
@@ -624,7 +603,6 @@ public class AsyPadPane extends Pane
 						{
 							Line l = new Line((Point) selectedShapes.get(0), (Point) selectedShapes.get(1));
 							addShape(l);
-							addCommand(new DrawCommand(l));
 						}
 						resetSelectedShapes();
 						selectedShapes.clear();
@@ -673,7 +651,6 @@ public class AsyPadPane extends Pane
 						{
 							Line l = new Line(p, c, false);
 							addShape(l);
-							addCommand(new DrawCommand(l));
 						}
 						else if(dist > c.getRadius())
 						{
@@ -685,13 +662,11 @@ public class AsyPadPane extends Pane
 							{
 								Line l = new Line(p, c, false);
 								addShape(l);
-								addCommand(new DrawCommand(l));
 							}
 							else
 							{
 								Line l = new Line(p, c, true);
 								addShape(l);
-								addCommand(new DrawCommand(l));
 							}
 						}
 
@@ -708,7 +683,6 @@ public class AsyPadPane extends Pane
 						{
 							Circle c = new Circle((Point) selectedShapes.get(0), (Point) selectedShapes.get(1));
 							addShape(c);
-							addCommand(new DrawCommand(c));
 						}
 						resetSelectedShapes();
 						selectedShapes.clear();
@@ -727,7 +701,6 @@ public class AsyPadPane extends Pane
 						{
 							Circle c = new Circle(p1, p2, p3, true);
 							addShape(c);
-							addCommand(new DrawCommand(c));
 						}
 						resetSelectedShapes();
 						selectedShapes.clear();
@@ -746,7 +719,6 @@ public class AsyPadPane extends Pane
 						{
 							Circle c = new Circle(p1, p2, p3, false);
 							addShape(c);
-							addCommand(new DrawCommand(c));
 						}
 						resetSelectedShapes();
 						selectedShapes.clear();
@@ -806,13 +778,11 @@ public class AsyPadPane extends Pane
 							{
 								Circle c = new Circle(c1, c2, p, false);
 								addShape(c);
-								addCommand(new DrawCommand(c));
 							}
 							else if(Utility.equal(Utility.distToShape(c2.getCenterX(), c2.getCenterY(), p), c2.getRadius()))
 							{
 								Circle c = new Circle(c2, c1, p, false);
 								addShape(c);
-								addCommand(new DrawCommand(c));
 							}
 						}
 						resetSelectedShapes();
@@ -986,16 +956,34 @@ public class AsyPadPane extends Pane
 	}
 
 	/**
-	 * Adds a new shape to this pane, checking whether a shape with the same name already exists.
+	 * Adds a new shape to this pane, checking whether a shape with the same name already exists and adding a draw command into the command list.
 	 * @param shape shape to add
 	 */
 	public void addShape(Shape shape)
 	{
 		if(isDuplicateName(shape.getName())) return;
+		addCommand(new DrawCommand(shape));
 		shapes.add(shape);
 		shape.draw(this);
 		shape.getObject().toBack();
 		shape.getLabel().toBack();
+	}
+	
+	/**
+	 * Adds a new shape to this pane with the option to bypass checks and adding the command
+	 * @param shape shape to add
+	 * @param bypass whether checks and adding command should be bypassed
+	 */
+	public void addShape(Shape shape, boolean bypass)
+	{
+		if(!bypass) addShape(shape);
+		else
+		{
+			shapes.add(shape);
+			shape.draw(this);
+			shape.getObject().toBack();
+			shape.getLabel().toBack();
+		}
 	}
 
 	/**
@@ -1006,11 +994,7 @@ public class AsyPadPane extends Pane
 	{
 		for(Shape s : shapes)
 		{
-			if(isDuplicateName(s.getName())) continue;
-			this.shapes.add(s);
-			s.draw(this);
-			s.getObject().toBack();
-			s.getLabel().toBack();
+			addShape(s);
 		}
 	}
 
@@ -1661,16 +1645,7 @@ public class AsyPadPane extends Pane
 				if(s.getLevel() == i)
 				{
 					//draw command for the shape
-					DrawCommand draw;
-					if(s instanceof Point)
-					{
-						Point p = (Point) s;
-						draw = new DrawCommand(p, p.getX(), p.getY(), p.getName());
-					}
-					else
-					{
-						draw = new DrawCommand(s);
-					}
+					DrawCommand draw = new DrawCommand(s);
 					apad += draw.toString();
 					
 					//set hidden and color for the shape 

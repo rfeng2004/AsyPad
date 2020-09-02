@@ -26,24 +26,19 @@ public class DrawCommand extends Command
 	public DrawCommand(Shape shape)
 	{
 		this.shape = shape;
-		defaultX = -1;
-		defaultY = -1;
-		defaultName = "";
-	}
-
-	/**
-	 * Creates a new DrawCommand specialized for a point.
-	 * @param point point to be drawn
-	 * @param x default x-coordinate
-	 * @param y default y-coordinate
-	 * @param name default name
-	 */
-	public DrawCommand(Point point, double x, double y, String name)
-	{
-		this.shape = point;
-		defaultX = x;
-		defaultY = y;
-		defaultName = name;
+		if(shape instanceof Point)
+		{
+			Point p = (Point) shape;
+			defaultX = p.getX();
+			defaultY = p.getY();
+			defaultName = p.getName();
+		}
+		else
+		{
+			defaultX = -1;
+			defaultY = -1;
+			defaultName = "";
+		}
 	}
 
 	public void doAction(AsyPadPane target)
@@ -53,7 +48,7 @@ public class DrawCommand extends Command
 			shape.setRemove(false);
 			shape.setHidden(false);
 			shape.setColor(Color.BLACK);
-			target.addShape(shape);
+			target.addShape(shape, true);
 		}
 		else
 		{
@@ -70,7 +65,7 @@ public class DrawCommand extends Command
 			p.setHidden(false);
 			p.setColor(Color.BLACK);
 			p.getLabel().setDirection(-Math.PI/4);
-			target.addShape(p);
+			target.addShape(p, true);
 		}
 	}
 

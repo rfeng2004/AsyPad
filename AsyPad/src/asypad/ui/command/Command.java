@@ -34,15 +34,7 @@ public abstract class Command
 		{
 			String args = command.substring(5, command.length()-1);
 			Shape s = Shape.buildShape(args, target);
-			if(s instanceof Point)
-			{
-				Point p = (Point) s;
-				load = new DrawCommand(p, p.getX(), p.getY(), p.getName());
-			}
-			else
-			{
-				load = new DrawCommand(s);
-			}
+			load = new DrawCommand(s);
 		}
 		else if(command.startsWith("delete"))
 		{
