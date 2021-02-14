@@ -22,7 +22,7 @@ public abstract class Shape
 	/**
 	 * Infinite that is used for drawing lines that should extend to infinity.
 	 */
-	public static final double INF = 2000;
+	public static final double INF = 10000;
 
 	/**
 	 * The formatter used to round to 2 decimal places for file i/o.

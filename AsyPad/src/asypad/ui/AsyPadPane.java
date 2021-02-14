@@ -874,7 +874,7 @@ public class AsyPadPane extends Pane
 						{
 							if(framesMissed >= 10) //missing greater than 10 frames means scroll is over
 							{
-								addCommand(new ZoomCommand(event.getSceneX(), event.getSceneY(), Math.pow(Math.E, totalScroll/1000)));
+								addCommand(new ZoomCommand(event.getSceneX(), event.getSceneY(), Math.pow(Math.E, totalScroll/5000)));
 								totalScroll = 0;
 								stop();
 							}
@@ -883,7 +883,7 @@ public class AsyPadPane extends Pane
 					};
 					update.start();
 				}
-				double factor = Math.pow(Math.E, event.getDeltaY()/1000);
+				double factor = Math.pow(Math.E, event.getDeltaY()/5000);
 				totalScroll += event.getDeltaY();
 				//System.out.println(totalScroll);
 				zoom(event.getSceneX(), event.getSceneY(), factor);
@@ -1173,7 +1173,7 @@ public class AsyPadPane extends Pane
 				targetY.put(p.getName(), zy+factor*(p.getY()-zy));
 			}
 		}
-		for(Shape s : shapes)
+		/*for(Shape s : shapes)
 		{
 			//zoom all dependency level 0 shapes by factor about zx and zy, all children will follow
 			if(s.getLevel() == 0)
@@ -1187,6 +1187,37 @@ public class AsyPadPane extends Pane
 			{
 				Point p = (Point) s;
 				p.setRelativeLocation(targetX.get(p.getName()), targetY.get(p.getName()));
+			}
+		}*/
+		
+		//go through points in order of dependency level
+		int MAXLVL = 0;
+		for(Shape s : shapes)
+		{
+			if(s.getLevel() > MAXLVL && s.isInAsyCode()) MAXLVL = s.getLevel();
+		}
+		for(int i = 0; i <= MAXLVL; i++)
+		{
+			for(Shape s : shapes)
+			{
+				if(s.getLevel() == 0 || s.getType() == POINT_TYPE.POINT_ON_SHAPE)
+				{
+					Point p = (Point) s;
+					if(p.getLevel() == i)
+					{
+						//zoom all dependency level 0 shapes by factor about zx and zy, all children will follow
+						if(i == 0)
+						{
+							p.setX(targetX.get(p.getName()));
+							p.setY(targetY.get(p.getName()));
+						}
+						//relative location of points on shape doesn't always zoom correctly, so manually fix
+						else
+						{
+							p.setRelativeLocation(targetX.get(p.getName()), targetY.get(p.getName()));
+						}
+					}
+				}
 			}
 		}
 		update();
