@@ -2,6 +2,7 @@ package asypad.shapes;
 
 import javafx.scene.layout.Pane;
 import asypad.shapes.types.POINT_TYPE;
+import asypad.ui.AsyPadPane;
 
 /**
  * Custom Point used for drawing in AsyPad.
@@ -455,7 +456,8 @@ public class Point extends Shape
 		double dir = (getLabel().getDirection() * 180 / Math.PI + 360) % 360;
 		if(type == POINT_TYPE.POINT)
 		{
-			String s = "pair " + asyVarN + " = (" + FORMATTER.format(x/100) + ", " + FORMATTER.format((INF-y)/100) + "); ";
+			//invert the y coordinate since y goes up in Asymptote but down on java screen
+			String s = "pair " + asyVarN + " = (" + FORMATTER.format(x/100) + ", " + FORMATTER.format((AsyPadPane.CURRENT_HEIGHT-y)/100) + "); ";
 			if(!hide) s += "dot(" + asyVarN + ", " + hex + "); label(\"$" + n + "$\", " + asyVarN + ", dir(" + dir + "));\n";
 			else s+="\n";
 			return s;

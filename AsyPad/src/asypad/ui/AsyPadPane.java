@@ -36,6 +36,16 @@ import asypad.ui.menus.*;
 public class AsyPadPane extends Pane
 {
 	/**
+	 * Current width of the pane.
+	 */
+	public static double CURRENT_WIDTH = AsyPad.DEFAULT_WIDTH;
+	
+	/**
+	 * Current height of the pane.
+	 */
+	public static double CURRENT_HEIGHT = AsyPad.DEFAULT_HEIGHT;
+	
+	/**
 	 * ArrayList of all drawn Shapes.
 	 */
 	private ArrayList<Shape> shapes;
@@ -1698,6 +1708,12 @@ public class AsyPadPane extends Pane
 	 */
 	public String toAsymptote()
 	{
+		//dimensions of the screen
+		CURRENT_WIDTH = getWidth();
+		if(CURRENT_WIDTH == 0) CURRENT_WIDTH = AsyPad.DEFAULT_WIDTH;
+		CURRENT_HEIGHT = getHeight();
+		if(CURRENT_HEIGHT == 0) CURRENT_HEIGHT = AsyPad.DEFAULT_HEIGHT;
+		
 		for(Shape s : shapes) s.addToAsy(); //adds all shapes to asymptote code
 		for(Shape s : shapes)
 		{
@@ -1769,9 +1785,9 @@ public class AsyPadPane extends Pane
 		}
 		resetPointPrimeNames();
 		double xmin = 0;
-		double xmax = getWidth()/100;
-		double ymin = (Shape.INF-getHeight())/100;
-		double ymax = Shape.INF/100;
+		double xmax = CURRENT_WIDTH/100;
+		double ymin = 0;
+		double ymax = CURRENT_HEIGHT/100;
 		asy+="// clip the drawing view\n";
 		asy+="clip((" + xmin + ", " + ymin + ")--(" + xmin + ", " + ymax + ")--(" + xmax + ", " + ymax + ")--(" + xmax + ", " + ymin + ")--cycle);";
 		return asy;
