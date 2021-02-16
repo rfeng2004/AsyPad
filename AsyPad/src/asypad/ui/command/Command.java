@@ -20,7 +20,7 @@ public abstract class Command
 	public static void loadCommand(String command, AsyPadPane target)
 	{
 		Command load = null;
-		//other than color, drag, draw, hide, and strokewidth,
+		//other than color, draw, drag, hide, and globalvar,
 		//these are legacy command loads (deprecated as of v2)
 		if(command.startsWith("color"))
 		{
@@ -36,7 +36,7 @@ public abstract class Command
 			Shape s = Shape.buildShape(args, target);
 			load = new DrawCommand(s);
 		}
-		else if(command.startsWith("delete"))
+		else if(command.startsWith("delete")) //deprecated as of v2
 		{
 			String name = command.substring(7, command.length()-1);
 			load = new DeleteCommand(target.findShapeByName(name));
@@ -60,7 +60,7 @@ public abstract class Command
 				load = new HideCommand(target.findShapeByName(name));
 			}
 		}
-		else if(command.startsWith("move"))
+		else if(command.startsWith("move")) //deprecated as of v2
 		{
 			int comma1 = command.indexOf(','), comma2 = command.indexOf(',', comma1+1);
 			String name = command.substring(5, comma1);
@@ -70,27 +70,29 @@ public abstract class Command
 			double y = Double.parseDouble(movey);
 			load = new MoveCommand((Point) target.findShapeByName(name), x, y);
 		}
-		else if(command.startsWith("rename"))
+		else if(command.startsWith("rename")) //deprecated as of v2
 		{
 			int comma = command.indexOf(',');
 			String name = command.substring(7, comma);
 			String newName = command.substring(comma+2, command.length()-1);
 			load = new RenameCommand((Point) target.findShapeByName(name), newName);
 		}
-		else if(command.startsWith("stroke"))
+		else if(command.startsWith("globalvar"))
 		{
-			String newStrokeWidth = command.substring(7, command.length()-1);
-			double stroke = Double.parseDouble(newStrokeWidth);
-			load = new StrokeWidthCommand(stroke);
+			int equal = command.indexOf('=');
+			String varName = command.substring(10, equal);
+			String newValueString = command.substring(equal+1, command.length()-1);
+			double newValue = Double.parseDouble(newValueString);
+			load = new GlobalVariableCommand(varName, newValue);
 		}
-		else if(command.startsWith("translate"))
+		else if(command.startsWith("translate")) //deprecated as of v2
 		{
 			int comma = command.indexOf(',');
 			double dx = Double.parseDouble(command.substring(10, comma));
 			double dy = Double.parseDouble(command.substring(comma+2, command.length()-1));
 			load = new TranslateCommand(dx, dy);
 		}
-		else if(command.startsWith("zoom"))
+		else if(command.startsWith("zoom")) //deprecated as of v2
 		{
 			int comma1 = command.indexOf(',');
 			int comma2 = command.indexOf(',', comma1+1);

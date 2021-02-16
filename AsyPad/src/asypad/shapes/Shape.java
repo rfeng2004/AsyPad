@@ -15,9 +15,14 @@ import asypad.ui.AsyPadPane;
 public abstract class Shape
 {
 	/**
+	 * Default stroke width.
+	 */
+	public static final double DEFAULT_STROKE_WIDTH = 3;
+	
+	/**
 	 * Stroke width of shapes.
 	 */
-	public static double StrokeWidth = 3;
+	public static double StrokeWidth = DEFAULT_STROKE_WIDTH;
 
 	/**
 	 * Infinite that is used for drawing lines that should extend to infinity.

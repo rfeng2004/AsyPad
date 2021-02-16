@@ -154,6 +154,7 @@ public class AsyPadMenuBar extends MenuBar
 		//settings
 		Menu settings = new Menu("Settings");
 		MenuItem setStrokeWidth = new MenuItem("Set Stroke Width");
+		MenuItem setAsyUnitSize = new MenuItem("Set Asy Unit Size");
 		setStrokeWidth.setOnAction(new EventHandler<ActionEvent>()
 		{
 			public void handle(ActionEvent event)
@@ -191,7 +192,7 @@ public class AsyPadMenuBar extends MenuBar
 					public void handle(ActionEvent event)
 					{
 						Shape.StrokeWidth = (double)((int)(sw.getValue()))/10;
-						parent.addCommand(new StrokeWidthCommand(Shape.StrokeWidth));
+						parent.addCommand(new GlobalVariableCommand("StrokeWidth", Shape.StrokeWidth));
 						setSW.close();
 						parent.update();
 					}
@@ -203,7 +204,56 @@ public class AsyPadMenuBar extends MenuBar
 				setSW.show();
 			}
 		});
-		settings.getItems().add(setStrokeWidth);
+		setAsyUnitSize.setOnAction(new EventHandler<ActionEvent>()
+		{
+			public void handle(ActionEvent event)
+			{
+				Stage setSW = new Stage();
+				Pane p = new Pane();
+				Scene scene = new Scene(p, 250, 80);
+				Label label = new Label("Set the unit size: " + AsyPadPane.AsyUnitSize);
+				label.setPrefSize(200, 20);
+				label.setLayoutX(50);
+				label.setLayoutY(0);
+				label.setTextAlignment(TextAlignment.CENTER);
+				Slider sw = new Slider();
+				sw.setOrientation(Orientation.HORIZONTAL);
+				sw.setShowTickMarks(true);
+				sw.setMajorTickUnit(10);
+				sw.setMax(50);
+				sw.setMinorTickCount(0);
+				sw.setShowTickLabels(false);
+				sw.setPrefSize(250, 30);
+				sw.setLayoutX(0);
+				sw.setLayoutY(20);
+				sw.setValue(AsyPadPane.AsyUnitSize*10);
+				sw.valueProperty().addListener((observable, oldValue, newValue)->
+				{
+					int j = newValue.intValue();
+					label.setText("Set the unit size: " + Double.toString((double) (j)/10));
+				});
+				Button update = new Button("Update");
+				update.setPrefHeight(30);
+				update.setLayoutX(90);
+				update.setLayoutY(50);
+				update.setOnAction(new EventHandler<ActionEvent>()
+				{
+					public void handle(ActionEvent event)
+					{
+						AsyPadPane.AsyUnitSize = (double)((int)(sw.getValue()))/10;
+						parent.addCommand(new GlobalVariableCommand("AsyUnitSize", AsyPadPane.AsyUnitSize));
+						setSW.close();
+						parent.update();
+					}
+				});
+				p.getChildren().addAll(label, sw, update);
+				setSW.setScene(scene);
+				setSW.setAlwaysOnTop(true);
+				setSW.setTitle("Set Asy Unit Size");
+				setSW.show();
+			}
+		});
+		settings.getItems().addAll(setStrokeWidth, setAsyUnitSize);
 
 		Menu view = new Menu("View");
 		MenuItem showHidden = new MenuItem("Show Hidden Shapes");

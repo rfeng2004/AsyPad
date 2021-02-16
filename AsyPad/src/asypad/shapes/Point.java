@@ -457,7 +457,7 @@ public class Point extends Shape
 		if(type == POINT_TYPE.POINT)
 		{
 			//invert the y coordinate since y goes up in Asymptote but down on java screen
-			String s = "pair " + asyVarN + " = (" + FORMATTER.format(x/100) + ", " + FORMATTER.format((AsyPadPane.CURRENT_HEIGHT-y)/100) + "); ";
+			String s = "pair " + asyVarN + " = (" + FORMATTER.format(x/100) + ", " + FORMATTER.format((AsyPadPane.CurrentHeight-y)/100) + "); ";
 			if(!hide) s += "dot(" + asyVarN + ", " + hex + "); label(\"$" + n + "$\", " + asyVarN + ", dir(" + dir + "));\n";
 			else s+="\n";
 			return s;
