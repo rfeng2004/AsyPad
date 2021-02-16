@@ -1,0 +1,20 @@
+\ProvidesPackage{asypad}[2021/02/14 v1.2 AsyPad diagram-to-asymptote converter]
+%thanks vEnhance for von.sty, many passages of code taken directly
+\usepackage{xstring}
+\usepackage{xifthen}
+
+\def\asypadprefix{.} % must be a directory name (with slash)
+\def\@asypadsetname#1{\StrLeft{\pdfmdfivesum{#1}}{12}[\@asypadname]}
+
+\newcommand{\@asypadname}{}
+\newwrite\@asypadfile
+
+\newcommand{\@asypadcore}[1]{
+    \@asypadsetname{#1}
+    \immediate\openout\@asypadfile=\asypadprefix/\@asypadname.apexe
+    \immediate\write\@asypadfile{java -jar /Users/raymondfeng/Documents/AsyPadv2.0.beta.jar conv #1 &>`dirname $0`/\@asypadname.out}
+    \immediate\closeout\@asypadfile
+    \IfFileExists{\asypadprefix/\@asypadname.out}{\input{\asypadprefix/\@asypadname.out}}{\PackageWarning{asypad}{file `\asypadprefix/\@asypadname.out' not found}}
+}
+
+\newcommand{\asypad}[1]{\@asypadcore{#1}}

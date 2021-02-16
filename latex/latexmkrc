@@ -1,0 +1,3 @@
+# AsyPad setup
+sub asypad_run { return system("bash '$_[0].apexe'"); }
+add_cus_dep("apexe", "out", 0, "asypad_run");
