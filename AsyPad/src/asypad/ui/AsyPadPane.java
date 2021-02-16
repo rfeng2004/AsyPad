@@ -31,7 +31,7 @@ import asypad.ui.menus.*;
  * A special drawing pane that interacts with the user and can be integrated into
  * other JavaFX applications.
  * @author Raymond Feng
- * @version 1.0
+ * @version 2.0
  */
 public class AsyPadPane extends Pane
 {

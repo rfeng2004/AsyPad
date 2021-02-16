@@ -310,7 +310,7 @@ public class AsyPadMenuBar extends MenuBar
 				licenseInfo.setText("AsyPad: A simple drawing tool that can convert diagrams into Asymptote code.\n" + 
 						"For more information visit: https://github.com/rfeng2004/AsyPad\n" + 
 						"\n" + 
-						"Copyright (C) 2018 Raymond Feng\n" + 
+						"Copyright (C) 2021 Raymond Feng\n" + 
 						"\n" + 
 						"This program is free software: you can redistribute it and/or modify\n" + 
 						"it under the terms of the GNU General Public License as published by\n" + 
@@ -328,6 +328,7 @@ public class AsyPadMenuBar extends MenuBar
 				about.setScene(scene);
 				about.setAlwaysOnTop(true);
 				about.setTitle("About AsyPad");
+				about.setResizable(false);
 				about.show();
 			}
 		});

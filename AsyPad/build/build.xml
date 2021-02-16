@@ -104,9 +104,9 @@
 			<fx:resources refid="appRes"/>
 	
 			<manifest>
-				<attribute name="Implementation-Vendor" value=""/>
+				<attribute name="Implementation-Vendor" value="Raymond Feng"/>
 				<attribute name="Implementation-Title" value="AsyPad"/>
-				<attribute name="Implementation-Version" value="0.1"/>
+				<attribute name="Implementation-Version" value="2.0"/>
 				<attribute name="JavaFX-Feature-Proxy" value="None"/>
 			</manifest>
 		</fx:jar>
@@ -115,7 +115,7 @@
 			height="700" width="1000"
 			outdir="build/dist" outfile="AsyPad"
 			placeholderref="asypad" placeholderid="AsyPad"
-			nativeBundles="all" verbose="true">
+			nativeBundles="dmg" verbose="true">
 			<fx:application name="AsyPad" mainClass="asypad.ui.AsyPad"/>
 			<fx:resources>
 				<fx:fileset dir="dist">
