@@ -310,7 +310,7 @@ public class AsyPadMenuBar extends MenuBar
 				licenseInfo.setText("AsyPad: A simple drawing tool that can convert diagrams into Asymptote code.\n" + 
 						"For more information visit: https://github.com/rfeng2004/AsyPad\n" + 
 						"\n" + 
-						"Copyright (C) 2021 Raymond Feng\n" + 
+						"Copyright (C) 2018-2021 Raymond Feng\n" + 
 						"\n" + 
 						"This program is free software: you can redistribute it and/or modify\n" + 
 						"it under the terms of the GNU General Public License as published by\n" + 
@@ -341,7 +341,7 @@ public class AsyPadMenuBar extends MenuBar
 				Stage cred = new Stage();
 				FlowPane p = new FlowPane();
 				Scene scene = new Scene(p, 500, 120);
-				Label creds = new Label("AsyPad v" + AsyPad.VERSION + "\nCreator: Raymond Feng\nCollaborators: Anthony Wang\nTester: Wenyi Feng");
+				Label creds = new Label("AsyPad v" + AsyPad.VERSION + "\nCreator: Raymond Feng\nCollaborators: Anthony Wang");//\nTester: Wenyi Feng"); //wanted to be removed
 				creds.setAlignment(Pos.CENTER);
 				creds.setStyle("-fx-font: 24 arial");
 				creds.setPrefSize(500, 120);
@@ -349,6 +349,7 @@ public class AsyPadMenuBar extends MenuBar
 				cred.setScene(scene);
 				cred.setAlwaysOnTop(true);
 				cred.setTitle("Credits");
+				cred.setResizable(false);
 				cred.show();
 			}
 		});
