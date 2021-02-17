@@ -12,7 +12,7 @@
 \newcommand{\@asypadcore}[1]{
     \@asypadsetname{#1}
     \immediate\openout\@asypadfile=\asypadprefix/\@asypadname.apexe
-    \immediate\write\@asypadfile{java -jar /Users/raymondfeng/Documents/AsyPadv2.0.beta.jar conv #1 &>`dirname $0`/\@asypadname.out}
+    \immediate\write\@asypadfile{java -jar /Applications/AsyPad.app/Contents/Java/AsyPad.jar conv #1 &>`dirname $0`/\@asypadname.out}
     \immediate\closeout\@asypadfile
     \IfFileExists{\asypadprefix/\@asypadname.out}{\input{\asypadprefix/\@asypadname.out}}{\PackageWarning{asypad}{file `\asypadprefix/\@asypadname.out' not found}}
 }
