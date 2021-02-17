@@ -116,7 +116,7 @@
 			height="700" width="1000"
 			outdir="build/dist" outfile="AsyPad"
 			placeholderref="asypad" placeholderid="AsyPad"
-			nativeBundles="image" verbose="true">
+			nativeBundles="pkg" verbose="true">
 			<fx:application refId="AsyPadApp"/>
 			<fx:resources refid="appRes"/>
 			<fx:info title="AsyPad" description="Easy to use drawing application.">
