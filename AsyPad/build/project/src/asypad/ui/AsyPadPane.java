@@ -10,6 +10,9 @@ package asypad.ui;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import javafx.animation.AnimationTimer;
 import javafx.event.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -28,10 +31,30 @@ import asypad.ui.menus.*;
  * A special drawing pane that interacts with the user and can be integrated into
  * other JavaFX applications.
  * @author Raymond Feng
- * @version 1.0
+ * @version 2.0
  */
 public class AsyPadPane extends Pane
 {
+	/**
+	 * Default asymptote unit size.
+	 */
+	public static final double DEFAULT_ASY_UNIT_SIZE = 1;
+	
+	/**
+	 * Current width of the pane.
+	 */
+	public static double CurrentWidth = AsyPad.DEFAULT_WIDTH;
+	
+	/**
+	 * Current height of the pane.
+	 */
+	public static double CurrentHeight = AsyPad.DEFAULT_HEIGHT;
+	
+	/**
+	 * Unit size for Asymptote conversion.
+	 */
+	public static double AsyUnitSize = DEFAULT_ASY_UNIT_SIZE;
+	
 	/**
 	 * ArrayList of all drawn Shapes.
 	 */
@@ -43,9 +66,9 @@ public class AsyPadPane extends Pane
 	private int snappedIndex;
 
 	/**
-	 * Whether the mouse has been dragged.
+	 * Whether the mouse has been dragging a shape.
 	 */
-	private boolean dragged;
+	private boolean shapeDragged;
 
 	/**
 	 * ArrayList of user selected shapes.
@@ -98,6 +121,26 @@ public class AsyPadPane extends Pane
 	private Color selected;
 
 	/**
+	 * ColorPicker option which saves custom colors during the session.
+	 */
+	private ColorPicker colorPicker;
+
+	/**
+	 * Previous mouse location (tracked for dragging background).
+	 */
+	private double pmouseX, pmouseY;
+
+	/**
+	 * Total translated amount (accumulated over a single gesture).
+	 */
+	private double totalTranslateX, totalTranslateY;
+
+	/**
+	 * Total scrolled amount (accumulated over a single gesture).
+	 */
+	private double totalScroll;
+
+	/**
 	 * Creates an AsyPadPane layout.
 	 */
 	public AsyPadPane()
@@ -113,6 +156,12 @@ public class AsyPadPane extends Pane
 		currentCircle.setFill(Color.TRANSPARENT);
 		currentCircle.setStroke(Color.BLACK);
 		selected = Color.RED;
+		colorPicker = new ColorPicker();
+		pmouseX = 0;
+		pmouseY = 0;
+		totalTranslateX = 0;
+		totalTranslateY = 0;
+		totalScroll = 0;
 
 		AsyPadMenuBar menus = new AsyPadMenuBar(this);
 		AsyPadToolBar tools = new AsyPadToolBar(this);
@@ -134,7 +183,6 @@ public class AsyPadPane extends Pane
 				if(event.getCode() == KeyCode.ESCAPE)
 				{
 					resetSelectedShapes();
-					selectedShapes.clear();
 					if(getChildren().contains(currentLine))
 					{
 						getChildren().remove(currentLine);
@@ -144,6 +192,7 @@ public class AsyPadPane extends Pane
 						getChildren().remove(currentCircle);
 					}
 				}
+				//add hotkeys?
 			}
 		});
 		this.setOnMouseMoved(new EventHandler<MouseEvent>()
@@ -172,7 +221,11 @@ public class AsyPadPane extends Pane
 				}
 				if(snappedIndex == -1)
 				{
-					setCursor(Cursor.DEFAULT);
+					if(tools.getSelectedTool() == MOUSE.MOUSE)
+					{
+						setCursor(Cursor.OPEN_HAND);
+					}
+					else setCursor(Cursor.DEFAULT);
 				}
 
 				SHAPE_TYPE tool = tools.getSelectedTool();
@@ -297,6 +350,10 @@ public class AsyPadPane extends Pane
 				SHAPE_TYPE tool = tools.getSelectedTool();
 				if(tool == MOUSE.MOUSE || tool instanceof POINT_TYPE)
 				{
+					if(snappedIndex == -1 && tool == MOUSE.MOUSE)
+					{
+						setCursor(Cursor.CLOSED_HAND);
+					}
 					if(snappedIndex != -1 && (event.getClickCount() == 2 || event.isSecondaryButtonDown()))
 					{
 						showConfigureShape(shapes.get(snappedIndex));
@@ -331,7 +388,6 @@ public class AsyPadPane extends Pane
 					{
 						Point p = new Point(event.getSceneX(), event.getSceneY(), nextPointName(1));
 						addShape(p);
-						addCommand(new DrawCommand(p, p.getX(), p.getY(), p.getName()));
 						//snappedIndex = shapes.size()-1;
 						setCursor(Cursor.HAND);
 					}
@@ -344,50 +400,12 @@ public class AsyPadPane extends Pane
 					{
 						Point p = new Point(event.getSceneX(), event.getSceneY(), shapes.get(snappedIndex), nextPointName(1));
 						addShape(p);
-						addCommand(new DrawCommand(p, p.getX(), p.getY(), p.getName()));
 						//snappedIndex = shapes.size()-1;
 						setCursor(Cursor.HAND);
 					}
 					else
 					{
-						if(lines.size() >= 2)
-						{
-							Point p = new Point(lines.get(0), lines.get(1), nextPointName(1));
-							addShape(p);
-							addCommand(new DrawCommand(p, p.getX(), p.getY(), p.getName()));
-						}
-						else if(lines.size() == 1 && circles.size() >= 1)
-						{
-							Point p1 = new Point((Line) lines.get(0), (Circle) circles.get(0), false, nextPointName(1));
-							Point p2 = new Point((Line) lines.get(0), (Circle) circles.get(0), true, nextPointName(1));
-							if(Utility.distToShape(event.getSceneX(), event.getSceneY(), p1) < Utility.distToShape(event.getSceneX(), event.getSceneY(), p2))
-							{
-								addShape(p1);
-								addCommand(new DrawCommand(p1, p1.getX(), p1.getY(), p1.getName()));
-							}
-							else
-							{
-								addShape(p2);
-								addCommand(new DrawCommand(p2, p2.getX(), p2.getY(), p2.getName()));
-							}
-						}
-						else if(circles.size() >= 2)
-						{
-							Point p1 = new Point((Circle) circles.get(0), (Circle) circles.get(1), false, nextPointName(1));
-							Point p2 = new Point((Circle) circles.get(0), (Circle) circles.get(1), true, nextPointName(1));
-							if(Utility.distToShape(event.getSceneX(), event.getSceneY(), p1) < Utility.distToShape(event.getSceneX(), event.getSceneY(), p2))
-							{
-								addShape(p1);
-								//System.out.println(p1);
-								addCommand(new DrawCommand(p1, p1.getX(), p1.getY(), p1.getName()));
-							}
-							else 
-							{
-								addShape(p2);
-								//System.out.println(p2);
-								addCommand(new DrawCommand(p2, p2.getX(), p2.getY(), p2.getName()));
-							}
-						}
+						createIntersectionPoint(event.getSceneX(), event.getSceneY(), lines, circles);
 					}
 				}
 				else if(tool == POINT_TYPE.POINT_ON_SHAPE)
@@ -396,66 +414,48 @@ public class AsyPadPane extends Pane
 					{
 						Point p = new Point(event.getSceneX(), event.getSceneY(), shapes.get(snappedIndex), nextPointName(1));
 						addShape(p);
-						addCommand(new DrawCommand(p, p.getX(), p.getY(), p.getName()));
 						//snappedIndex = shapes.size()-1;
 						setCursor(Cursor.HAND);
 					}
 				}
 				else if(tool == POINT_TYPE.INTERSECTION_POINT)
 				{
-					if(snappedIndex != -1 && shapes.get(snappedIndex) instanceof Point) return;
-					ArrayList<Line> lines = new ArrayList<Line>();
-					ArrayList<Circle> circles = new ArrayList<Circle>();
-					for(Shape s : snappedShapes)
+					if(snappedIndex != -1)
 					{
-						if(s instanceof Line)
+						if(shapes.get(snappedIndex) instanceof Point) return;
+						else if(snappedShapes.size() == 1)
 						{
-							lines.add((Line) s);
-						}
-						else if(s instanceof Circle)
-						{
-							circles.add((Circle) s);
+							if(!selectedShapes.contains(shapes.get(snappedIndex))) selectedShapes.add(shapes.get(snappedIndex));
 						}
 					}
-					if(lines.size() >= 2)
+					if(selectedShapes.isEmpty())
 					{
-						Point p = new Point(lines.get(0), lines.get(1), nextPointName(1));
-						addShape(p);
-						addCommand(new DrawCommand(p, p.getX(), p.getY(), p.getName()));
+						ArrayList<Line> lines = new ArrayList<Line>();
+						ArrayList<Circle> circles = new ArrayList<Circle>();
+						for(Shape s : snappedShapes)
+						{
+							if(s instanceof Line)
+							{
+								lines.add((Line) s);
+							}
+							else if(s instanceof Circle)
+							{
+								circles.add((Circle) s);
+							}
+						}
+						createIntersectionPoint(event.getSceneX(), event.getSceneY(), lines, circles);
 					}
-					else if(lines.size() == 1 && circles.size() >= 1)
+					else if(selectedShapes.size() == 2)
 					{
-						Point p1 = new Point((Line) lines.get(0), (Circle) circles.get(0), false, nextPointName(1));
-						Point p2 = new Point((Line) lines.get(0), (Circle) circles.get(0), true, nextPointName(1));
-						if(Utility.distToShape(event.getSceneX(), event.getSceneY(), p1) < Utility.distToShape(event.getSceneX(), event.getSceneY(), p2))
-						{
-							addShape(p1);
-							//System.out.println(p1);
-							addCommand(new DrawCommand(p1, p1.getX(), p1.getY(), p1.getName()));
-						}
-						else 
-						{
-							addShape(p2);
-							//System.out.println(p2);
-							addCommand(new DrawCommand(p2, p2.getX(), p2.getY(), p2.getName()));
-						}
-					}
-					else if(circles.size() >= 2)
-					{
-						Point p1 = new Point((Circle) circles.get(0), (Circle) circles.get(1), false, nextPointName(1));
-						Point p2 = new Point((Circle) circles.get(0), (Circle) circles.get(1), true, nextPointName(1));
-						if(Utility.distToShape(event.getSceneX(), event.getSceneY(), p1) < Utility.distToShape(event.getSceneX(), event.getSceneY(), p2))
-						{
-							addShape(p1);
-							//System.out.println(p1);
-							addCommand(new DrawCommand(p1, p1.getX(), p1.getY(), p1.getName()));
-						}
-						else 
-						{
-							addShape(p2);
-							//System.out.println(p2);
-							addCommand(new DrawCommand(p2, p2.getX(), p2.getY(), p2.getName()));
-						}
+						Shape s1 = selectedShapes.get(0), s2 = selectedShapes.get(1);
+						ArrayList<Line> lines = new ArrayList<Line>();
+						ArrayList<Circle> circles = new ArrayList<Circle>();
+						if(s1 instanceof Line) lines.add((Line)s1);
+						else circles.add((Circle)s1);
+						if(s2 instanceof Line) lines.add((Line)s2);
+						else circles.add((Circle)s2);
+						createIntersectionPoint(event.getSceneX(), event.getSceneY(), lines, circles);
+						resetSelectedShapes();
 					}
 				}
 				else if(tool == POINT_TYPE.MIDPOINT)
@@ -467,10 +467,8 @@ public class AsyPadPane extends Pane
 						{
 							Point p = new Point((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), nextPointName(1));
 							addShape(p);
-							addCommand(new DrawCommand(p, p.getX(), p.getY(), p.getName()));
 						}
 						resetSelectedShapes();
-						selectedShapes.clear();
 					}
 				}
 				else if(tool == LINE_TYPE.SEGMENT || tool == LINE_TYPE.LINE)
@@ -484,17 +482,14 @@ public class AsyPadPane extends Pane
 							{
 								Line l = new Line((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), true);
 								addShape(l);
-								addCommand(new DrawCommand(l));
 							}
 							else 
 							{
 								Line l = new Line((Point) selectedShapes.get(0), (Point) selectedShapes.get(1), false);
 								addShape(l);
-								addCommand(new DrawCommand(l));
 							}
 						}
 						resetSelectedShapes();
-						selectedShapes.clear();
 						getChildren().remove(currentLine);
 					}
 				}
@@ -530,13 +525,11 @@ public class AsyPadPane extends Pane
 							{
 								Line l = new Line((Point) selectedShapes.get(0), (Line) selectedShapes.get(1), true);
 								addShape(l);
-								addCommand(new DrawCommand(l));
 							}
 							else 
 							{
 								Line l = new Line((Point) selectedShapes.get(0), (Line) selectedShapes.get(1), false);
 								addShape(l);
-								addCommand(new DrawCommand(l));
 							}
 						}
 						else 
@@ -545,17 +538,14 @@ public class AsyPadPane extends Pane
 							{
 								Line l = new Line((Point) selectedShapes.get(1), (Line) selectedShapes.get(0), true);
 								addShape(l);
-								addCommand(new DrawCommand(l));
 							}
 							else
 							{
 								Line l = new Line((Point) selectedShapes.get(1), (Line) selectedShapes.get(0), false);
 								addShape(l);
-								addCommand(new DrawCommand(l));
 							}
 						}
 						resetSelectedShapes();
-						selectedShapes.clear();
 						getChildren().remove(currentLine);
 					}
 				}
@@ -571,10 +561,8 @@ public class AsyPadPane extends Pane
 						{
 							Line l = new Line(p1, p2, p3);
 							addShape(l);
-							addCommand(new DrawCommand(l));
 						}
 						resetSelectedShapes();
-						selectedShapes.clear();
 					}
 				}
 				else if(tool == LINE_TYPE.PERPENDICULAR_BISECTOR)
@@ -586,10 +574,8 @@ public class AsyPadPane extends Pane
 						{
 							Line l = new Line((Point) selectedShapes.get(0), (Point) selectedShapes.get(1));
 							addShape(l);
-							addCommand(new DrawCommand(l));
 						}
 						resetSelectedShapes();
-						selectedShapes.clear();
 					}
 				}
 				else if(tool == LINE_TYPE.TANGENT_LINE)
@@ -618,55 +604,43 @@ public class AsyPadPane extends Pane
 					}
 					if(selectedShapes.size() == 2)
 					{
+						Point p;
+						Circle c;
 						if(selectedShapes.get(0) instanceof Point)
 						{
-							Point p = (Point) selectedShapes.get(0);
-							Circle c = (Circle) selectedShapes.get(1);
-							if(Utility.dist(p.getX(), p.getY(), c.getCenterX(), c.getCenterY()) > c.getRadius())
-							{
-								Point p1 = new Point(Utility.tangentX(p.getX(), p.getY(), c, false), Utility.tangentY(p.getX(), p.getY(), c, false));
-								Point p2 = new Point(Utility.tangentX(p.getX(), p.getY(), c, true), Utility.tangentY(p.getX(), p.getY(), c, true));
-								double mx = event.getSceneX();
-								double my = event.getSceneY();
-								if(Utility.dist(mx, my, p1.getX(), p1.getY()) < Utility.dist(mx, my, p2.getX(), p2.getY()))
-								{
-									Line l = new Line((Point) selectedShapes.get(0), (Circle) selectedShapes.get(1), false);
-									addShape(l);
-									addCommand(new DrawCommand(l));
-								}
-								else
-								{
-									Line l = new Line((Point) selectedShapes.get(0), (Circle) selectedShapes.get(1), true);
-									addShape(l);
-									addCommand(new DrawCommand(l));
-								}
-							}
-
+							p = (Point) selectedShapes.get(0);
+							c = (Circle) selectedShapes.get(1);
 						}
 						else
 						{
-							Point p = (Point) selectedShapes.get(1);
-							Circle c = (Circle) selectedShapes.get(0);
-							if(Utility.dist(p.getX(), p.getY(), c.getCenterX(), c.getCenterY()) > c.getRadius())
+							p = (Point) selectedShapes.get(1);
+							c = (Circle) selectedShapes.get(0);
+						}
+						double dist = Utility.dist(p.getX(), p.getY(), c.getCenterX(), c.getCenterY());
+						if(Utility.equal(dist, c.getRadius()))
+						{
+							Line l = new Line(p, c, false);
+							addShape(l);
+						}
+						else if(dist > c.getRadius())
+						{
+							Point p1 = new Point(Utility.tangentX(p.getX(), p.getY(), c, false), Utility.tangentY(p.getX(), p.getY(), c, false));
+							Point p2 = new Point(Utility.tangentX(p.getX(), p.getY(), c, true), Utility.tangentY(p.getX(), p.getY(), c, true));
+							double mx = event.getSceneX();
+							double my = event.getSceneY();
+							if(Utility.dist(mx, my, p1.getX(), p1.getY()) < Utility.dist(mx, my, p2.getX(), p2.getY()))
 							{
-								Point p1 = new Point(Utility.tangentX(p.getX(), p.getY(), c, false), Utility.tangentY(p.getX(), p.getY(), c, false));
-								Point p2 = new Point(Utility.tangentX(p.getX(), p.getY(), c, true), Utility.tangentY(p.getX(), p.getY(), c, true));
-								if(Utility.distToShape(event.getSceneX(), event.getSceneY(), p1) < Utility.distToShape(event.getSceneX(), event.getSceneY(), p2))
-								{
-									Line l = new Line((Point) selectedShapes.get(1), (Circle) selectedShapes.get(0), false);
-									addShape(l);
-									addCommand(new DrawCommand(l));
-								}
-								else
-								{
-									Line l = new Line((Point) selectedShapes.get(1), (Circle) selectedShapes.get(0), true);
-									addShape(l);
-									addCommand(new DrawCommand(l));
-								}
+								Line l = new Line(p, c, false);
+								addShape(l);
+							}
+							else
+							{
+								Line l = new Line(p, c, true);
+								addShape(l);
 							}
 						}
+
 						resetSelectedShapes();
-						selectedShapes.clear();
 					}
 				}
 				else if(tool == CIRCLE_TYPE.CIRCLE)
@@ -678,10 +652,8 @@ public class AsyPadPane extends Pane
 						{
 							Circle c = new Circle((Point) selectedShapes.get(0), (Point) selectedShapes.get(1));
 							addShape(c);
-							addCommand(new DrawCommand(c));
 						}
 						resetSelectedShapes();
-						selectedShapes.clear();
 						getChildren().remove(currentCircle);
 					}
 				}
@@ -697,10 +669,8 @@ public class AsyPadPane extends Pane
 						{
 							Circle c = new Circle(p1, p2, p3, true);
 							addShape(c);
-							addCommand(new DrawCommand(c));
 						}
 						resetSelectedShapes();
-						selectedShapes.clear();
 						getChildren().remove(currentCircle);
 					}
 				}
@@ -716,14 +686,12 @@ public class AsyPadPane extends Pane
 						{
 							Circle c = new Circle(p1, p2, p3, false);
 							addShape(c);
-							addCommand(new DrawCommand(c));
 						}
 						resetSelectedShapes();
-						selectedShapes.clear();
 						getChildren().remove(currentCircle);
 					}
 				}
-				else if(tool == CIRCLE_TYPE.TANGENT_CIRCLE)
+				/*else if(tool == CIRCLE_TYPE.TANGENT_CIRCLE)
 				{
 					if(snappedIndex != -1)
 					{
@@ -776,20 +744,20 @@ public class AsyPadPane extends Pane
 							{
 								Circle c = new Circle(c1, c2, p, false);
 								addShape(c);
-								addCommand(new DrawCommand(c));
 							}
 							else if(Utility.equal(Utility.distToShape(c2.getCenterX(), c2.getCenterY(), p), c2.getRadius()))
 							{
 								Circle c = new Circle(c2, c1, p, false);
 								addShape(c);
-								addCommand(new DrawCommand(c));
 							}
 						}
 						resetSelectedShapes();
-						selectedShapes.clear();
 						getChildren().remove(currentCircle);
 					}
-				}
+				}*/
+
+				pmouseX = event.getSceneX();
+				pmouseY = event.getSceneY();
 
 				setSelectedShapes();
 				clearGarbage();
@@ -807,22 +775,31 @@ public class AsyPadPane extends Pane
 						Shape s = shapes.get(snappedIndex);
 						if(s.getType() == POINT_TYPE.POINT)
 						{
-							dragged = true;
+							shapeDragged = true;
 							((Point) s).setX(Math.max(0, event.getSceneX()));
 							((Point) s).setY(Math.max(0, event.getSceneY()));
 						}
 						else if(s.getType() == POINT_TYPE.POINT_ON_SHAPE)
 						{
-							dragged = true;
+							shapeDragged = true;
 							((Point) s).setRelativeLocation(event.getSceneX(), event.getSceneY());
 						}
+					}
+					else if(tool == MOUSE.MOUSE)
+					{
+						//setCursor(Cursor.CLOSED_HAND);
+						double dx = event.getSceneX()-pmouseX;
+						double dy = event.getSceneY()-pmouseY;
+						totalTranslateX += dx;
+						totalTranslateY += dy;
+						translate(dx, dy);
 					}
 				}
 				else if(tool == MOUSE.DRAG)
 				{
 					if(snappedIndex != -1 && shapes.get(snappedIndex) instanceof Point)
 					{
-						dragged = true;
+						shapeDragged = true;
 						Point p = (Point) shapes.get(snappedIndex);
 						double cx = event.getSceneX();
 						double cy = event.getSceneY();
@@ -834,6 +811,9 @@ public class AsyPadPane extends Pane
 						p.getLabel().setDirection(-direction);
 					}
 				}
+
+				pmouseX = event.getSceneX();
+				pmouseY = event.getSceneY();
 			}
 		});
 		this.setOnMouseReleased(new EventHandler<MouseEvent>()
@@ -841,9 +821,9 @@ public class AsyPadPane extends Pane
 			public void handle(MouseEvent event)
 			{
 				SHAPE_TYPE tool = tools.getSelectedTool();
-				if(dragged)
+				if(shapeDragged)
 				{
-					if(tool == MOUSE.MOUSE)
+					if(tool == MOUSE.MOUSE || tool instanceof POINT_TYPE)
 					{
 						Shape s = shapes.get(snappedIndex);
 						if(s.getType() == POINT_TYPE.POINT)
@@ -874,7 +854,59 @@ public class AsyPadPane extends Pane
 						addCommand(new DragCommand(p, -direction));
 					}
 				}
-				dragged = false;
+				if(getCursor() == Cursor.CLOSED_HAND)
+				{
+					setCursor(Cursor.OPEN_HAND);
+					addCommand(new TranslateCommand(totalTranslateX, totalTranslateY));
+					totalTranslateX = 0;
+					totalTranslateY = 0;
+				}
+				shapeDragged = false;
+			}
+		});
+
+		//handle zooming with zoom gesture or scrolling
+		this.setOnZoom(new EventHandler<ZoomEvent>()
+		{
+			public void handle(ZoomEvent event)
+			{
+				zoom(event.getSceneX(), event.getSceneY(), event.getZoomFactor());
+			}
+		});
+		this.setOnZoomFinished(new EventHandler<ZoomEvent>()
+		{
+			public void handle(ZoomEvent event)
+			{
+				addCommand(new ZoomCommand(event.getSceneX(), event.getSceneY(), event.getTotalZoomFactor()));
+			}
+		});
+		this.setOnScroll(new EventHandler<ScrollEvent>()
+		{
+			private int framesMissed = 0;
+			public void handle(ScrollEvent event)
+			{
+				framesMissed = 0;
+				if(totalScroll == 0)
+				{
+					AnimationTimer update = new AnimationTimer()
+					{
+						public void handle(long now)
+						{
+							if(framesMissed >= 10) //missing greater than 10 frames means scroll is over
+							{
+								addCommand(new ZoomCommand(event.getSceneX(), event.getSceneY(), Math.pow(Math.E, totalScroll/5000)));
+								totalScroll = 0;
+								stop();
+							}
+							framesMissed++;
+						}
+					};
+					update.start();
+				}
+				double factor = Math.pow(Math.E, event.getDeltaY()/5000);
+				totalScroll += event.getDeltaY();
+				//System.out.println(totalScroll);
+				zoom(event.getSceneX(), event.getSceneY(), factor);
 			}
 		});
 	}
@@ -889,16 +921,34 @@ public class AsyPadPane extends Pane
 	}
 
 	/**
-	 * Adds a new shape to this pane, checking whether a shape with the same name already exists.
+	 * Adds a new shape to this pane, checking whether a shape with the same name already exists and adding a draw command into the command list.
 	 * @param shape shape to add
 	 */
 	public void addShape(Shape shape)
 	{
 		if(isDuplicateName(shape.getName())) return;
+		addCommand(new DrawCommand(shape));
 		shapes.add(shape);
 		shape.draw(this);
 		shape.getObject().toBack();
 		shape.getLabel().toBack();
+	}
+
+	/**
+	 * Adds a new shape to this pane with the option to bypass checks and adding the command
+	 * @param shape shape to add
+	 * @param bypass whether checks and adding command should be bypassed
+	 */
+	public void addShape(Shape shape, boolean bypass)
+	{
+		if(!bypass) addShape(shape);
+		else
+		{
+			shapes.add(shape);
+			shape.draw(this);
+			shape.getObject().toBack();
+			shape.getLabel().toBack();
+		}
 	}
 
 	/**
@@ -909,11 +959,7 @@ public class AsyPadPane extends Pane
 	{
 		for(Shape s : shapes)
 		{
-			if(isDuplicateName(s.getName())) continue;
-			this.shapes.add(s);
-			s.draw(this);
-			s.getObject().toBack();
-			s.getLabel().toBack();
+			addShape(s);
 		}
 	}
 
@@ -932,13 +978,14 @@ public class AsyPadPane extends Pane
 	}
 
 	/**
-	 * Clears the AsyPadPane by deleting all shapes and resetting the Stroke Width to the default.
+	 * Clears the AsyPadPane by deleting all shapes and resetting the global variables to their defaults.
 	 */
 	public void clear()
 	{
 		for(Shape s : shapes) s.delete();
 		update();
-		Shape.StrokeWidth = 3;
+		Shape.StrokeWidth = Shape.DEFAULT_STROKE_WIDTH;
+		AsyUnitSize = DEFAULT_ASY_UNIT_SIZE;
 	}
 
 	/**
@@ -961,10 +1008,9 @@ public class AsyPadPane extends Pane
 	public void undo()
 	{
 		resetSelectedShapes();
-		selectedShapes.clear();
 		getChildren().remove(currentLine);
 		getChildren().remove(currentCircle);
-		
+
 		if(currentCommandIndex > -1) currentCommandIndex--;
 		clear();
 		for(int i = 0; i <= currentCommandIndex; i++)
@@ -980,10 +1026,9 @@ public class AsyPadPane extends Pane
 	public void redo()
 	{
 		resetSelectedShapes();
-		selectedShapes.clear();
 		getChildren().remove(currentLine);
 		getChildren().remove(currentCircle);
-		
+
 		if(currentCommandIndex < commands.size()-1)
 		{
 			currentCommandIndex++;
@@ -1037,7 +1082,168 @@ public class AsyPadPane extends Pane
 			s.refresh();
 		}
 	}
-	
+
+	/**
+	 * Updates the label that shows the current tool.
+	 * @param tool new current tool
+	 */
+	public void updateTool(String tool)
+	{
+		currentTool.setText("Tool: " + tool);
+		currentTool.requestFocus(); //needed for key listener to be valid on the pane.
+		resetSelectedShapes();
+		if(getChildren().contains(currentLine))
+		{
+			getChildren().remove(currentLine);
+		}
+		if(getChildren().contains(currentCircle))
+		{
+			getChildren().remove(currentCircle);
+		}
+	}
+
+	/**
+	 * Sets the description of the current tool.
+	 * @param description description of tool.
+	 */
+	public void updateToolDescription(String description)
+	{
+		currentToolDescription.setText(description);
+	}
+
+	/**
+	 * Shows a live updating Asymptote Panel.
+	 */
+	public void showAsyPanel()
+	{
+		Stage asyPanel = new Stage();
+		FlowPane p = new FlowPane();
+		Scene scene = new Scene(p, 500, 600);
+
+		TextArea asymptote = new TextArea();
+		asymptote.setPrefSize(500, 600);
+		asymptote.setEditable(false);
+		asymptote.setText(toAsymptote());
+
+		AnimationTimer update = new AnimationTimer()
+		{
+			private long lastUpdate = 0;
+			public void handle(long now)
+			{
+				if(now-lastUpdate > 1e9)
+				{
+					lastUpdate = now;
+					double vScroll = asymptote.getScrollTop();
+					double hScroll = asymptote.getScrollLeft();
+					if(!toAsymptote().equals(asymptote.getText()))
+					{
+						asymptote.setText(toAsymptote());
+					}
+					asymptote.setScrollTop(vScroll);
+					asymptote.setScrollLeft(hScroll);
+				}
+			}
+		};
+		update.start();
+
+		p.getChildren().add(asymptote);
+		asyPanel.setScene(scene);
+		asyPanel.setAlwaysOnTop(true);
+		asyPanel.setTitle("Live Updating Asymptote Panel");
+		asyPanel.setResizable(false);
+		asyPanel.show();
+	}
+
+	/**
+	 * Translates the entire figure by the given amount.
+	 * @param dx translation in x direction
+	 * @param dy translation in y direction
+	 */
+	public void translate(double dx, double dy)
+	{
+		for(Shape s : shapes)
+		{
+			//move all dependency level 0 shapes by dx and dy, all children will follow
+			if(s.getLevel() == 0)
+			{
+				Point p = (Point) s;
+				p.setX(p.getX()+dx);
+				p.setY(p.getY()+dy);
+			}
+		}
+		update();
+	}
+
+	/**
+	 * Zooms by the specified factor with respect to the specified location
+	 * @param zx x-coordinate of zoom
+	 * @param zy y-coordinate of zoom
+	 * @param factor zoom factor
+	 */
+	public void zoom(double zx, double zy, double factor)
+	{
+		HashMap<String, Double> targetX = new HashMap<String, Double>();
+		HashMap<String, Double> targetY = new HashMap<String, Double>();
+		//get target locations for all points with degrees of freedom
+		for(Shape s : shapes)
+		{
+			if(s.getLevel() == 0 || s.getType() == POINT_TYPE.POINT_ON_SHAPE)
+			{
+				Point p = (Point) s;
+				targetX.put(p.getName(), zx+factor*(p.getX()-zx));
+				targetY.put(p.getName(), zy+factor*(p.getY()-zy));
+			}
+		}
+		/*for(Shape s : shapes)
+		{
+			//zoom all dependency level 0 shapes by factor about zx and zy, all children will follow
+			if(s.getLevel() == 0)
+			{
+				Point p = (Point) s;
+				p.setX(targetX.get(p.getName()));
+				p.setY(targetY.get(p.getName()));
+			}
+			//relative location of points on shape doesn't always zoom correctly, so manually fix
+			if(s.getType() == POINT_TYPE.POINT_ON_SHAPE)
+			{
+				Point p = (Point) s;
+				p.setRelativeLocation(targetX.get(p.getName()), targetY.get(p.getName()));
+			}
+		}*/
+		
+		//go through points in order of dependency level
+		int MAXLVL = 0;
+		for(Shape s : shapes)
+		{
+			if(s.getLevel() > MAXLVL && s.isInAsyCode()) MAXLVL = s.getLevel();
+		}
+		for(int i = 0; i <= MAXLVL; i++)
+		{
+			for(Shape s : shapes)
+			{
+				if(s.getLevel() == 0 || s.getType() == POINT_TYPE.POINT_ON_SHAPE)
+				{
+					Point p = (Point) s;
+					if(p.getLevel() == i)
+					{
+						//zoom all dependency level 0 shapes by factor about zx and zy, all children will follow
+						if(i == 0)
+						{
+							p.setX(targetX.get(p.getName()));
+							p.setY(targetY.get(p.getName()));
+						}
+						//relative location of points on shape doesn't always zoom correctly, so manually fix
+						else
+						{
+							p.setRelativeLocation(targetX.get(p.getName()), targetY.get(p.getName()));
+						}
+					}
+				}
+			}
+		}
+		update();
+	}
+
 	/**
 	 * Clears out the garbage shapes that were used for calculation but are not needed anymore.
 	 */
@@ -1073,7 +1279,6 @@ public class AsyPadPane extends Pane
 		Button delete = new Button("Delete Point");
 		Button hide = new Button("Hide Point");
 		Label chooseColor = new Label("Set Point Color: ");
-		ColorPicker colorPicker = new ColorPicker();
 		flowPane.getChildren().addAll(name, submit, cancel, delete, hide, chooseColor, colorPicker);
 		cancel.requestFocus();
 		submit.setOnAction(new EventHandler<ActionEvent>()
@@ -1154,7 +1359,6 @@ public class AsyPadPane extends Pane
 			Button delete = new Button("Delete Shape");
 			Button hide = new Button("Hide Shape");
 			Label chooseColor = new Label("Set Shape Color: ");
-			ColorPicker colorPicker = new ColorPicker();
 			flowPane.getChildren().addAll(cancel, delete, hide, chooseColor, colorPicker);
 			cancel.requestFocus();
 			cancel.setOnAction(new EventHandler<ActionEvent>()
@@ -1202,34 +1406,6 @@ public class AsyPadPane extends Pane
 			configure.setTitle("Shape Options");
 			configure.show();
 		}
-	}
-
-	/**
-	 * Updates the label that shows the current tool.
-	 * @param tool new current tool
-	 */
-	public void updateTool(String tool)
-	{
-		currentTool.setText("Tool: " + tool);
-		resetSelectedShapes();
-		selectedShapes.clear();
-		if(getChildren().contains(currentLine))
-		{
-			getChildren().remove(currentLine);
-		}
-		if(getChildren().contains(currentCircle))
-		{
-			getChildren().remove(currentCircle);
-		}
-	}
-
-	/**
-	 * Sets the description of the current tool.
-	 * @param description description of tool.
-	 */
-	public void updateToolDescription(String description)
-	{
-		currentToolDescription.setText(description);
 	}
 
 	/**
@@ -1290,7 +1466,7 @@ public class AsyPadPane extends Pane
 	}
 
 	/**
-	 * Resets the stroke color of all selected shapes to their original color.
+	 * Resets the stroke color of all selected shapes to their original color and clears the selectedShapes array.
 	 */
 	private void resetSelectedShapes()
 	{
@@ -1302,6 +1478,7 @@ public class AsyPadPane extends Pane
 				s.getObject().setFill(s.getColor());
 			}
 		}
+		selectedShapes.clear();
 	}
 
 	/**
@@ -1356,15 +1533,14 @@ public class AsyPadPane extends Pane
 		}
 
 		if(isAllLettersOrNumbers) return true;
-		/*else if(pname.length() == 2) //check for a point prime
+		else if(pname.length() == 2) //check for a point prime
 		{
-			if(pname.charAt(1) != '\'') return false;
-			else return true;
-		}*/
+			return pname.charAt(1) == '\'';
+		}
 		else if(pname.length() == 3) //subscript names
 		{
 			if(pname.charAt(1) != '_') return false;
-			if((pname.charAt(2) < '0' || pname.charAt(2) > '9') && (pname.charAt(2) < 'a' || pname.charAt(2) > 'z')) return false;
+			if((pname.charAt(2) < '0' || pname.charAt(2) > '9') && (pname.charAt(2) < 'a' || pname.charAt(2) > 'z') && (pname.charAt(2) < 'A' || pname.charAt(2) > 'Z')) return false;
 			else return true;
 		}
 		else return false;
@@ -1382,6 +1558,64 @@ public class AsyPadPane extends Pane
 			if(s.getName().equals(name)) return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Creates an intersection point from a mouse click at mouseX, mouseY using the known lines and circles passing near the click.
+	 * @param mouseX x-coordinate of mouse location
+	 * @param mouseY y-coordinate of mouse location
+	 * @param lines lines passing near the click
+	 * @param circles circles passing near the click
+	 */
+	private void createIntersectionPoint(double mouseX, double mouseY, ArrayList<Line> lines, ArrayList<Circle> circles)
+	{
+		if(lines.size() >= 2)
+		{
+			Point p = new Point(lines.get(0), lines.get(1), nextPointName(1));
+			addShape(p);
+		}
+		else if(lines.size() == 1 && circles.size() >= 1)
+		{
+			Point p1 = new Point((Line) lines.get(0), (Circle) circles.get(0), false, nextPointName(1));
+			Point p2 = new Point((Line) lines.get(0), (Circle) circles.get(0), true, nextPointName(1));
+			if(Utility.distToShape(mouseX, mouseY, p1) < Utility.distToShape(mouseX, mouseY, p2))
+			{
+				addShape(p1);
+				//System.out.println(p1);
+			}
+			else 
+			{
+				addShape(p2);
+				//System.out.println(p2);
+			}
+		}
+		else if(circles.size() >= 2)
+		{
+			Point p1 = new Point((Circle) circles.get(0), (Circle) circles.get(1), false, nextPointName(1));
+			Point p2 = new Point((Circle) circles.get(0), (Circle) circles.get(1), true, nextPointName(1));
+			if(Utility.distToShape(mouseX, mouseY, p1) < Utility.distToShape(mouseX, mouseY, p2))
+			{
+				addShape(p1);
+				//System.out.println(p1);
+			}
+			else 
+			{
+				addShape(p2);
+				//System.out.println(p2);
+			}
+		}
+	}
+
+	private void resetPointPrimeNames()
+	{
+		for(Shape s : shapes)
+		{
+			if(s instanceof Point && s.getName().length() == 2 && s.getName().charAt(1) == 'p')
+			{
+				s.setName(""+s.getName().charAt(0)+'\'');
+				s.refreshName();
+			}
+		}
 	}
 
 	/**
@@ -1405,6 +1639,7 @@ public class AsyPadPane extends Pane
 		catch(IOException ioe)
 		{
 			ioe.printStackTrace();
+			updateToolDescription("Error while loading " + apad.getAbsolutePath());
 		}
 		update();
 		updateToolDescription("Loaded diagram from " + apad.getAbsolutePath());
@@ -1417,6 +1652,8 @@ public class AsyPadPane extends Pane
 	public String toApad()
 	{
 		String apad = "";
+		//following code is terrible: both buggy and inefficient, so it has been deprecated
+		/*
 		clear();
 		for(int i = 0; i <= currentCommandIndex; i++)
 		{
@@ -1427,6 +1664,56 @@ public class AsyPadPane extends Pane
 			if(commands.get(i) instanceof RenameCommand) commands.get(i).doAction(this);
 		}
 		update();
+		*/
+
+		int MAXLVL = 0;
+		
+		//if global vars are not at default
+		if(Shape.StrokeWidth != Shape.DEFAULT_STROKE_WIDTH)
+		{
+			apad += (new GlobalVariableCommand("StrokeWidth", Shape.StrokeWidth)).toString();
+		}
+		if(AsyUnitSize != DEFAULT_ASY_UNIT_SIZE)
+		{
+			apad += (new GlobalVariableCommand("AsyUnitSize", AsyUnitSize)).toString();
+		}
+
+		for(Shape s : shapes)
+		{
+			if(s.getLevel() > MAXLVL && s.isInAsyCode()) MAXLVL = s.getLevel();
+		}
+
+		for(int i = 0; i <= MAXLVL; i++)
+		{
+			for(Shape s : shapes)
+			{
+				if(s.getLevel() == i)
+				{
+					//draw command for the shape
+					DrawCommand draw = new DrawCommand(s);
+					apad += draw.toString();
+
+					//set hidden and color for the shape 
+					if(s.isHidden())
+					{
+						apad += (new HideCommand(s)).toString();
+					}
+					if(!s.getColor().equals(Color.BLACK))
+					{
+						apad += (new ColorCommand(s, s.getColor())).toString();
+					}
+
+					//set label direction for points
+					if(s instanceof Point)
+					{
+						Point p = (Point) s;
+						double dir = p.getLabel().getDirection();
+						//only add the command if it has been changed from the default value
+						if(!Utility.equal(dir, -Math.PI/4)) apad += (new DragCommand(p, dir)).toString();
+					}
+				}
+			}
+		}
 		return apad;
 	}
 
@@ -1436,6 +1723,12 @@ public class AsyPadPane extends Pane
 	 */
 	public String toAsymptote()
 	{
+		//dimensions of the screen
+		CurrentWidth = getWidth();
+		if(CurrentWidth == 0) CurrentWidth = AsyPad.DEFAULT_WIDTH;
+		CurrentHeight = getHeight();
+		if(CurrentHeight == 0) CurrentHeight = AsyPad.DEFAULT_HEIGHT;
+		
 		for(Shape s : shapes) s.addToAsy(); //adds all shapes to asymptote code
 		for(Shape s : shapes)
 		{
@@ -1448,18 +1741,19 @@ public class AsyPadPane extends Pane
 			{
 				Point p = (Point) s.getDependencies().get(0);
 				Circle c = (Circle) s.getDependencies().get(1);
-				if(Utility.dist(p.getX(), p.getY(), c.getCenterX(), c.getCenterY()) < c.getRadius())
+				double dist = Utility.dist(p.getX(), p.getY(), c.getCenterX(), c.getCenterY());
+				if(!Utility.equal(dist, c.getRadius()) && dist < c.getRadius())
 				{
 					//remove non-existent tangent lines
 					s.removeFromAsy();
 				}
 			}
 		}
-		String asy = "//Generated By AsyPadv" + AsyPad.VERSION + "\n";
+		String asy = "// Generated By AsyPadv" + AsyPad.VERSION + "\n";
 		asy+="import olympiad;\nimport markers;\nimport math;\nimport graph;\n";
-		asy+="//change the unit size to fit your needs\n";
-		asy+="unitsize(1cm);\n";
-		
+		asy+="// change the unit size to fit your needs\n";
+		asy+="unitsize(" + AsyUnitSize + "cm);\n";
+
 		ArrayList<String> colors = new ArrayList<String>();
 		for(Shape s : shapes)
 		{
@@ -1472,12 +1766,12 @@ public class AsyPadPane extends Pane
 				}
 			}
 		}
-		asy+="//colored pens\n";
+		asy+="// colored pens\n";
 		for(String color : colors)
 		{
 			asy+="pen c" + color + " = rgb(\"" + color + "\");\n";
 		}
-		
+
 		int MAXLVL = 0;
 		for(Shape s : shapes)
 		{
@@ -1485,16 +1779,16 @@ public class AsyPadPane extends Pane
 		}
 		for(int i = 0; i <= MAXLVL; i++)
 		{
-			asy += "//dependency level " + i + "\n";
+			asy += "// dependency level " + i + "\n";
 			if(i == 0)
 			{
-				asy += "/* You can change the coordinates of these points of dependency level 0.\n";
-				asy += "The drawing will retain the same relationships and qualities.\n";
-				asy += "Please be aware that as a result of this some of the image may be clipped off. */\n";
+				asy += "/* You can change the coordinates of these points of dependency level 0.\n "
+						+ "The drawing will retain the same relationships and qualities.\n "
+						+ "Please be aware that as a result of this some of the image may be clipped off. */\n";
 			}
 			if(i == 1)
 			{
-				asy += "//Do not change anything below, unless you are experienced in Asymptote.\n";
+				asy += "// Do not change anything below, unless you are experienced in Asymptote.\n";
 			}
 			for(Shape s : shapes)
 			{
@@ -1504,11 +1798,12 @@ public class AsyPadPane extends Pane
 				}
 			}
 		}
+		resetPointPrimeNames();
 		double xmin = 0;
-		double xmax = getWidth()/100;
-		double ymin = (Shape.INF-getHeight())/100;
-		double ymax = Shape.INF/100;
-		asy+="//clip the drawing view\n";
+		double xmax = CurrentWidth/100;
+		double ymin = 0;
+		double ymax = CurrentHeight/100;
+		asy+="// clip the drawing view\n";
 		asy+="clip((" + xmin + ", " + ymin + ")--(" + xmin + ", " + ymax + ")--(" + xmax + ", " + ymax + ")--(" + xmax + ", " + ymin + ")--cycle);";
 		return asy;
 	}

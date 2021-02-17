@@ -27,6 +27,7 @@ public class AsyPadMenuBar extends MenuBar
 {
 	/**
 	 * Creates a new AsyPad menu bar with specified parent.
+	 * @param parent the AsyPadPane that contains this AsyPadMenuBar
 	 */
 	public AsyPadMenuBar(AsyPadPane parent)
 	{
@@ -52,7 +53,7 @@ public class AsyPadMenuBar extends MenuBar
 		MenuItem saveApad = new MenuItem("Save as AsyPad File");
 		MenuItem saveAsy = new MenuItem("Save as Asymptote File");
 		MenuItem loadApad = new MenuItem("Load AsyPad File");
-		
+
 		KeyCodeCombination cs = new KeyCodeCombination(KeyCode.S, c);
 		saveApad.setAccelerator(cs);
 		saveApad.setOnAction(new EventHandler<ActionEvent>()
@@ -75,7 +76,7 @@ public class AsyPadMenuBar extends MenuBar
 				}
 			}
 		});
-		
+
 		KeyCodeCombination shiftcs = new KeyCodeCombination(KeyCode.S, c, KeyCodeCombination.SHIFT_DOWN);
 		saveAsy.setAccelerator(shiftcs);
 		saveAsy.setOnAction(new EventHandler<ActionEvent>()
@@ -113,7 +114,7 @@ public class AsyPadMenuBar extends MenuBar
 				parent.loadApad(f);
 			}
 		});
-		
+
 		file.getItems().addAll(saveApad, saveAsy, loadApad);
 
 		//undo+redo
@@ -121,11 +122,11 @@ public class AsyPadMenuBar extends MenuBar
 		MenuItem undo = new MenuItem("Undo");
 		KeyCodeCombination cz = new KeyCodeCombination(KeyCode.Z, c);
 		undo.setAccelerator(cz);
-		
+
 		MenuItem redo = new MenuItem("Redo");
 		KeyCodeCombination cy = new KeyCodeCombination(KeyCode.Y, c);
 		redo.setAccelerator(cy);
-		
+
 		//MenuItem clear = new MenuItem("Clear");
 		undo.setOnAction(new EventHandler<ActionEvent>()
 		{
@@ -153,6 +154,7 @@ public class AsyPadMenuBar extends MenuBar
 		//settings
 		Menu settings = new Menu("Settings");
 		MenuItem setStrokeWidth = new MenuItem("Set Stroke Width");
+		MenuItem setAsyUnitSize = new MenuItem("Set Asy Unit Size");
 		setStrokeWidth.setOnAction(new EventHandler<ActionEvent>()
 		{
 			public void handle(ActionEvent event)
@@ -190,7 +192,7 @@ public class AsyPadMenuBar extends MenuBar
 					public void handle(ActionEvent event)
 					{
 						Shape.StrokeWidth = (double)((int)(sw.getValue()))/10;
-						parent.addCommand(new StrokeWidthCommand(Shape.StrokeWidth));
+						parent.addCommand(new GlobalVariableCommand("StrokeWidth", Shape.StrokeWidth));
 						setSW.close();
 						parent.update();
 					}
@@ -198,13 +200,64 @@ public class AsyPadMenuBar extends MenuBar
 				p.getChildren().addAll(label, sw, refresh);
 				setSW.setScene(scene);
 				setSW.setAlwaysOnTop(true);
+				setSW.setTitle("Set Stroke Width");
 				setSW.show();
 			}
 		});
-		settings.getItems().add(setStrokeWidth);
+		setAsyUnitSize.setOnAction(new EventHandler<ActionEvent>()
+		{
+			public void handle(ActionEvent event)
+			{
+				Stage setSW = new Stage();
+				Pane p = new Pane();
+				Scene scene = new Scene(p, 250, 80);
+				Label label = new Label("Set the unit size: " + AsyPadPane.AsyUnitSize);
+				label.setPrefSize(200, 20);
+				label.setLayoutX(50);
+				label.setLayoutY(0);
+				label.setTextAlignment(TextAlignment.CENTER);
+				Slider sw = new Slider();
+				sw.setOrientation(Orientation.HORIZONTAL);
+				sw.setShowTickMarks(true);
+				sw.setMajorTickUnit(10);
+				sw.setMax(50);
+				sw.setMinorTickCount(0);
+				sw.setShowTickLabels(false);
+				sw.setPrefSize(250, 30);
+				sw.setLayoutX(0);
+				sw.setLayoutY(20);
+				sw.setValue(AsyPadPane.AsyUnitSize*10);
+				sw.valueProperty().addListener((observable, oldValue, newValue)->
+				{
+					int j = newValue.intValue();
+					label.setText("Set the unit size: " + Double.toString((double) (j)/10));
+				});
+				Button update = new Button("Update");
+				update.setPrefHeight(30);
+				update.setLayoutX(90);
+				update.setLayoutY(50);
+				update.setOnAction(new EventHandler<ActionEvent>()
+				{
+					public void handle(ActionEvent event)
+					{
+						AsyPadPane.AsyUnitSize = (double)((int)(sw.getValue()))/10;
+						parent.addCommand(new GlobalVariableCommand("AsyUnitSize", AsyPadPane.AsyUnitSize));
+						setSW.close();
+						parent.update();
+					}
+				});
+				p.getChildren().addAll(label, sw, update);
+				setSW.setScene(scene);
+				setSW.setAlwaysOnTop(true);
+				setSW.setTitle("Set Asy Unit Size");
+				setSW.show();
+			}
+		});
+		settings.getItems().addAll(setStrokeWidth, setAsyUnitSize);
 
 		Menu view = new Menu("View");
 		MenuItem showHidden = new MenuItem("Show Hidden Shapes");
+		MenuItem showAsyPanel = new MenuItem("Show Asy Panel");
 		showHidden.setOnAction(new EventHandler<ActionEvent>()
 		{
 			public void handle(ActionEvent event)
@@ -217,7 +270,14 @@ public class AsyPadMenuBar extends MenuBar
 				parent.update();
 			}
 		});
-		view.getItems().add(showHidden);
+		showAsyPanel.setOnAction(new EventHandler<ActionEvent>()
+		{
+			public void handle(ActionEvent event)
+			{
+				parent.showAsyPanel();
+			}
+		});
+		view.getItems().addAll(showHidden, showAsyPanel);
 
 		//help menu (about and credits)
 		Menu help = new Menu("Help");
@@ -230,27 +290,27 @@ public class AsyPadMenuBar extends MenuBar
 		{
 			public void handle(ActionEvent event)
 			{
-				Stage a = new Stage();
+				Stage about = new Stage();
 				FlowPane p = new FlowPane();
 				Scene scene = new Scene(p, 500, 300);
-				
+
 				Label description = new Label("AsyPad allows you to draw diagrams\n and save them into Asymptote Files.");
 				description.setAlignment(Pos.CENTER);
 				description.setStyle("-fx-font: 24 arial");
 				description.setPrefSize(500, 100);
-				
+
 				Label license = new Label("GNU General Public License Information");
 				license.setAlignment(Pos.CENTER);
 				license.setStyle("-fx-font: 14 arial");
 				license.setPrefSize(500, 50);
-				
+
 				TextArea licenseInfo = new TextArea();
 				licenseInfo.setPrefSize(500, 150);
 				licenseInfo.setEditable(false);
 				licenseInfo.setText("AsyPad: A simple drawing tool that can convert diagrams into Asymptote code.\n" + 
 						"For more information visit: https://github.com/rfeng2004/AsyPad\n" + 
 						"\n" + 
-						"Copyright (C) 2018 Raymond Feng\n" + 
+						"Copyright (C) 2021 Raymond Feng\n" + 
 						"\n" + 
 						"This program is free software: you can redistribute it and/or modify\n" + 
 						"it under the terms of the GNU General Public License as published by\n" + 
@@ -265,9 +325,11 @@ public class AsyPadMenuBar extends MenuBar
 						"You should have received a copy of the GNU General Public License\n" + 
 						"along with this program.  If not, see https://www.gnu.org/licenses/.");
 				p.getChildren().addAll(description, license, licenseInfo);
-				a.setScene(scene);
-				a.setAlwaysOnTop(true);
-				a.show();
+				about.setScene(scene);
+				about.setAlwaysOnTop(true);
+				about.setTitle("About AsyPad");
+				about.setResizable(false);
+				about.show();
 			}
 		});
 
@@ -286,6 +348,7 @@ public class AsyPadMenuBar extends MenuBar
 				p.getChildren().add(creds);
 				cred.setScene(scene);
 				cred.setAlwaysOnTop(true);
+				cred.setTitle("Credits");
 				cred.show();
 			}
 		});

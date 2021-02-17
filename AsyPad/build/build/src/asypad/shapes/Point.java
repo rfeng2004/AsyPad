@@ -2,6 +2,7 @@ package asypad.shapes;
 
 import javafx.scene.layout.Pane;
 import asypad.shapes.types.POINT_TYPE;
+import asypad.ui.AsyPadPane;
 
 /**
  * Custom Point used for drawing in AsyPad.
@@ -201,7 +202,7 @@ public class Point extends Shape
 	 * @param l line
 	 * @param c circle
 	 * @param identifier which intersection point this will be
-	 * @param name
+	 * @param name name of point
 	 */
 	public Point(Line l, Circle c, boolean identifier, String name)
 	{
@@ -221,10 +222,10 @@ public class Point extends Shape
 	/**
 	 * Constructs an intersection point between circles c1 and c2. Identifier = true represents
 	 * the intersection point that is more counterclockwise wrt the first circle.
-	 * @param l line
-	 * @param c circle
+	 * @param c1 first circle
+	 * @param c2 second circle
 	 * @param identifier which intersection point this will be
-	 * @param name
+	 * @param name name of point
 	 */
 	public Point(Circle c1, Circle c2, boolean identifier, String name)
 	{
@@ -439,12 +440,25 @@ public class Point extends Shape
 	{
 		if(!inAsyCode) return "";
 		String n = getName();
-		String hex = "c"+Utility.hex(color);
-		double dir = (getLabel().getDirection()*180/Math.PI+360)%360;
+		String asyVarN = n;
+		//System.out.println(asyVarN);
+		if(asyVarN.length() == 2 && asyVarN.charAt(1) == '\'')
+		{
+			asyVarN = "" + asyVarN.charAt(0) + 'p';
+			//System.out.println(asyVarN);
+			
+			//temporarily set the point name to the asy-safe name so that the rest of the asy code generates properly
+			//this name is then immediately REVERTED in the AsyPadPane.toAsymptote()
+			setName(asyVarN);
+			refreshName();
+		}
+		String hex = "c" + Utility.hex(color);
+		double dir = (getLabel().getDirection() * 180 / Math.PI + 360) % 360;
 		if(type == POINT_TYPE.POINT)
 		{
-			String s = "pair " + n + " = (" + FORMATTER.format(x/100) + ", " + FORMATTER.format((INF-y)/100) + "); ";
-			if(!hide) s += "dot(" + n + ", " + hex + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
+			//invert the y coordinate since y goes up in Asymptote but down on java screen
+			String s = "pair " + asyVarN + " = (" + FORMATTER.format(x/100) + ", " + FORMATTER.format((AsyPadPane.CurrentHeight-y)/100) + "); ";
+			if(!hide) s += "dot(" + asyVarN + ", " + hex + "); label(\"$" + n + "$\", " + asyVarN + ", dir(" + dir + "));\n";
 			else s+="\n";
 			return s;
 		}
@@ -454,8 +468,8 @@ public class Point extends Shape
 			{
 				String l1 = dependencies.get(0).getName();
 				String l2 = dependencies.get(1).getName();
-				String s = "pair " + n + " = intersectionpoint(" + l1 + ", " + l2 + "); ";
-				if(!hide) s += "dot(" + n + ", " + hex + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
+				String s = "pair " + asyVarN + " = intersectionpoint(" + l1 + ", " + l2 + "); ";
+				if(!hide) s += "dot(" + asyVarN + ", " + hex + "); label(\"$" + n + "$\", " + asyVarN + ", dir(" + dir + "));\n";
 				else s+="\n";
 				return s;
 			}
@@ -465,8 +479,8 @@ public class Point extends Shape
 				String c = dependencies.get(1).getName();
 				int a = 1;
 				if(identifier) a = 0;
-				String s = "pair " + n + " = intersectionpoints(" + l + ", " + c + ")[" + a + "]; ";
-				if(!hide) s += "dot(" + n + ", " + hex + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
+				String s = "pair " + asyVarN + " = intersectionpoints(" + l + ", " + c + ")[" + a + "]; ";
+				if(!hide) s += "dot(" + asyVarN + ", " + hex + "); label(\"$" + n + "$\", " + asyVarN + ", dir(" + dir + "));\n";
 				else s+="\n";
 				return s;
 			}
@@ -476,8 +490,8 @@ public class Point extends Shape
 				String c2 = dependencies.get(1).getName();
 				int a = 1;
 				if(identifier) a = 0;
-				String s = "pair " + n + " = intersectionpoints(" + c1 + ", " + c2 + ")[" + a + "]; ";
-				if(!hide) s += "dot(" + n + ", " + hex + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
+				String s = "pair " + asyVarN + " = intersectionpoints(" + c1 + ", " + c2 + ")[" + a + "]; ";
+				if(!hide) s += "dot(" + asyVarN + ", " + hex + "); label(\"$" + n + "$\", " + asyVarN + ", dir(" + dir + "));\n";
 				else s+="\n";
 				return s;
 			}
@@ -487,16 +501,16 @@ public class Point extends Shape
 			if(dependencies.get(0) instanceof Line)
 			{
 				String l = dependencies.get(0).getName();
-				String s = "pair " + n + " = relpoint(" + l + ", " + relativeLocation + "); ";
-				if(!hide) s += "dot(" + n + ", " + hex + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
+				String s = "pair " + asyVarN + " = relpoint(" + l + ", " + relativeLocation + "); ";
+				if(!hide) s += "dot(" + asyVarN + ", " + hex + "); label(\"$" + n + "$\", " + asyVarN + ", dir(" + dir + "));\n";
 				else s+="\n";
 				return s;
 			}
 			else if(dependencies.get(0) instanceof Circle)
 			{
 				String c = dependencies.get(0).getName();
-				String s = "pair " + n + " = relpoint(" + c + ", " + -relativeLocation/(2*Math.PI) + "); ";
-				if(!hide) s += "dot(" + n + ", " + hex + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
+				String s = "pair " + asyVarN + " = relpoint(" + c + ", " + -relativeLocation/(2*Math.PI) + "); ";
+				if(!hide) s += "dot(" + asyVarN + ", " + hex + "); label(\"$" + n + "$\", " + asyVarN + ", dir(" + dir + "));\n";
 				else s+="\n";
 				return s;
 			}
@@ -505,8 +519,8 @@ public class Point extends Shape
 		{
 			String p1 = dependencies.get(0).getName();
 			String p2 = dependencies.get(1).getName();
-			String s = "pair " + n + " = (" + p1 + " + " + p2 + ")/2; ";
-			if(!hide) s += "dot(" + n + ", " + hex + "); label(\"$" + n + "$\", " + n + ", dir(" + dir + "));\n";
+			String s = "pair " + asyVarN + " = (" + p1 + " + " + p2 + ")/2; ";
+			if(!hide) s += "dot(" + asyVarN + ", " + hex + "); label(\"$" + n + "$\", " + asyVarN + ", dir(" + dir + "));\n";
 			else s+="\n";
 			return s;
 		}

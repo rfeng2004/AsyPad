@@ -88,9 +88,10 @@
 			<fx:fileset dir="dist" includes="libs/*"/>
 		</fx:resources>
 	
-		<fx:application id="fxApplication"
+		<fx:application id="AsyPadApp"
 			name="AsyPad"
 			mainClass="asypad.ui.AsyPad"
+			version="2.0"
 		/>
 	
 		<mkdir dir="build/classes/META-INF" />
@@ -98,7 +99,7 @@
 	
 	
 		<fx:jar destfile="dist/AsyPad.jar">
-			<fx:application name="AsyPad" mainClass="asypad.ui.AsyPad"/>
+			<fx:application refId="AsyPadApp"/>
 			<fileset dir="build/classes">
 			</fileset>
 			<fx:resources refid="appRes"/>
@@ -115,13 +116,9 @@
 			height="700" width="1000"
 			outdir="build/dist" outfile="AsyPad"
 			placeholderref="asypad" placeholderid="AsyPad"
-			nativeBundles="dmg" verbose="true">
-			<fx:application name="AsyPad" mainClass="asypad.ui.AsyPad"/>
-			<fx:resources>
-				<fx:fileset dir="dist">
-					<include name="AsyPad.jar"/>
-				</fx:fileset>
-			</fx:resources>
+			nativeBundles="image" verbose="true">
+			<fx:application refId="AsyPadApp"/>
+			<fx:resources refid="appRes"/>
 			<fx:info title="AsyPad" description="Easy to use drawing application.">
 				<fx:association extension="apad" description="AsyPad File"/>
 			</fx:info>

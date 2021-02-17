@@ -23,7 +23,7 @@ public class Tool extends MenuItem
 	 * @param bar toolbar that this is on
 	 * @param pane pane that contains the toolbar
 	 */
-	public Tool(Image image, String name, String description, SHAPE_TYPE type, Menu parent, AsyPadToolBar bar, AsyPadPane pane)
+	public Tool(Image image, String name, String description, SHAPE_TYPE type, ToolMenu parent, AsyPadToolBar bar, AsyPadPane pane)
 	{
 		super();
 		setText(name);
@@ -39,7 +39,8 @@ public class Tool extends MenuItem
 				ImageView d = new ImageView(image);
 				d.setFitHeight(30);
 				d.setFitWidth(30);
-				parent.setGraphic(d);
+				parent.setImage(d);
+				parent.setLastUsed((Tool)(event.getSource()));
 				pane.updateTool(name);
 				pane.updateToolDescription(description);
 			}

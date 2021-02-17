@@ -21,5 +21,5 @@ public enum CIRCLE_TYPE implements SHAPE_TYPE
 	/**
 	 * Circle tangent to two other circles.
 	 */
-	TANGENT_CIRCLE;
+	//TANGENT_CIRCLE;
 }

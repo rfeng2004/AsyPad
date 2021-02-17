@@ -20,27 +20,46 @@
 package asypad.ui;
 
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+
 import java.io.File;
+import java.util.Optional;
 
 /**
  * AsyPad: A simple drawing tool that can convert diagrams into Asymptote code.
  * @author Raymond Feng
- * @version 1.0
+ * @version 2.0
  */
 public class AsyPad extends Application
 {
 	/**
 	 * Version number of AsyPad.
 	 */
-	public static final String VERSION = "1.2";
+	public static final String VERSION = "2.0";
 
 	/**
 	 * Operating system the AsyPad is running on.
 	 */
 	public static final String OS = System.getProperty("os.name");
+	
+	/**
+	 * Default width of application window.
+	 */
+	public static final double DEFAULT_WIDTH = 1000;
+	
+	/**
+	 * Default height of application window.
+	 */
+	public static final double DEFAULT_HEIGHT = 700;
 
 	/**
 	 * The main component of the AsyPad Application.
@@ -72,7 +91,22 @@ public class AsyPad extends Application
 
 	public static void main(String args[])
 	{
-		launch(args);
+		if(args.length >= 2 && args[0].equals("conv"))
+		{
+			if(args.length == 2 && args[1].endsWith(".apad"))
+			{
+				AsyPadPane converter = new AsyPadPane();
+				converter.loadApad(new File(args[1]));
+				String latex = "\\begin{center}\n\\begin{asy}\n" + converter.toAsymptote() + "\n\\end{asy}\n\\end{center}";
+				System.out.println(latex);
+			}
+			else throw new AsyPadException("Incorrect arguments.");
+		}
+		else
+		{
+			launch(args);
+		}
+		System.exit(0);
 	}
 
 	public void start(Stage primaryStage)
@@ -87,8 +121,44 @@ public class AsyPad extends Application
 				rootNode.loadApad(new File(filename));
 			}
 		}
-		
-		Scene scene = new Scene(rootNode, 1000, 700);
+
+		//close confirmation
+		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>()
+		{
+			public void handle(WindowEvent event)
+			{
+				Alert alert = new Alert(AlertType.CONFIRMATION);
+				alert.setTitle("Quit AsyPad");
+				alert.setHeaderText("Are you sure you want to quit?");
+				alert.setContentText("Unsaved changes will be lost.");
+
+				Image icon = new Image("resources/AsyPad.icns");
+				ImageView iconGraphic = new ImageView(icon);
+				iconGraphic.setFitHeight(50);
+				iconGraphic.setFitWidth(50);
+
+				alert.setGraphic(iconGraphic);
+				alert.getGraphic().setOnMousePressed(new EventHandler<MouseEvent>()
+				{
+					public void handle(MouseEvent event)
+					{
+						rootNode.showAsyPanel();
+					}
+				});
+				alert.initOwner(primaryStage);
+				Optional<ButtonType> res = alert.showAndWait();
+
+				if(res.isPresent())
+				{
+					if(res.get().equals(ButtonType.CANCEL))
+					{
+						event.consume();
+					}
+				}
+			}
+		});
+
+		Scene scene = new Scene(rootNode, DEFAULT_WIDTH, DEFAULT_HEIGHT);
 		primaryStage.getIcons().add(new Image("resources/AsyPad.icns"));
 		primaryStage.setTitle("AsyPad");
 		primaryStage.setScene(scene);

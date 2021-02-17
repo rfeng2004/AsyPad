@@ -15,6 +15,14 @@ public class Utility
 	private static double EPSILON = 0.001;
 	
 	/**
+	 * This prevents any Utility objects from being created.
+	 */
+	private Utility()
+	{
+		
+	}
+	
+	/**
 	 * Calculates the distance between 2 points.
 	 * @param x1 x-coordinate of first point
 	 * @param y1 y-coordinate of first point
@@ -624,7 +632,7 @@ public class Utility
 	/**
 	 * Finds the x-coordinate of the point such that the line formed by the point and the given point
 	 * is tangent to the circle. identifier is used to find which point (true = point more counterclockwise wrt the first circle).
-	 * If it is on the circle, finds the point 1 unit away and in the positive x direction from the given point.
+	 * If it is on the circle, finds the point 1 unit away and counterclockwise from the given point.
 	 * If it is inside the circle, returns Double.POSITIVE_INFINITY.
 	 * @param x x-coordinate
 	 * @param y y-coordinate
@@ -637,17 +645,9 @@ public class Utility
 		if(equal(dist(c.getCenterX(), c.getCenterY(), x, y), c.getRadius()))
 		{
 			// translate the circle to be centered at the origin
-			double translationX = x - c.getCenterX(), translationY = - y + c.getCenterY();
+			double translationX = x - c.getCenterX(), translationY = y - c.getCenterY();
 			
-			// if it is a vertical line
-			if(translationY == 0)
-			{
-				return x;
-			}
-			 
-			double m = -translationX / translationY;
-			
-			return x + 1 / (m * m + 1);
+			return x + translationY / Math.sqrt(translationX*translationX + translationY*translationY);
 		}
 		else if(dist(c.getCenterX(), c.getCenterY(), x, y) < c.getRadius())
 		{
@@ -662,8 +662,7 @@ public class Utility
 	/**
 	 * Finds the y-coordinate of the point such that the line formed by the point and the given point
 	 * is tangent to the circle. identifier is used to find which point (true = point more counterclockwise wrt the first circle).
-	 * If it is on the circle, finds the point 1 unit away and in the positive y direction from the given point.
-	 * If it is a vertical line, returns 1 unit down.
+	 * If it is on the circle, finds the point 1 unit away and counterclockwise from the given point.
 	 * If it is inside the circle, returns Double.POSITIVE_INFINITY.
 	 * @param x x-coordinate
 	 * @param y y-coordinate
@@ -676,17 +675,9 @@ public class Utility
 		if(equal(dist(c.getCenterX(), c.getCenterY(), x, y), c.getRadius()))
 		{
 			// translate the circle to be centered at the origin
-			double translationX = x - c.getCenterX(), translationY = - y + c.getCenterY();
+			double translationX = x - c.getCenterX(), translationY = y - c.getCenterY();
 			
-			// if it is a vertical line
-			if(translationY == 0)
-			{
-				return y - 1;
-			}
-			 
-			double m = -translationX / translationY;
-			
-			return y - m / (m * m + 1);
+			return y - translationX / Math.sqrt(translationX*translationX + translationY*translationY);
 		}
 		else if(dist(c.getCenterX(), c.getCenterY(), x, y) < c.getRadius())
 		{
@@ -771,7 +762,7 @@ public class Utility
 	}
 	
 	/**
-	 * This is the equivalent of the sgn* function. Returns -1 if d < 0, 1 otherwise. (In particular, signumstar(0)=1)
+	 * This is the equivalent of the sgn* function. Returns -1 if d &lt; 0, 1 otherwise. (In particular, signumstar(0)=1)
 	 * @param d double to take sgn* of
 	 * @return sgn*(d)
 	 */
@@ -785,7 +776,7 @@ public class Utility
 	 * Whether the two doubles are equal (since rounding errors exist)
 	 * @param d1 first double
 	 * @param d2 second double
-	 * @return whether |d1-d2| < 0.0001 = epsilon
+	 * @return whether |d1-d2| &lt; 0.0001 = epsilon
 	 */
 	public static boolean equal(double d1, double d2)
 	{
